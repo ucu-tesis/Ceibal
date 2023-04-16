@@ -1,0 +1,24 @@
+/* Variables de estilo globales */
+:root {
+  --ceibal-green: #CCECEA;
+  --ceibal-green-hover: #66C6C0;
+  --ceibal-black: #111111;
+}
+
+/* Fuente de ceibal */
+@font-face {
+  font-family: ceibal-font;
+  src: url(Assets/Fonts/ceibalmozaic-regular-webfont.woff2);
+}
+
+body {
+  margin: 0;
+  font-family: ceibal-font; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
