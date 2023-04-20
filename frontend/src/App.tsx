@@ -1,7 +1,6 @@
-import React from "react";
 import MainHeader from "./Components/Headers/MainHeader";
-import RecordButton from "./Components/Buttons/RecordButton";
 import "./App.css";
+import Recorder from "./Components/Recorder";
 
 const App = () => {
   return (
@@ -9,7 +8,9 @@ const App = () => {
       <MainHeader></MainHeader>
       <hr></hr>
       <div className="App">
-        <RecordButton></RecordButton>
+        <Recorder
+          onComplete={(buffer) => console.log("Recording completed, send to backend", buffer)}
+        ></Recorder>
       </div>
     </div>
   );

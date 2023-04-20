@@ -1,9 +1,13 @@
 import React from "react";
-import "./styles.css"
+import "./styles.css";
 
-const RecordButton: React.FC = () => {
+interface RecordButtonProps {
+  onClick?: () => void;
+}
+
+const RecordButton: React.FC<RecordButtonProps> = ({ onClick }) => {
   return (
-    <button type="submit" className="record-button row">
+    <button type="submit" className="button row" onClick={onClick}>
       <div className="record-fill"></div>
       <div>Grabar</div>
     </button>
