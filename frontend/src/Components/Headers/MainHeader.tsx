@@ -1,11 +1,12 @@
 import React from "react";
-import logo from "../../Assets/Img/logo_ceibal.png";
+import logo from "../../assets/images/logo_ceibal.png";
+import Image from "next/image";
 
 const MainHeader: React.FC = () => {
   return (
     <div id="header" className="row">
       <div>
-        <img id="app-logo" src={logo} alt="" />
+        <Image id="app-logo" src={logo} alt="" />
       </div>
       <div>Inicio</div>
     </div>

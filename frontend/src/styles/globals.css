@@ -1,4 +1,22 @@
-.App {
+/* Variables de estilo globales */
+:root {
+  --ceibal-green: #ccecea;
+  --ceibal-green-hover: #66c6c0;
+  --ceibal-black: #111111;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,19 +45,3 @@ hr {
   background-color: #008078;
   height: 4px;
 }
-
-button {
-  font-family: ceibal-font; 
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-

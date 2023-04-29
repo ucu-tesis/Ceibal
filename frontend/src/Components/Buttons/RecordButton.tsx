@@ -1,5 +1,5 @@
 import React from "react";
-import "./styles.css";
+import styles from "./Button.module.css";
 
 interface RecordButtonProps {
   onClick?: () => void;
@@ -7,8 +7,8 @@ interface RecordButtonProps {
 
 const RecordButton: React.FC<RecordButtonProps> = ({ onClick }) => {
   return (
-    <button type="submit" className="button row" onClick={onClick}>
-      <div className="record-fill"></div>
+    <button type="submit" className={`${styles.button} row`} onClick={onClick}>
+      <div className={styles["record-fill"]}></div>
       <div>Grabar</div>
     </button>
   );

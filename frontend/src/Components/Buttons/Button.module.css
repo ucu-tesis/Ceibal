@@ -16,8 +16,7 @@
   background: var(--ceibal-green-hover);
 }
 
-.record-fill,
-.stop-fill {
+.record-fill {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -26,5 +25,10 @@
 }
 
 .stop-fill {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0.5px solid var(--ceibal-black);
+  background-color: red;
   border-radius: 0;
 }

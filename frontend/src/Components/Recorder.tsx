@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import RecordButton from "./Buttons/RecordButton";
-import StopButton from "./Buttons/StopButton";
+import RecordButton from "./buttons/RecordButton";
+import StopButton from "./buttons/StopButton";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer) => void;
@@ -57,11 +57,10 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
 
     if (arrayBuffer && !playing) {
       const newBufferSource = currentContext.createBufferSource();
-      currentContext.decodeAudioData(arrayBuffer, (buffer) => {
-        newBufferSource.buffer = buffer;
-        newBufferSource.connect(currentContext.destination);
-        newBufferSource.start(0);
-      });
+      const buffer = await currentContext.decodeAudioData(arrayBuffer.slice(0));
+      newBufferSource.buffer = buffer;
+      newBufferSource.connect(currentContext.destination);
+      newBufferSource.start(0);
 
       newBufferSource.onended = () => {
         setPlaying(false);
