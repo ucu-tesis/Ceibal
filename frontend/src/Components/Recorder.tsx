@@ -3,7 +3,7 @@ import RecordButton from "./buttons/RecordButton";
 import StopButton from "./buttons/StopButton";
 
 interface RecorderProps {
-  onComplete: (audioBuffer: ArrayBuffer) => void;
+  onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
 }
 
 const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
@@ -29,10 +29,11 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
       };
 
       recorder.onstop = async () => {
-        const blob = new Blob(audioChunks, { type: "audio/mpeg-3" });
+        const mimeType = recorder.mimeType.split(";")[0];
+        const blob = new Blob(audioChunks, { type: mimeType });
         const buffer = await new Response(blob).arrayBuffer();
         setArrayBuffer(buffer);
-        onComplete(buffer);
+        onComplete(buffer, mimeType);
       };
 
       recorder.start();
