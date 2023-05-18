@@ -3,25 +3,24 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background: var(--ceibal-green);
-  color: var(--ceibal-black) !important;
+  color: var(--ceibal-white);
   outline: none;
-  border: 0.5px solid var(--ceibal-black);
-  border-radius: 25px;
-  height: 49px;
-  padding: 8px 16px;
+  border: 0;
+  border-radius: 12px;
 }
 
-.button:hover {
-  background: var(--ceibal-green-hover);
+.button.big {
+  background: var(--ceibal-action-color);
+  height: 100px;
+  padding: 25px 20px;
 }
 
-.record-fill {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 0.5px solid var(--ceibal-black);
-  background-color: red;
+.button.big div:nth-child(2) {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 100%;
+  margin-top: 16px;
 }
 
 .stop-fill {
