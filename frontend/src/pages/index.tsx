@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Recorder from "@/components/Recorder";
+import TextContainer from "@/Components/Containers/TextContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,13 +16,10 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/recordings/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/recordings/upload", {
+        method: "POST",
+        body: formData,
+      });
 
       if (response.ok) {
         const fileUrl = await response.text();
@@ -54,11 +52,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Recorder
-          onComplete={(buffer, mimeType) =>
-            uploadFile(buffer, mimeType).then(() => alert("Archivo subido"))
-          }
-        ></Recorder>
+        <div className="container col">
+          <TextContainer />
+          <Recorder
+            onComplete={(buffer, mimeType) => uploadFile(buffer, mimeType).then(() => alert("Archivo subido"))}
+          ></Recorder>
+        </div>
       </main>
     </>
   );
