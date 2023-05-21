@@ -1,11 +1,17 @@
+import React, { useState } from "react";
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Recorder from "@/components/Recorder";
+import SendButton from "@/Components/Buttons/SendButton";
 import TextContainer from "@/Components/Containers/TextContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [sendActive, setSendActive] = useState(false);
+  const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
+  const [mimeType, setMimetype] = useState<string>("");
+
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
     const file = new File([arrayBuffer], `audio-file.${fileExtension}`, {
@@ -43,6 +49,19 @@ export default function Home() {
     return mimeToExtensionMap[mimeType] || "unknown";
   }
 
+  const onSend = () => {
+    if (buffer) {
+      uploadFile(buffer, mimeType).then(() => alert("Archivo subido"));
+      setSendActive(false);
+    }
+  };
+
+  const onComplete = (buffer: ArrayBuffer, mimeType: string) => {
+    setBuffer(buffer);
+    setMimetype(mimeType);
+    setSendActive(true);
+  };
+
   return (
     <>
       <Head>
@@ -54,9 +73,7 @@ export default function Home() {
       <main>
         <div className="container col">
           <TextContainer />
-          <Recorder
-            onComplete={(buffer, mimeType) => uploadFile(buffer, mimeType).then(() => alert("Archivo subido"))}
-          ></Recorder>
+          {sendActive ? <SendButton onClick={onSend} /> : <Recorder onComplete={onComplete}></Recorder>}
         </div>
       </main>
     </>

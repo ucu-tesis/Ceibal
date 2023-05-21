@@ -14,18 +14,18 @@
   padding: 25px 20px;
 }
 
+.button.big.large {
+  padding-inline: 120px;
+  gap: 16px;
+}
+
 .button.big div:nth-child(2) {
   font-style: normal;
   font-weight: 600;
-  font-size: 40px;
+  font-size: 32px;
   line-height: 100%;
 }
 
-.stop-fill {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 0.5px solid var(--ceibal-black);
-  background-color: red;
-  border-radius: 0;
+.button.big.stop-fill {
+  background-color: var(--ceibal-pink);
 }
