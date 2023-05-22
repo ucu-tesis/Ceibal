@@ -11,6 +11,7 @@ export default function Home() {
   const [sendActive, setSendActive] = useState(false);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [mimeType, setMimetype] = useState<string>("");
+  const [newRecord, setNewRecord] = useState(false);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -53,6 +54,7 @@ export default function Home() {
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => alert("Archivo subido"));
       setSendActive(false);
+      setNewRecord(true);
     }
   };
 
@@ -61,6 +63,11 @@ export default function Home() {
     setMimetype(mimeType);
     setSendActive(true);
   };
+
+  const onRecording = () => {
+    setSendActive(false);
+    setNewRecord(false);
+  }
 
   return (
     <>
@@ -73,7 +80,7 @@ export default function Home() {
       <main>
         <div className="container col">
           <TextContainer />
-          <Recorder onComplete={onComplete}></Recorder>
+          <Recorder onComplete={onComplete} newRecord={newRecord} onRecording={onRecording}></Recorder>
           {sendActive && <SendButton onClick={onSend} />}
         </div>
       </main>
