@@ -18,7 +18,7 @@ jobs:
       - name: setup node 18.16.0
         uses: actions/setup-node@v3
         with:
-          node-version: 18.16.0
+          node-version: 19.8.1
       - name: build frontend
         run: |
           cd frontend
