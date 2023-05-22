@@ -2,6 +2,7 @@
 :root {
   --ceibal-green: #005f28;
   --ceibal-green-secondary: #50af32;
+  --ceibal-green-terciary: #00A096;
   --ceibal-black: #000000;
   --ceibal-action-color: #2d2373;
   --ceibal-pink: #c80f64;
@@ -65,4 +66,9 @@ hr {
   margin: 0;
   background-color: var(--ceibal-green);
   height: 4px;
+}
+
+#recorder.row {
+  align-items: center;
+  gap: 32px;
 }

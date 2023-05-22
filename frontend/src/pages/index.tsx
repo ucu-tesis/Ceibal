@@ -73,7 +73,8 @@ export default function Home() {
       <main>
         <div className="container col">
           <TextContainer />
-          {sendActive ? <SendButton onClick={onSend} /> : <Recorder onComplete={onComplete}></Recorder>}
+          <Recorder onComplete={onComplete}></Recorder>
+          {sendActive && <SendButton onClick={onSend} />}
         </div>
       </main>
     </>

@@ -19,11 +19,30 @@
   gap: 16px;
 }
 
+.button.large {
+  padding: 12px 80px;
+  gap: 8px;
+}
+
+.button.big.no-fill, .button.no-fill {
+  background: none;  
+}
+
 .button.big div:nth-child(2) {
   font-style: normal;
   font-weight: 600;
   font-size: 32px;
   line-height: 100%;
+}
+
+.button.big.no-fill div:nth-child(2), .button.no-fill div:nth-child(2) {
+  font-size: 20px;
+  color: var(--ceibal-green-terciary);
+}
+
+.outlined {
+  border: 2px solid var(--ceibal-green-terciary);
+  border-radius: 6px;
 }
 
 .button.big.stop-fill {

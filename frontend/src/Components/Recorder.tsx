@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import RecordButton from "./buttons/RecordButton";
 import StopButton from "./buttons/StopButton";
+import PlayButton from "./Buttons/PlayButton";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
@@ -8,13 +9,10 @@ interface RecorderProps {
 
 const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
   const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [bufferSource, setBufferSource] =
-    useState<AudioBufferSourceNode | null>(null);
+  const [bufferSource, setBufferSource] = useState<AudioBufferSourceNode | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
 
   const startRecording = async () => {
@@ -76,18 +74,16 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
   };
 
   return (
-    <div>
+    <div id="recorder" className="row">
       {recording ? (
         <StopButton onClick={stopRecording} />
       ) : (
-        <RecordButton onClick={startRecording} />
+        <RecordButton onClick={startRecording} recordAgain={!!arrayBuffer} />
       )}
 
       {arrayBuffer && (
         <div>
-          <button onClick={toggleAudioPlayback}>
-            {playing ? "Pausar" : "Reproducir"}
-          </button>
+          <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
         </div>
       )}
     </div>
