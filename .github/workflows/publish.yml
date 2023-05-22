@@ -52,7 +52,7 @@ jobs:
       - name: rsync frontend (package-lock.json)
         uses: snack-dev/rsync-deployments@4.1
         with:
-          switches: -avzr --exclude node_modules/
+          switches: -avzr --exclude="node_modules/"
           path: frontend/package-lock.json
           remote_path: /var/www/frontend/
           remote_host: tesis.app
@@ -62,7 +62,7 @@ jobs:
       - name: rsync backend
         uses: snack-dev/rsync-deployments@4.1
         with:
-          switches: -avzr --exclude node_modules/ src/ test/
+          switches: -avzr --exclude="node_modules/ src/ test/"
           path: backend/
           remote_path: /var/www/backend/
           remote_host: tesis.app
