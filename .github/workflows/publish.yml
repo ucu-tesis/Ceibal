@@ -22,12 +22,12 @@ jobs:
       - name: build frontend
         run: |
           cd frontend
-          npm i
+          npm ci
           npm run build
       - name: build backend
         run: |
           cd backend
-          npm i
+          npm ci
           npm run build
       - name: rsync frontend (.next)
         uses: snack-dev/rsync-deployments@4.1
