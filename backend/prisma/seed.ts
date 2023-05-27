@@ -12,7 +12,7 @@ async function load() {
       last_name: 'Admin',
     },
   });
-  const alice = await prisma.user.upsert({
+  const testTeacher = await prisma.user.upsert({
     where: { cedula: '10000' },
     update: {},
     create: {
@@ -29,8 +29,6 @@ async function load() {
     },
     include: { GroupsOwned: true },
   });
-  console.log({ alice });
-  console.log(alice.GroupsOwned[0]);
 
   const testStudent = await prisma.student.upsert({
     where: { cedula: '50000' },
@@ -40,12 +38,32 @@ async function load() {
       first_name: 'Drago',
       last_name: 'Berto',
       EvaluationGroups: {
-        connect: { id: alice.GroupsOwned[0].id },
+        connect: { id: testTeacher.GroupsOwned[0].id },
       },
     },
     include: { EvaluationGroups: true },
   });
-  console.log({ testStudent });
+
+  const testReading = await prisma.reading.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      title: 'Test reading',
+      content:
+        'Blablabla some long text, Blablabla some long text. Blablabla some long text.',
+    },
+  });
+
+  const evaulationGroupReadingParams = {
+    reading_id: testReading.id,
+    evaluation_group_id: testStudent.EvaluationGroups[0].id,
+  };
+
+  await prisma.evaluationGroupReading.upsert({
+    where: { id: 1 }, // TODO evaulationGroupReadingParams, (after adding unique constraint)
+    update: {},
+    create: evaulationGroupReadingParams,
+  });
 }
 const main = async () => {
   try {
