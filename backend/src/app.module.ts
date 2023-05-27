@@ -10,4 +10,4 @@ import { FileUploadService } from './services/file-upload.service';
   controllers: [AppController, RecordingsController],
   providers: [AppService, FileUploadService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -47,7 +47,9 @@ export class FileUploadService implements MulterOptionsFactory {
     try {
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      return `https://${bucket}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${filename}`;
+      return `https://${bucket}.s3.${this.configService.get(
+        'AWS_REGION',
+      )}.amazonaws.com/${filename}`;
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error uploading file to S3');
