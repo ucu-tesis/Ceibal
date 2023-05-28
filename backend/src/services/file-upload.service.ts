@@ -56,7 +56,8 @@ export class FileUploadService implements MulterOptionsFactory {
       )}.amazonaws.com/${filename}`;
 
       const student = await this.prismaService.student.findFirst();
-      const evaluationGroupReading = await this.prismaService.evaluationGroupReading.findFirst();
+      const evaluationGroupReading =
+        await this.prismaService.evaluationGroupReading.findFirst();
       await this.prismaService.recording.create({
         data: {
           recording_url: url,
