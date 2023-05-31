@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int               @id @default(autoincrement())
+  cedula           String            @unique
+  first_name       String
+  last_name        String
+  password_hash    String?
+  GroupsOwned EvaluationGroup[] @relation(name: "owned")
+  GroupsCreated EvaluationGroup[] @relation(name: "created")
+}
+
+model Student {
+  id               Int               @id @default(autoincrement())
+  cedula           String            @unique
+  first_name       String
+  last_name        String
+  password_hash    String?
+  EvaluationGroups EvaluationGroup[]
+  Recording        Recording[]
+}
+
+model EvaluationGroup {
+  id                      Int                      @id @default(autoincrement())
+  name                    String
+  school_data             Json?
+  school_year             Int
+  Teacher                 User                     @relation(name: "owned", fields: [teacher_id], references: [id])
+  teacher_id              Int
+  Creator                 User                     @relation(name: "created", fields: [created_by], references: [id])
+  created_by              Int
+  Students                Student[]
+  EvaluationGroupReadings EvaluationGroupReading[]
+}
+
+model Reading {
+  id                      Int                      @id @default(autoincrement())
+  title                   String
+  content                 String
+  EvaluationGroupReadings EvaluationGroupReading[]
+}
+
+model EvaluationGroupReading {
+  id                  Int             @id @default(autoincrement())
+  Reading             Reading         @relation(fields: [reading_id], references: [id])
+  reading_id          Int
+  EvaluationGroup     EvaluationGroup @relation(fields: [evaluation_group_id], references: [id])
+  evaluation_group_id Int
+  Recording           Recording[]
+}
+
+model Recording {
+  id                          Int                    @id @default(autoincrement())
+  recording_url               String
+  evaluation                  Json?
+  EvaluationGroupReading      EvaluationGroupReading @relation(fields: [evaluation_group_reading_id], references: [id])
+  evaluation_group_reading_id Int
+  Student                     Student                @relation(fields: [student_id], references: [id])
+  student_id                  Int
+}
