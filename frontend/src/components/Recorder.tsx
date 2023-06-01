@@ -1,13 +1,26 @@
 import React, { useRef, useState, useEffect } from "react";
-import RecordButton from "./buttons/RecordButton";
-import StopButton from "./buttons/StopButton";
-import PlayButton from "./Buttons/PlayButton";
+import PlayButton from "./buttons/PlayButton";
+import PrimaryButton from "./buttons/PrimaryButton";
+import RecordIcon from "../assets/images/record_icon.svg";
+import StopIcon from "../assets/images/stop_icon.svg";
+import Image from "next/image";
+import localFont from "next/font/local";
+import SecondaryButton from "./buttons/SecondaryButton";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
   newRecord?: boolean;
   onRecording: () => void;
 }
+
+const mozaicFont = localFont({
+  src: [
+    {
+      path: "../assets/fonts/ceibalmozaic-regular-webfont.woff2",
+      style: "normal",
+    },
+  ],
+});
 
 const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording }) => {
   const [recording, setRecording] = useState(false);
@@ -17,11 +30,13 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   const [bufferSource, setBufferSource] = useState<AudioBufferSourceNode | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
 
+  const buttonRef = useRef(null);
+
   useEffect(() => {
     if (newRecord) {
       setArrayBuffer(null);
-    } 
-  }, [newRecord])
+    }
+  }, [newRecord]);
 
   const startRecording = async () => {
     try {
@@ -51,9 +66,13 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   };
 
   const stopRecording = () => {
+    const buttonElement = document.getElementById("primary-button") as HTMLElement;
     if (mediaRecorder) {
-      mediaRecorder.stop();
-      setRecording(false);
+      buttonElement.style.transform = "scale(0.75)";
+      setTimeout(() => {
+        mediaRecorder.stop();
+        setRecording(false);
+      }, 500);
     }
   };
 
@@ -84,20 +103,33 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
 
   return (
     <div id="recorder" className="row">
-      <PrimaryButton variant={(recording ? "pink" : "") as keyof Object}>
-        {recording ? "Parar" : "Grabar"}
-      </PrimaryButton>
-
-      {recording ? (
-        <StopButton onClick={stopRecording} />
-      ) : (
-        <RecordButton onClick={startRecording} recordAgain={!!arrayBuffer} />
-      )}
-
-      {arrayBuffer && !recording && (
-        <div>
+      {arrayBuffer && !recording ? (
+        <>
+          <SecondaryButton onClick={startRecording}/>
           <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
-        </div>
+        </>
+      ) : (
+        <PrimaryButton
+          id="primary-button"
+          onClick={recording ? stopRecording : startRecording}
+          variant={(recording ? "pink" : "") as keyof Object}
+        >
+          {recording ? (
+            <>
+              <div>
+                <Image src={StopIcon} alt=""></Image>
+              </div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Parar</div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Image src={RecordIcon} alt=""></Image>
+              </div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar</div>
+            </>
+          )}
+        </PrimaryButton>
       )}
     </div>
   );
