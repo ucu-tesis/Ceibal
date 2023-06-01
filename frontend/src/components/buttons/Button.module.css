@@ -3,32 +3,48 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background: var(--ceibal-green);
-  color: var(--ceibal-black) !important;
+  color: var(--ceibal-white);
   outline: none;
-  border: 0.5px solid var(--ceibal-black);
-  border-radius: 25px;
-  height: 49px;
-  padding: 8px 16px;
+  border: 0;
+  border-radius: 12px;
 }
 
-.button:hover {
-  background: var(--ceibal-green-hover);
+.button.big {
+  background: var(--ceibal-action-color);
+  padding: 25px 20px;
 }
 
-.record-fill {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 0.5px solid var(--ceibal-black);
-  background-color: red;
+.button.big.large {
+  padding-inline: 120px;
+  gap: 16px;
 }
 
-.stop-fill {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 0.5px solid var(--ceibal-black);
-  background-color: red;
-  border-radius: 0;
+.button.large {
+  padding: 12px 80px;
+  gap: 8px;
+}
+
+.button.big.no-fill, .button.no-fill {
+  background: none;  
+}
+
+.button.big div:nth-child(2) {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 100%;
+}
+
+.button.big.no-fill div:nth-child(2), .button.no-fill div:nth-child(2) {
+  font-size: 20px;
+  color: var(--ceibal-green-terciary);
+}
+
+.outlined {
+  border: 2px solid var(--ceibal-green-terciary);
+  border-radius: 6px;
+}
+
+.button.big.stop-fill {
+  background-color: var(--ceibal-pink);
 }
