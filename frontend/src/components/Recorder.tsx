@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import RecordButton from "./buttons/RecordButton";
 import StopButton from "./buttons/StopButton";
-import PlayButton from "./Buttons/PlayButton";
+import PlayButton from "./buttons/PlayButton";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;

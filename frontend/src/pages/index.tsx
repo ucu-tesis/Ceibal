@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Recorder from "@/components/Recorder";
-import SendButton from "@/Components/Buttons/SendButton";
-import TextContainer from "@/Components/Containers/TextContainer";
+import SendButton from "@/components/buttons/SendButton";
+import TextContainer from "@/components/containers/TextContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
