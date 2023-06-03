@@ -1,10 +1,18 @@
+import React, { useState } from "react";
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Recorder from "@/components/Recorder";
+import SendButton from "@/Components/Buttons/SendButton";
+import TextContainer from "@/Components/Containers/TextContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [sendActive, setSendActive] = useState(false);
+  const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
+  const [mimeType, setMimetype] = useState<string>("");
+  const [newRecord, setNewRecord] = useState(false);
+
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
     const file = new File([arrayBuffer], `audio-file.${fileExtension}`, {
@@ -15,13 +23,10 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/recordings/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/recordings/upload", {
+        method: "POST",
+        body: formData,
+      });
 
       if (response.ok) {
         const fileUrl = await response.text();
@@ -45,6 +50,25 @@ export default function Home() {
     return mimeToExtensionMap[mimeType] || "unknown";
   }
 
+  const onSend = () => {
+    if (buffer) {
+      uploadFile(buffer, mimeType).then(() => alert("Archivo subido"));
+      setSendActive(false);
+      setNewRecord(true);
+    }
+  };
+
+  const onComplete = (buffer: ArrayBuffer, mimeType: string) => {
+    setBuffer(buffer);
+    setMimetype(mimeType);
+    setSendActive(true);
+  };
+
+  const onRecording = () => {
+    setSendActive(false);
+    setNewRecord(false);
+  }
+
   return (
     <>
       <Head>
@@ -54,11 +78,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Recorder
-          onComplete={(buffer, mimeType) =>
-            uploadFile(buffer, mimeType).then(() => alert("Archivo subido"))
-          }
-        ></Recorder>
+        <div className="container col">
+          <TextContainer />
+          <Recorder onComplete={onComplete} newRecord={newRecord} onRecording={onRecording}></Recorder>
+          {sendActive && <SendButton onClick={onSend} />}
+        </div>
       </main>
     </>
   );

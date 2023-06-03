@@ -8,7 +8,9 @@ const MainHeader: React.FC = () => {
       <div>
         <Image id="app-logo" src={logo} alt="" />
       </div>
-      <div>Inicio</div>
+      <div>
+        <a>Salir</a>
+      </div>
     </div>
   );
 };

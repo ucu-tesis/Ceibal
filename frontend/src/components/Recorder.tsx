@@ -1,24 +1,31 @@
-import React, { useRef, useState } from "react";
-import StopButton from "./buttons/StopButton";
+import React, { useRef, useState, useEffect } from "react";
 import RecordButton from "./buttons/RecordButton";
+import StopButton from "./buttons/StopButton";
+import PlayButton from "./Buttons/PlayButton";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
+  newRecord?: boolean;
+  onRecording: () => void;
 }
 
-const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
+const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording }) => {
   const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [bufferSource, setBufferSource] =
-    useState<AudioBufferSourceNode | null>(null);
+  const [bufferSource, setBufferSource] = useState<AudioBufferSourceNode | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    if (newRecord) {
+      setArrayBuffer(null);
+    } 
+  }, [newRecord])
 
   const startRecording = async () => {
     try {
+      onRecording();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
@@ -76,18 +83,16 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete }) => {
   };
 
   return (
-    <div>
+    <div id="recorder" className="row">
       {recording ? (
         <StopButton onClick={stopRecording} />
       ) : (
-        <RecordButton onClick={startRecording} />
+        <RecordButton onClick={startRecording} recordAgain={!!arrayBuffer} />
       )}
 
-      {arrayBuffer && (
+      {arrayBuffer && !recording && (
         <div>
-          <button onClick={toggleAudioPlayback}>
-            {playing ? "Pausar" : "Reproducir"}
-          </button>
+          <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
         </div>
       )}
     </div>

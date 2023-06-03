@@ -1,8 +1,13 @@
 /* Variables de estilo globales */
 :root {
-  --ceibal-green: #ccecea;
-  --ceibal-green-hover: #66c6c0;
-  --ceibal-black: #111111;
+  --ceibal-green: #005f28;
+  --ceibal-green-secondary: #50af32;
+  --ceibal-green-terciary: #00A096;
+  --ceibal-black: #000000;
+  --ceibal-action-color: #2d2373;
+  --ceibal-pink: #c80f64;
+  --ceibal-white: #ffffff;
+  --ceibal-grey: #ecebeb;
 }
 
 body {
@@ -12,27 +17,43 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Temporal, para darle relleno al espacio entre el boton de grabar y el header */
-  height: 250px;
 }
 
 #header {
-  margin-inline: 100px;
+  margin-inline: 20px;
+  margin-right: 50px;
+  justify-content: space-between;
   align-items: center;
-  gap: 32px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 100%;
+}
+
+#header a {
+  cursor: pointer;
 }
 
 .row {
   display: flex;
   flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+main > .container {
+  margin: 72px;
+  gap: 64px;
 }
 
 #app-logo {
@@ -42,6 +63,12 @@ code {
 }
 
 hr {
-  background-color: #008078;
+  margin: 0;
+  background-color: var(--ceibal-green);
   height: 4px;
+}
+
+#recorder.row {
+  align-items: center;
+  gap: 32px;
 }
