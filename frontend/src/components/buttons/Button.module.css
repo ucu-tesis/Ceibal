@@ -8,6 +8,7 @@
   border: 0;
   border-radius: 12px;
   transition: background-color 0.5s, transform 0.5s;
+  animation: appear 0.5s ease-in-out 1s;
 }
 
 .button.big {
@@ -49,3 +50,4 @@
 .button.big.stop-fill {
   background-color: var(--ceibal-pink);
 }
+

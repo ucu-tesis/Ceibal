@@ -11,6 +11,7 @@ interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
   newRecord?: boolean;
   onRecording: () => void;
+  componentRef: React.LegacyRef<HTMLDivElement> | undefined;
 }
 
 const mozaicFont = localFont({
@@ -22,15 +23,13 @@ const mozaicFont = localFont({
   ],
 });
 
-const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording }) => {
+const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording, componentRef }) => {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
   const [bufferSource, setBufferSource] = useState<AudioBufferSourceNode | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
-
-  const buttonRef = useRef(null);
 
   useEffect(() => {
     if (newRecord) {
@@ -102,10 +101,10 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   };
 
   return (
-    <div id="recorder" className="row">
+    <div ref={componentRef} id="recorder" className="row">
       {arrayBuffer && !recording ? (
         <>
-          <SecondaryButton onClick={startRecording}/>
+          <SecondaryButton onClick={startRecording} />
           <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
         </>
       ) : (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import Recorder from "@/components/Recorder";
@@ -12,6 +12,9 @@ export default function Home() {
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [mimeType, setMimetype] = useState<string>("");
   const [newRecord, setNewRecord] = useState(false);
+
+  const ref = useRef(null);
+  const divRef = useRef<HTMLDivElement | null>(null);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -52,9 +55,24 @@ export default function Home() {
 
   const onSend = () => {
     if (buffer) {
-      uploadFile(buffer, mimeType).then(() => alert("Archivo subido"));
-      setSendActive(false);
-      setNewRecord(true);
+      uploadFile(buffer, mimeType).then(() => {
+        alert("Archivo subido");
+      });
+      const recorder = divRef.current;
+      if (recorder) {
+        recorder.style.animation = "vanish 0.6s ease-in-out";
+      }
+      if (ref.current) {
+        const sendButton = ref.current as HTMLElement;
+        sendButton.style.animation = "vanish 0.6s ease-in-out";
+      }
+      setTimeout(() => {
+        setSendActive(false);
+        setNewRecord(true);
+        if (recorder) {
+          recorder.style.animation = "appear 0.6s ease-in-out";
+        }
+      }, 500);
     }
   };
 
@@ -67,7 +85,7 @@ export default function Home() {
   const onRecording = () => {
     setSendActive(false);
     setNewRecord(false);
-  }
+  };
 
   return (
     <>
@@ -80,8 +98,13 @@ export default function Home() {
       <main>
         <div className="container col">
           <TextContainer />
-          <Recorder onComplete={onComplete} newRecord={newRecord} onRecording={onRecording}></Recorder>
-          {sendActive && <SendButton onClick={onSend} />}
+          <Recorder
+            componentRef={divRef}
+            onComplete={onComplete}
+            newRecord={newRecord}
+            onRecording={onRecording}
+          ></Recorder>
+          {sendActive && <SendButton componentRef={ref} onClick={onSend} />}
         </div>
       </main>
     </>

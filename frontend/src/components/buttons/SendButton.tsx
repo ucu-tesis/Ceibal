@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 
 interface SendButtonProps {
   onClick?: () => void;
+  componentRef: React.LegacyRef<HTMLButtonElement> | undefined;
 }
 
 const mozaicFont = localFont({
@@ -17,9 +18,9 @@ const mozaicFont = localFont({
   ],
 });
 
-const SendButton: React.FC<SendButtonProps> = ({ onClick }) => {
+const SendButton: React.FC<SendButtonProps> = ({ onClick, componentRef: ref}) => {
   return (
-    <button type="submit" className={`${styles.button} ${styles.big} ${styles.large} row`} onClick={onClick}>
+    <button ref={ref} type="submit" className={`${styles.button} ${styles.big} ${styles.large} row`} onClick={onClick}>
       <div>
         <Image src={SendIcon} alt=""></Image>
       </div>
