@@ -1,11 +1,24 @@
 import React, { useState, useRef } from "react";
 import Head from "next/head";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import Recorder from "@/components/Recorder";
 import SendButton from "@/Components/Buttons/SendButton";
+import Image from "next/image";
 import TextContainer from "@/Components/Containers/TextContainer";
+import PrimaryButton from "@/components/buttons/PrimaryButton";
+import SendIcon from "../assets/images/send_icon.svg";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const mozaicFont = localFont({
+  src: [
+    {
+      path: "../assets/fonts/ceibalmozaic-regular-webfont.woff2",
+      style: "normal",
+    },
+  ],
+});
 
 export default function Home() {
   const [sendActive, setSendActive] = useState(false);
@@ -104,7 +117,14 @@ export default function Home() {
             newRecord={newRecord}
             onRecording={onRecording}
           ></Recorder>
-          {sendActive && <SendButton componentRef={ref} onClick={onSend} />}
+          {sendActive && (
+            <PrimaryButton buttonRef={ref} onClick={onSend} variant={"large" as keyof Object}>
+              <div>
+                <Image src={SendIcon} alt=""></Image>
+              </div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Enviar</div>
+            </PrimaryButton>
+          )}
         </div>
       </main>
     </>

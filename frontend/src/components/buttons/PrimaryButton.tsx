@@ -6,16 +6,19 @@ interface PrimaryButtonProps {
   onClick?: () => void;
   variant: keyof Object;
   children: string | JSX.Element | JSX.Element[];
+  buttonRef: React.LegacyRef<HTMLButtonElement> | undefined
 }
 
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ id, onClick, variant, children }) => {
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ id, onClick, variant, children, buttonRef }) => {
   const classVariants = {
     pink: styles["stop-fill"],
+    large: styles.large
   };
 
   return (
     <button
       id={id}
+      ref={buttonRef}
       type="submit"
       className={`${styles.button} ${styles.big} ${classVariants[variant] ?? ""} row`}
       onClick={onClick}

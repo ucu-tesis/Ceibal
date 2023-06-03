@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
-import PlayButton from "./buttons/PlayButton";
 import PrimaryButton from "./buttons/PrimaryButton";
 import RecordIcon from "../assets/images/record_icon.svg";
 import StopIcon from "../assets/images/stop_icon.svg";
 import Image from "next/image";
 import localFont from "next/font/local";
 import SecondaryButton from "./buttons/SecondaryButton";
+import RecordAgainIcon from "../assets/images/record_again_icon.svg";
+import PlayIcon from "../assets/images/play_icon.svg";
+import PauseIcon from "../assets/images/pause_icon.svg";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
@@ -104,8 +106,18 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
     <div ref={componentRef} id="recorder" className="row">
       {arrayBuffer && !recording ? (
         <>
-          <SecondaryButton onClick={startRecording} />
-          <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
+          <SecondaryButton onClick={startRecording} variant={"" as keyof Object}>
+            <div>
+              <Image src={RecordAgainIcon} alt=""></Image>
+            </div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar otra vez</div>
+          </SecondaryButton>
+          <SecondaryButton onClick={toggleAudioPlayback} variant={"outlined" as keyof Object}>
+            <div>
+              <Image src={playing ? PauseIcon : PlayIcon} alt=""></Image>
+            </div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>{playing ? "Parar" : "Reproducir"}</div>
+          </SecondaryButton>
         </>
       ) : (
         <PrimaryButton
