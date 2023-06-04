@@ -106,7 +106,7 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
     <div ref={componentRef} id="recorder" className="row">
       {arrayBuffer && !recording ? (
         <>
-          <SecondaryButton onClick={startRecording} variant={"" as keyof Object}>
+          <SecondaryButton onClick={startRecording} variant={"noFill" as keyof Object}>
             <div>
               <Image src={RecordAgainIcon} alt=""></Image>
             </div>

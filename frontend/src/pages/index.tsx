@@ -5,8 +5,11 @@ import localFont from "next/font/local";
 import Recorder from "@/components/Recorder";
 import Image from "next/image";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
+import SecondaryButton from "@/components/buttons/SecondaryButton";
 import SendIcon from "../assets/images/send_icon.svg";
 import TextContainer from "@/components/containers/TextContainer";
+import Spinner from "@/components/spinners/Spinner";
+import ModalDialog from "@/components/modals/ModalDialog";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +27,9 @@ export default function Home() {
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [mimeType, setMimetype] = useState<string>("");
   const [newRecord, setNewRecord] = useState(false);
+
+  const [sending, setSending] = useState(false);
+  const [openModal, setOpen] = useState(false);
 
   const ref = useRef(null);
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -68,7 +74,13 @@ export default function Home() {
   const onSend = () => {
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => {
-        alert("Archivo subido");
+        setSending(false);
+        setOpen(true);
+        setSendActive(false);
+        setNewRecord(true);
+        if (recorder) {
+          recorder.style.animation = "appear 0.6s ease-in-out";
+        }
       });
       const recorder = divRef.current;
       if (recorder) {
@@ -79,11 +91,7 @@ export default function Home() {
         sendButton.style.animation = "vanish 0.6s ease-in-out";
       }
       setTimeout(() => {
-        setSendActive(false);
-        setNewRecord(true);
-        if (recorder) {
-          recorder.style.animation = "appear 0.6s ease-in-out";
-        }
+        setSending(true);
       }, 500);
     }
   };
@@ -99,6 +107,10 @@ export default function Home() {
     setNewRecord(false);
   };
 
+  const closeModal = () => {
+    setOpen(false);
+  };
+
   return (
     <>
       <Head>
@@ -109,20 +121,36 @@ export default function Home() {
       </Head>
       <main>
         <div className="container col">
+          {openModal && (
+            <ModalDialog title="¡Genial!">
+              <span>
+                Tu lectura se ha enviado correctamente. ¡Felicidades! Ahora puedes continuar explorando y aprendiendo.
+              </span>
+              <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
+                Continuar
+              </SecondaryButton>
+            </ModalDialog>
+          )}
           <TextContainer />
-          <Recorder
-            componentRef={divRef}
-            onComplete={onComplete}
-            newRecord={newRecord}
-            onRecording={onRecording}
-          ></Recorder>
-          {sendActive && (
-            <PrimaryButton buttonRef={ref} onClick={onSend} variant={"large" as keyof Object}>
-              <div>
-                <Image src={SendIcon} alt=""></Image>
-              </div>
-              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Enviar</div>
-            </PrimaryButton>
+          {!sending ? (
+            <>
+              <Recorder
+                componentRef={divRef}
+                onComplete={onComplete}
+                newRecord={newRecord}
+                onRecording={onRecording}
+              ></Recorder>
+              {sendActive && (
+                <PrimaryButton buttonRef={ref} onClick={onSend} variant={"large" as keyof Object}>
+                  <div>
+                    <Image src={SendIcon} alt=""></Image>
+                  </div>
+                  <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Enviar</div>
+                </PrimaryButton>
+              )}
+            </>
+          ) : (
+            <Spinner />
           )}
         </div>
       </main>

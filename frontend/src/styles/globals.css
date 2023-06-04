@@ -4,10 +4,13 @@
   --ceibal-green-secondary: #50af32;
   --ceibal-green-terciary: #00A096;
   --ceibal-black: #000000;
+  --ceibal-black-secondary: #2D3748;
   --ceibal-action-color: #2d2373;
+  --ceibal-sky-blue: #00A0E1;
   --ceibal-pink: #c80f64;
   --ceibal-white: #ffffff;
   --ceibal-grey: #ecebeb;
+  --ceibal-overlay: rgba(0, 0, 0, 0.4);
 }
 
 body {

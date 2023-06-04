@@ -10,13 +10,15 @@ interface SecondaryButtonProps {
 
 const SecondaryButton: React.FC<SecondaryButtonProps> = ({ onClick, variant, children }) => {
   const classVariants = {
-    outlined: `${styles.large} ${styles.outlined}`,
+    blueFill: styles["blue-fill"],
+    noFill: styles["no-fill"],
+    outlined: `${styles["no-fill"]} ${styles.outlined}`,
   };
 
   return (
     <button
       type="submit"
-      className={`${styles.button} ${styles.big} ${styles["no-fill"]} ${classVariants[variant] ?? ""} row`}
+      className={`${styles.button} ${styles.large} ${classVariants[variant] ?? ""} row`}
       onClick={onClick}
     >
      {children}

@@ -23,11 +23,13 @@
 
 .button.large {
   padding: 12px 80px;
+  font-size: 20px;
   gap: 8px;
 }
 
-.button.big.no-fill, .button.no-fill {
-  background: none;  
+.button.big.no-fill,
+.button.no-fill {
+  background: none;
 }
 
 .button.big div:nth-child(2) {
@@ -37,8 +39,7 @@
   line-height: 100%;
 }
 
-.button.big.no-fill div:nth-child(2), .button.no-fill div:nth-child(2) {
-  font-size: 20px;
+.button.no-fill div:nth-child(2) {
   color: var(--ceibal-green-terciary);
 }
 
@@ -51,3 +52,6 @@
   background-color: var(--ceibal-pink);
 }
 
+.button.large.blue-fill {
+  background-color: var(--ceibal-sky-blue);
+}
