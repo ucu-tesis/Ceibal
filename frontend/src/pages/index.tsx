@@ -3,11 +3,10 @@ import Head from "next/head";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Recorder from "@/components/Recorder";
-import SendButton from "@/Components/Buttons/SendButton";
 import Image from "next/image";
-import TextContainer from "@/Components/Containers/TextContainer";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import SendIcon from "../assets/images/send_icon.svg";
+import TextContainer from "@/components/containers/TextContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
