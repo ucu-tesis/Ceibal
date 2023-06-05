@@ -55,3 +55,7 @@
 .button.large.blue-fill {
   background-color: var(--ceibal-sky-blue);
 }
+
+.button.large.red-fill {
+  background-color: var(--ceibal-red);
+}

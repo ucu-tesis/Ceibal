@@ -11,6 +11,7 @@ interface SecondaryButtonProps {
 const SecondaryButton: React.FC<SecondaryButtonProps> = ({ onClick, variant, children }) => {
   const classVariants = {
     blueFill: styles["blue-fill"],
+    redFill: styles["red-fill"],
     noFill: styles["no-fill"],
     outlined: `${styles["no-fill"]} ${styles.outlined}`,
   };

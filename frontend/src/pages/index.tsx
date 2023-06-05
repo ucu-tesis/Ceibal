@@ -29,10 +29,13 @@ export default function Home() {
   const [newRecord, setNewRecord] = useState(false);
 
   const [sending, setSending] = useState(false);
+  const [errorModal, setErrorModal] = useState(false);
   const [openModal, setOpen] = useState(false);
 
   const ref = useRef(null);
   const divRef = useRef<HTMLDivElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const errorModalRef = useRef<HTMLDivElement | null>(null);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -52,11 +55,14 @@ export default function Home() {
       if (response.ok) {
         const fileUrl = await response.text();
         console.log("File uploaded successfully:", fileUrl);
+        setOpen(true);
       } else {
         console.error("Error uploading file:", response.status);
+        setErrorModal(true);
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+      setErrorModal(true);
     }
   }
 
@@ -75,7 +81,6 @@ export default function Home() {
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => {
         setSending(false);
-        setOpen(true);
         setSendActive(false);
         setNewRecord(true);
         if (recorder) {
@@ -108,7 +113,23 @@ export default function Home() {
   };
 
   const closeModal = () => {
-    setOpen(false);
+    const modal = modalRef.current;
+    if (modal) {
+      modal.style.transform = "scale(0.5)";
+    }
+    setTimeout(() => {
+      setOpen(false);
+    }, 300);
+  };
+
+  const closeErrorModal = () => {
+    const modal = errorModalRef.current;
+    if (modal) {
+      modal.style.transform = "scale(0.5)";
+    }
+    setTimeout(() => {
+      setErrorModal(false);
+    }, 300);
   };
 
   return (
@@ -122,12 +143,22 @@ export default function Home() {
       <main>
         <div className="container col">
           {openModal && (
-            <ModalDialog title="¡Genial!">
+            <ModalDialog componentRef={modalRef} title="¡Genial!">
               <span>
                 Tu lectura se ha enviado correctamente. ¡Felicidades! Ahora puedes continuar explorando y aprendiendo.
               </span>
               <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
                 Continuar
+              </SecondaryButton>
+            </ModalDialog>
+          )}
+          {errorModal && (
+            <ModalDialog componentRef={errorModalRef} title="Ups">
+              <span>
+                Lo sentimos, tu lectura no se ha podido enviar. Inténtalo de nuevo más tarde o pide ayuda a un adulto.
+              </span>
+              <SecondaryButton onClick={closeErrorModal} variant={"redFill" as keyof Object}>
+                Cerrar
               </SecondaryButton>
             </ModalDialog>
           )}
