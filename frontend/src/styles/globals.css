@@ -4,10 +4,14 @@
   --ceibal-green-secondary: #50af32;
   --ceibal-green-terciary: #00A096;
   --ceibal-black: #000000;
+  --ceibal-black-secondary: #2D3748;
   --ceibal-action-color: #2d2373;
+  --ceibal-sky-blue: #00A0E1;
   --ceibal-pink: #c80f64;
+  --ceibal-red: #BE0A0A;
   --ceibal-white: #ffffff;
   --ceibal-grey: #ecebeb;
+  --ceibal-overlay: rgba(0, 0, 0, 0.4);
 }
 
 body {
@@ -71,4 +75,22 @@ hr {
 #recorder.row {
   align-items: center;
   gap: 32px;
+}
+
+@keyframes vanish {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
 }

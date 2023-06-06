@@ -1,15 +1,31 @@
 import React, { useRef, useState, useEffect } from "react";
-import RecordButton from "./buttons/RecordButton";
-import StopButton from "./buttons/StopButton";
-import PlayButton from "./buttons/PlayButton";
+import PrimaryButton from "./buttons/PrimaryButton";
+import RecordIcon from "../assets/images/record_icon.svg";
+import StopIcon from "../assets/images/stop_icon.svg";
+import Image from "next/image";
+import localFont from "next/font/local";
+import SecondaryButton from "./buttons/SecondaryButton";
+import RecordAgainIcon from "../assets/images/record_again_icon.svg";
+import PlayIcon from "../assets/images/play_icon.svg";
+import PauseIcon from "../assets/images/pause_icon.svg";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
   newRecord?: boolean;
   onRecording: () => void;
+  componentRef: React.LegacyRef<HTMLDivElement> | undefined;
 }
 
-const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording }) => {
+const mozaicFont = localFont({
+  src: [
+    {
+      path: "../assets/fonts/ceibalmozaic-regular-webfont.woff2",
+      style: "normal",
+    },
+  ],
+});
+
+const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording, componentRef }) => {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
@@ -20,8 +36,8 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   useEffect(() => {
     if (newRecord) {
       setArrayBuffer(null);
-    } 
-  }, [newRecord])
+    }
+  }, [newRecord]);
 
   const startRecording = async () => {
     try {
@@ -51,9 +67,13 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   };
 
   const stopRecording = () => {
+    const buttonElement = document.getElementById("primary-button") as HTMLElement;
     if (mediaRecorder) {
-      mediaRecorder.stop();
-      setRecording(false);
+      buttonElement.style.transform = "scale(0.75)";
+      setTimeout(() => {
+        mediaRecorder.stop();
+        setRecording(false);
+      }, 500);
     }
   };
 
@@ -83,17 +103,44 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording 
   };
 
   return (
-    <div id="recorder" className="row">
-      {recording ? (
-        <StopButton onClick={stopRecording} />
+    <div ref={componentRef} id="recorder" className="row">
+      {arrayBuffer && !recording ? (
+        <>
+          <SecondaryButton onClick={startRecording} variant={"noFill" as keyof Object}>
+            <div>
+              <Image src={RecordAgainIcon} alt=""></Image>
+            </div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar otra vez</div>
+          </SecondaryButton>
+          <SecondaryButton onClick={toggleAudioPlayback} variant={"outlined" as keyof Object}>
+            <div>
+              <Image src={playing ? PauseIcon : PlayIcon} alt=""></Image>
+            </div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>{playing ? "Parar" : "Reproducir"}</div>
+          </SecondaryButton>
+        </>
       ) : (
-        <RecordButton onClick={startRecording} recordAgain={!!arrayBuffer} />
-      )}
-
-      {arrayBuffer && !recording && (
-        <div>
-          <PlayButton onClick={toggleAudioPlayback} playing={playing}></PlayButton>
-        </div>
+        <PrimaryButton
+          id="primary-button"
+          onClick={recording ? stopRecording : startRecording}
+          variant={(recording ? "pink" : "") as keyof Object}
+        >
+          {recording ? (
+            <>
+              <div>
+                <Image src={StopIcon} alt=""></Image>
+              </div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Parar</div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Image src={RecordIcon} alt=""></Image>
+              </div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar</div>
+            </>
+          )}
+        </PrimaryButton>
       )}
     </div>
   );
