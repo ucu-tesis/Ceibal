@@ -6,7 +6,7 @@ interface PrimaryButtonProps {
   onClick?: () => void;
   variant: keyof Object;
   children: string | JSX.Element | JSX.Element[];
-  buttonRef: React.LegacyRef<HTMLButtonElement> | undefined
+  buttonRef?: React.LegacyRef<HTMLButtonElement> | undefined;
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({ id, onClick, variant, children, buttonRef }) => {

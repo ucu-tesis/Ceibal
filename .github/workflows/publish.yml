@@ -88,4 +88,5 @@ jobs:
           script: |
             cd /var/www/backend
             npm i --production
+            npx prisma migrate deploy
             pm2 restart "backend"
