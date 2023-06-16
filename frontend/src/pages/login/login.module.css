@@ -1,0 +1,19 @@
+.login-layout {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.login-layout div:first-child {
+    height: 100%;
+    width: 20%;
+}
+
+.login-layout div:last-child {
+    height: 100%;
+    width: 80%;
+    background-image: url(../../assets/images/login_img.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right;
+}
