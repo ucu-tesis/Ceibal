@@ -1,0 +1,10 @@
+Copyright 2022-2050 Alpha Cephei Inc
+
+Small Spanish model for Vosk
+
+WER
+
+%WER 18.51 [ 28200 / 152364, 3732 ins, 5395 del, 19073 sub ] exp/chain_a/tdnn/decode_test_cv_look_fast/wer_10_0.0
+LOG (nnet3-latgen-faster-lookahead[5.5.916~6-7f57e]:main():nnet3-latgen-faster-lookahead.cc:215) Time taken 797.251s: real-time factor assuming 100 frames/sec is 0.0845848
+%WER 20.39 [ 2939 / 14416, 495 ins, 745 del, 1699 sub ] exp/chain_a/tdnn/decode_test_mtedx_look_fast/wer_8_0.0
+LOG (nnet3-latgen-faster-lookahead[5.5.916~6-7f57e]:main():nnet3-latgen-faster-lookahead.cc:215) Time taken 34.4051s: real-time factor assuming 100 frames/sec is 0.0877592

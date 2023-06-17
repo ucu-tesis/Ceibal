@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+  audiolib:
+    platform: linux/amd64
+    build:
+      context: ./
+      dockerfile: audiolib/Dockerfile
+    volumes:
+      - $PWD/audiolib:/app/audiolib
+      - $PWD/.torchcache:/root/.cache/torch
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+  db:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: ceibal_development, ceibal_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+  api:
+    build:
+      context: ./
+      dockerfile: backend/Dockerfile
+    volumes:
+      - $PWD/backend:/app/backend
+      - /app/backend/node_modules
+    expose:
+      - ${BACKEND_PORT}
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    environment:
+      - "SEED_DATABASE=${SEED_DATABASE}"
+      - "DATABASE_URL=postgresql://postgres:password@db:5432/ceibal_development?schema=public"
+    depends_on:
+      - db
+

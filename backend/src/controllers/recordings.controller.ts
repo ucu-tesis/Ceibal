@@ -14,7 +14,9 @@ export class RecordingsController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async upload(@UploadedFile() file: File): Promise<string> {
+  async upload(
+    @UploadedFile() file: File,
+  ): Promise<{ path: string; data: any }> {
     return this.fileUploadService.uploadFileToS3(file);
   }
 }

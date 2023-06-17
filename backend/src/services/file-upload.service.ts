@@ -7,6 +7,7 @@ import {
 } from '@nestjs/platform-express';
 import { diskStorage, File } from 'multer';
 import { PrismaService } from 'src/prisma.service';
+import axios from 'axios';
 
 @Injectable()
 export class FileUploadService implements MulterOptionsFactory {
@@ -38,7 +39,7 @@ export class FileUploadService implements MulterOptionsFactory {
     };
   }
 
-  async uploadFileToS3(file: File): Promise<string> {
+  async uploadFileToS3(file: File): Promise<{ path: string; data: any }> {
     const bucket = this.configService.get('AWS_BUCKET');
     const filename = `${Date.now()}-${file.originalname}`;
     const params = {
@@ -51,7 +52,7 @@ export class FileUploadService implements MulterOptionsFactory {
     try {
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      const url = `https://${bucket}.s3.${this.configService.get(
+      const path = `https://${bucket}.s3.${this.configService.get(
         'AWS_REGION',
       )}.amazonaws.com/${filename}`;
 
@@ -60,15 +61,42 @@ export class FileUploadService implements MulterOptionsFactory {
         await this.prismaService.evaluationGroupReading.findFirst();
       await this.prismaService.recording.create({
         data: {
-          recording_url: url,
+          recording_url: path,
           student_id: student.id,
           evaluation_group_reading_id: evaluationGroupReading.id,
         },
       });
 
-      return url;
+      const formData = new FormData();
+      formData.append('text', 'some text'); // TODO set proper text
+      console.log('--------------------');
+      console.log(file);
+      console.log(file.originalname);
+      console.log(filename);
+      formData.append('file', new Blob([file.buffer]), file.originalname);
+
+      // console.log(new Blob([file.buffer]).toString());
+
+      // TODO add typing to `data`
+      // TODO use env var
+      const { data } = await axios.post(
+        'http://audiolib:8000/process_audio',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      return {
+        path,
+        data,
+      };
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      console.log(error?.response?.data?.detail);
+      // TODO log axios error properly
       throw new BadRequestException('Error uploading file to S3');
     }
   }

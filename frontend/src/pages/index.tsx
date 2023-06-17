@@ -53,8 +53,8 @@ export default function Home() {
       });
 
       if (response.ok) {
-        const fileUrl = await response.text();
-        console.log("File uploaded successfully:", fileUrl);
+        const processingData = await response.json();
+        console.log("File uploaded successfully:", processingData);
         setOpen(true);
       } else {
         console.error("Error uploading file:", response.status);
