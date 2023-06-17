@@ -10,7 +10,10 @@
   --ceibal-pink: #c80f64;
   --ceibal-red: #BE0A0A;
   --ceibal-white: #ffffff;
-  --ceibal-grey: #ecebeb;
+  --ceibal-light-grey: #ecebeb;
+  --ceibal-light-grey-secondary: #EDF2F7;
+  --ceibal-grey: #808080;
+  --ceibal-grey-secondary: #A0AEC0;
   --ceibal-overlay: rgba(0, 0, 0, 0.4);
 }
 

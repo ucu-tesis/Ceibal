@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import styles from "./login.module.css";
+import Image from "next/image";
+import LogoCeibal from "../../assets/images/logo_ceibal.png"
+import InputText from "@/components/inputs/InputText";
 
 const Login: React.FC = () => {
   useEffect(() => {
@@ -9,7 +12,12 @@ const Login: React.FC = () => {
 
   return (
     <div className={`${styles["login-layout"]} row`}>
-      <div></div>
+      <div className={`${styles["col"]}`}>
+        <Image src={LogoCeibal} alt=""></Image>
+        <p>Inicio de Sesión</p>
+        <InputText placeholder="Documento"></InputText>
+        <InputText placeholder="Contraseña"></InputText>
+      </div>
       <div></div>
     </div>
   );

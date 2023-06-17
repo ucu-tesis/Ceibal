@@ -1,0 +1,14 @@
+.input-login {
+  background-color: var(--ceibal-light-grey-secondary);
+  max-width: 334px;
+  width: -webkit-fill-available;
+  height: 48px;
+  border: none;
+  border-radius: 6px;
+  padding: 0px 16px;
+  font-size: 18px;
+}
+
+.input-login::placeholder {
+    color: var(--ceibal-grey-secondary);
+}
