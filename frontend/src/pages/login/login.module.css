@@ -4,12 +4,13 @@
     width: 100%;
 }
 
-.login-layout div:first-child {
+.login-layout > div:first-child {
     height: 100%;
     width: 30%;
+    padding: 16px;
 }
 
-.login-layout div:last-child {
+.login-layout > div:last-child {
     height: 100%;
     width: 70%;
     background-image: url(../../assets/images/login_img.svg);
@@ -34,5 +35,9 @@
 .login-layout p {
     margin-top: 8px;
     font-size: 24px;
-    color: var(--ceibal-grey);
+    color: var(--ceibal-black-secondary);
+}
+
+.login-layout button {
+    width: -webkit-fill-available;
 }

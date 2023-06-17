@@ -59,3 +59,22 @@
 .button.large.red-fill {
   background-color: var(--ceibal-red);
 }
+
+.rounded {
+  cursor: pointer;
+  border-radius: 50px;
+  padding: 0px 24px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.rounded.black {
+  max-width: 334px;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+  background-color: var(--ceibal-black);
+  color: var(--ceibal-white);
+}
