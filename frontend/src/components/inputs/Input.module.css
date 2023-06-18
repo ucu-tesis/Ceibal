@@ -1,6 +1,5 @@
 .input-login {
   background-color: var(--ceibal-light-grey-secondary);
-  max-width: 334px;
   width: -webkit-fill-available;
   height: 48px;
   border: none;
