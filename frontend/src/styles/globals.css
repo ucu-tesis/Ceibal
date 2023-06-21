@@ -4,13 +4,17 @@
   --ceibal-green-secondary: #50af32;
   --ceibal-green-terciary: #00A096;
   --ceibal-black: #000000;
-  --ceibal-black-secondary: #2D3748;
+  --ceibal-black-secondary: #212529;
+  --ceibal-dark-grey: #2D3748;
   --ceibal-action-color: #2d2373;
   --ceibal-sky-blue: #00A0E1;
   --ceibal-pink: #c80f64;
   --ceibal-red: #BE0A0A;
   --ceibal-white: #ffffff;
-  --ceibal-grey: #ecebeb;
+  --ceibal-light-grey: #ecebeb;
+  --ceibal-light-grey-secondary: #EDF2F7;
+  --ceibal-grey: #808080;
+  --ceibal-grey-secondary: #A0AEC0;
   --ceibal-overlay: rgba(0, 0, 0, 0.4);
 }
 
