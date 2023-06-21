@@ -63,8 +63,7 @@
 .rounded {
   cursor: pointer;
   border-radius: 50px;
-  padding: 0px 24px;
-  height: 48px;
+  padding: 12px 24px;
   justify-content: center;
   align-items: center;
   gap: 8px;
