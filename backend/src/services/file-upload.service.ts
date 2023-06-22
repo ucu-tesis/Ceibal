@@ -69,34 +69,32 @@ export class FileUploadService implements MulterOptionsFactory {
 
       const formData = new FormData();
       formData.append('text', 'some text'); // TODO set proper text
-      console.log('--------------------');
-      console.log(file);
-      console.log(file.originalname);
-      console.log(filename);
       formData.append('file', new Blob([file.buffer]), file.originalname);
 
-      // console.log(new Blob([file.buffer]).toString());
-
       // TODO add typing to `data`
-      // TODO use env var
-      const { data } = await axios.post(
-        'http://audiolib:8000/process_audio',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+      let data = null;
+      try {
+        const response = await axios.post(
+          `${this.configService.get('AUDIOLIB_URL')}/process_audio`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        },
-      );
+        );
+        data = response.data;
+      } catch (error) {
+        // TODO log axios error properly
+        console.error(error?.response?.data?.detail);
+      }
 
       return {
         path,
         data,
       };
     } catch (error) {
-      // console.log(error);
-      console.log(error?.response?.data?.detail);
-      // TODO log axios error properly
+      console.log(error);
       throw new BadRequestException('Error uploading file to S3');
     }
   }
