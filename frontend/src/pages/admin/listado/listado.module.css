@@ -1,0 +1,9 @@
+.container {
+  padding: 24px;
+}
+
+.filters {
+  justify-content: left;
+  margin-top: 64px;
+  gap: 40px;
+}

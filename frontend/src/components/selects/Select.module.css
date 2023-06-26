@@ -1,0 +1,30 @@
+.select-bar {
+  position: relative;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid var(--ceibal-light-grey);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--ceibal-white);
+}
+
+.options {
+  position: absolute;
+  width: -webkit-fill-available;
+  top: 40px;
+  left: 0;
+  cursor: pointer;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.09);
+}
+
+.options div {
+  font-size: 10px;
+  padding: 12px 16px;
+}
+
+.options div:hover {
+   background-color: var(--ceibal-light-grey-secondary);
+}
