@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 # Allows you to run this workflow manually from the Actions tab
 # on: workflow_dispatch
@@ -69,6 +70,16 @@ jobs:
           remote_port: 22
           remote_user: ubuntu
           remote_key: ${{ secrets.DEPLOY_KEY }}
+      - name: rsync audiolib
+        uses: snack-dev/rsync-deployments@4.1
+        with:
+          switches: -avzr --exclude="__pycache__"
+          path: audiolib/
+          remote_path: /var/www/audiolib/
+          remote_host: tesis.app
+          remote_port: 22
+          remote_user: ubuntu
+          remote_key: ${{ secrets.DEPLOY_KEY }}
       - name: reboot frontend
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -90,3 +101,11 @@ jobs:
             npm i --production
             npx prisma migrate deploy
             pm2 restart "backend"
+      - name: reboot audiolib
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: tesis.app
+          username: ubuntu
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            pm2 restart "audiolib"
