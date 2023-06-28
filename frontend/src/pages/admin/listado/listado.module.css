@@ -22,3 +22,18 @@
   text-align: right;
   font-weight: 700;
 }
+
+.edit-modal {
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.edit-modal > div {
+  justify-content: center;
+  gap: 24px;
+}
+
+.add-class {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
