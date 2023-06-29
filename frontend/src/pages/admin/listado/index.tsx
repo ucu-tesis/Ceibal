@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
@@ -36,6 +36,25 @@ type Classroom = {
 const ListTeachers: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const [cellEditable, setCellEditable] = useState(false);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
+  const tableRef = useRef(null);
+
+  useEffect(() => {
+    if (cellEditable) {
+      if (tableRef.current) {
+        const table = tableRef.current as HTMLElement;
+        const tableCell = table?.querySelector("td");
+        tableCell?.focus();
+      }
+    }
+  }, [cellEditable]);
+
+  const addClass = () => {
+    setCellEditable(true);
+  };
+
   const options: Option[] = [
     { value: "todos", label: "Todos" },
     { value: "habilitado", label: "Habilitado" },
@@ -48,6 +67,20 @@ const ListTeachers: React.FC = () => {
     { name: "Laura Pereira", email: "lpereira@gmail.com", ci: "3025665-8" },
     { name: "María Fernandez", email: "mfernandez@gmail.com", ci: "3458974-2" },
   ];
+
+  const [teachersList, setTeachersList] = useState<Teacher[]>(sampleTeachers);
+
+  useEffect(() => {
+    if (searchValue) {
+      const searchRegex = new RegExp(searchValue);
+      const newTeachersList = sampleTeachers.filter(({ name, ci }) => {
+        return name.toLowerCase().match(searchRegex) || ci.toLowerCase().match(searchRegex);
+      });
+      setTeachersList(newTeachersList);
+    } else {
+      setTeachersList(sampleTeachers);
+    }
+  }, [searchValue]);
 
   const schools: Classroom[] = [
     { school: "Escuela 15", year: "1er año" },
@@ -74,7 +107,13 @@ const ListTeachers: React.FC = () => {
         <h1>Maestros</h1>
         <div className={`${styles.filters} row`}>
           <InputGroup>
-            <Input width="auto" placeholder="Documento o Nombre" />
+            <Input
+              width="auto"
+              placeholder="Documento o Nombre"
+              onChange={({ target: { value } }) => {
+                value !== "" ? setSearchValue(value.toLowerCase()) : setSearchValue(null);
+              }}
+            />
             <InputRightAddon>
               <SearchIcon />
             </InputRightAddon>
@@ -92,7 +131,7 @@ const ListTeachers: React.FC = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {sampleTeachers.map(({ name, email, ci }, index) => {
+              {teachersList.map(({ name, email, ci }, index) => {
                 return (
                   <Tr key={index}>
                     <Td>{name}</Td>
@@ -135,13 +174,19 @@ const ListTeachers: React.FC = () => {
               </div>
               <div className={`${styles["add-class"]} row`}>
                 <span>Clases</span>
-                <Button borderRadius="24px" leftIcon={<AddIcon />} colorScheme="green" variant="solid">
+                <Button
+                  borderRadius="24px"
+                  leftIcon={<AddIcon />}
+                  colorScheme="green"
+                  variant="solid"
+                  onClick={addClass}
+                >
                   Agregar Clase
                 </Button>
               </div>
 
               <TableContainer>
-                <Table className={`${styles["main-table"]}`}>
+                <Table ref={tableRef} className={`${styles["main-table"]}`}>
                   <Thead>
                     <Tr>
                       <Th>Escuela</Th>
@@ -149,6 +194,12 @@ const ListTeachers: React.FC = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
+                    {cellEditable && (
+                      <Tr>
+                        <Td contentEditable></Td>
+                        <Td contentEditable></Td>
+                      </Tr>
+                    )}
                     {schools.map(({ school, year }, index) => {
                       return (
                         <Tr key={index}>
