@@ -70,6 +70,8 @@ const ListTeachers: React.FC = () => {
 
   const [teachersList, setTeachersList] = useState<Teacher[]>(sampleTeachers);
 
+  const inputRegex = /\w|\d|\-/;
+
   useEffect(() => {
     if (searchValue) {
       const searchRegex = new RegExp(searchValue);
@@ -109,6 +111,12 @@ const ListTeachers: React.FC = () => {
           <InputGroup>
             <Input
               width="auto"
+              onKeyDown={(e) => {
+                if (!e.key.match(inputRegex)) {
+                  e.preventDefault();
+                }
+              }}
+              maxLength={30}
               placeholder="Documento o Nombre"
               onChange={({ target: { value } }) => {
                 value !== "" ? setSearchValue(value.toLowerCase()) : setSearchValue(null);
