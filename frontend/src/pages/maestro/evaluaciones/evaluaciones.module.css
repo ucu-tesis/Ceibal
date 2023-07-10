@@ -3,10 +3,16 @@
   }
   
   .filters {
-    justify-content: right;
+    justify-content: left;
     margin-top: 8px;
     margin-bottom: 24px;
     gap: 40px;
+  }
+
+  .table-border {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
   }
   
   .main-table {

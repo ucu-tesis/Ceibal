@@ -4,17 +4,17 @@ import styles from "./Select.module.css";
 
 interface SelectProps {
   id?: string;
-  onChange?: () => void;
+  onChange?: (value: Option) => void;
   options: Option[];
   defaultValue: Option;
 }
 
 type Option = {
-  value: string;
+  value?: string;
   label: string;
 };
 
-const Select: React.FC<SelectProps> = ({ options, defaultValue }) => {
+const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
   const divRef = useRef(null);
   const [selectValue, setValue] = useState(defaultValue);
   const [openOptions, setOpen] = useState(false);
@@ -50,6 +50,7 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue }) => {
                 onClick={(e) => {
                   e.stopPropagation();
                   setValue(element);
+                  onChange(element);
                   setOpen(false);
                 }}
               >

@@ -61,12 +61,12 @@ const ListTeachers: React.FC = () => {
     { value: "deshabilitado", label: "Deshabilitado" },
   ];
 
-  const sampleTeachers: Teacher[] = [
+  const sampleTeachers = useState<Teacher[]>([
     { name: "Ana Gonzalez", email: "agonzalez@gmail.com", ci: "4485263-8" },
     { name: "Martín Rodriguez", email: "mrodriguez@gmail.com", ci: "4712354-3" },
     { name: "Laura Pereira", email: "lpereira@gmail.com", ci: "3025665-8" },
     { name: "María Fernandez", email: "mfernandez@gmail.com", ci: "3458974-2" },
-  ];
+  ]);
 
   const [teachersList, setTeachersList] = useState<Teacher[]>(sampleTeachers);
 
@@ -82,7 +82,7 @@ const ListTeachers: React.FC = () => {
     } else {
       setTeachersList(sampleTeachers);
     }
-  }, [searchValue]);
+  }, [searchValue, sampleTeachers]);
 
   const schools: Classroom[] = [
     { school: "Escuela 15", year: "1er año" },
@@ -128,7 +128,7 @@ const ListTeachers: React.FC = () => {
           </InputGroup>
           <Select options={options} defaultValue={options[0]}></Select>
         </div>
-        <TableContainer>
+        <TableContainer className={`${styles["table-border"]}`}>
           <Table className={`${styles["main-table"]}`}>
             <Thead>
               <Tr>
