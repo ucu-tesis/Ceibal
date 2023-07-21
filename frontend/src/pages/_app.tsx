@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <div>
       <style jsx global>{`
         body {
-          font-family: ${mozaicFont.style.fontFamily};
+          font-family: ${mozaicFont.style.fontFamily} !important;
         }
       `}</style>
       <Component {...pageProps} />
