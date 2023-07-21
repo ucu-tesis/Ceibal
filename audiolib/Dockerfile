@@ -35,6 +35,7 @@ RUN pip install python-multipart
 
 # conda run -n audiodsp uvicorn main:app
 # conda run --no-capture-output -n audiodsp uvicorn main:app
+# conda run --no-capture-output -n audiodsp python main.py
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "python", "main.py"]
 # ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
 #ENTRYPOINT ["tail", "-f", "/dev/null"]

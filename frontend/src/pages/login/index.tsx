@@ -7,6 +7,7 @@ import RightIcon from "../../assets/images/right_icon.svg";
 import InputText from "@/components/inputs/InputText";
 import InputPassword from "@/components/inputs/InputPassword";
 import RoundedButton from "@/components/buttons/RoundedButton";
+import Link from "next/link";
 
 const Login: React.FC = () => {
   useEffect(() => {
@@ -29,7 +30,7 @@ const Login: React.FC = () => {
             <div>Continuar</div>
             <Image src={RightIcon} alt=""></Image>
           </RoundedButton>
-          <span>Si aún no te has registrado como usuario/a y quieres acceder a las plataformas, haz <a href="/registro">clic aquí</a></span>
+          <span>Si aún no te has registrado como usuario/a y quieres acceder a las plataformas, haz <Link href="/registro">clic aquí</Link></span>
         </div>
         <div></div>
       </div>

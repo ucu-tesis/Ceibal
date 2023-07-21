@@ -86,6 +86,7 @@ export class FileUploadService implements MulterOptionsFactory {
         data = response.data;
       } catch (error) {
         // TODO log axios error properly
+        console.error(error);
         console.error(error?.response?.data?.detail);
       }
 

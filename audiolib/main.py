@@ -25,7 +25,7 @@ async def process_audio(
     # palabras_con_repeticiones, tiempo_repeticiones.
     # Tambien puede ser que se esten mockeando algunas cosas en las graficas
     # TODO revisar formato webm vs mp3
-    analisis_audio(newDir, dirName, '.webm', text, False)
+    analisis_audio(newDir, dirName, '.webm', text, True)
     resJson, img1, img2, img3, img4 = getImageAndJson(newDir)
 
     payload = {
