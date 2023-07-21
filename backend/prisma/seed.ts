@@ -8,8 +8,11 @@ async function load() {
     update: {},
     create: {
       cedula: '99999',
+      email: 'admin@admin.com',
       first_name: 'Admin',
       last_name: 'Admin',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
     },
   });
   const testTeacher = await prisma.user.upsert({
@@ -17,6 +20,7 @@ async function load() {
     update: {},
     create: {
       cedula: '10000',
+      email: 'alice@email.com',
       first_name: 'Alice',
       last_name: 'Wonders',
       GroupsOwned: {
@@ -26,6 +30,8 @@ async function load() {
           created_by: admin.id,
         },
       },
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
     },
     include: { GroupsOwned: true },
   });
@@ -35,11 +41,14 @@ async function load() {
     update: {},
     create: {
       cedula: '50000',
+      email: 'drago@student.com',
       first_name: 'Drago',
       last_name: 'Berto',
       EvaluationGroups: {
         connect: { id: testTeacher.GroupsOwned[0].id },
       },
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
     },
     include: { EvaluationGroups: true },
   });
