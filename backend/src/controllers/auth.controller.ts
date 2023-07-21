@@ -29,16 +29,16 @@ export class AuthController {
   }
 
   @Post('sign-up')
-  async signUp(@Body() userDto: SignUpUserRequest) {
+  async signUp(@Body() user: SignUpUserRequest) {
     if (
-      !userDto.ci ||
-      !userDto.password ||
-      !userDto.email ||
-      !userDto.first_name ||
-      !userDto.last_name
+      !user.ci ||
+      !user.password ||
+      !user.email ||
+      !user.first_name ||
+      !user.last_name
     ) {
       throw new BadRequestException('All fields are required');
     }
-    return await this.authService.signUp(userDto);
+    return await this.authService.signUp(user);
   }
 }
