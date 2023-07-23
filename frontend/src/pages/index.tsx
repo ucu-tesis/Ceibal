@@ -11,6 +11,7 @@ import TextContainer from "@/components/containers/TextContainer";
 import Spinner from "@/components/spinners/Spinner";
 import ModalDialog from "@/components/modals/ModalDialog";
 import ProgressBar from "@/components/progress/ProgressBar";
+import useFileUpload from "./api/hooks/useFileUpload";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,7 +30,6 @@ export default function Home() {
   const [mimeType, setMimetype] = useState<string>("");
   const [newRecord, setNewRecord] = useState(false);
 
-  const [sending, setSending] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [openModal, setOpen] = useState(false);
 
@@ -37,6 +37,18 @@ export default function Home() {
   const divRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const errorModalRef = useRef<HTMLDivElement | null>(null);
+
+  // Usar data que devuelve el hook
+  const onSuccess = async (data: Response) => {
+    setOpen(true);
+  };
+
+  const onError = (data: any) => {
+    console.error("Error uploading file:", data?.status);
+    setErrorModal(true);
+  };
+
+  const { mutate, isLoading } = useFileUpload(onSuccess, onError);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -48,19 +60,7 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/recordings/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const processingData = await response.json();
-        console.log("File uploaded successfully:", processingData);
-        setOpen(true);
-      } else {
-        console.error("Error uploading file:", response.status);
-        setErrorModal(true);
-      }
+      mutate(formData);
     } catch (error) {
       console.error("Error uploading file:", error);
       setErrorModal(true);
@@ -81,7 +81,6 @@ export default function Home() {
   const onSend = () => {
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => {
-        setSending(false);
         setSendActive(false);
         setNewRecord(true);
         if (recorder) {
@@ -96,9 +95,6 @@ export default function Home() {
         const sendButton = ref.current as HTMLElement;
         sendButton.style.animation = "vanish 0.6s ease-in-out";
       }
-      setTimeout(() => {
-        setSending(true);
-      }, 500);
     }
   };
 
@@ -146,14 +142,14 @@ export default function Home() {
           {openModal && (
             <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
               <div className="progress col">
-              <ProgressBar value="92"></ProgressBar>
-              <span>Cantidad de pausas: 4</span>
-              <span>Cantidad de repeticiones: 4</span>
-              <span>Velocidad de lectura: 120 palabras/minuto</span>
-              <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
-                Aceptar
-              </SecondaryButton>
-            </div>
+                <ProgressBar value="92"></ProgressBar>
+                <span>Cantidad de pausas: 4</span>
+                <span>Cantidad de repeticiones: 4</span>
+                <span>Velocidad de lectura: 120 palabras/minuto</span>
+                <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
+                  Aceptar
+                </SecondaryButton>
+              </div>
             </ModalDialog>
           )}
           {errorModal && (
@@ -167,7 +163,7 @@ export default function Home() {
             </ModalDialog>
           )}
           <TextContainer />
-          {!sending ? (
+          {!isLoading ? (
             <>
               <Recorder
                 componentRef={divRef}
