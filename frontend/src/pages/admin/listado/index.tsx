@@ -61,7 +61,7 @@ const ListTeachers: React.FC = () => {
     { value: "deshabilitado", label: "Deshabilitado" },
   ];
 
-  const sampleTeachers = useState<Teacher[]>([
+  const [sampleTeachers] = useState<Teacher[]>([
     { name: "Ana Gonzalez", email: "agonzalez@gmail.com", ci: "4485263-8" },
     { name: "Martín Rodriguez", email: "mrodriguez@gmail.com", ci: "4712354-3" },
     { name: "Laura Pereira", email: "lpereira@gmail.com", ci: "3025665-8" },

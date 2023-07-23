@@ -43,8 +43,7 @@ const EvaluationList: React.FC = () => {
         return year === yearFilter.value;
       });
       setEvalList(newEvalList);
-    }
-    else {
+    } else {
       setEvalList(sampleList);
     }
   }, [yearFilter, sampleList]);
@@ -89,7 +88,14 @@ const EvaluationList: React.FC = () => {
                     <Td>{name}</Td>
                     <Td>{year}</Td>
                     <Td textAlign="right">
-                      <Link href="#">Ver Resultado</Link>
+                      <Link
+                        href={{
+                          pathname: "/maestro/evaluaciones/[grupo]",
+                          query: { grupo: "a" },
+                        }}
+                      >
+                        Ver Resultado
+                      </Link>
                     </Td>
                   </Tr>
                 );
