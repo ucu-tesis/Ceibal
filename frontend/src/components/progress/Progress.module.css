@@ -1,0 +1,29 @@
+.progress-bar {
+    position: relative;
+    width: 270px;
+    height: 270px;
+    border-radius: 50%;
+    background: 
+      radial-gradient(closest-side, #346608 79%, transparent 80% 100%),
+      conic-gradient(#4C950C 92%, white 0);  
+  }
+  
+  .progress-bar progress {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+  }
+  
+  .progress-bar span {
+    position: relative;
+    left: 32%;
+    top: 32%;
+    font-weight: 600;
+    font-size: 31px;
+    line-height: initial;
+    color: var(--ceibal-white);
+  }
+  
+  .progress-bar span:first-child {
+    font-size: 80px;
+  }

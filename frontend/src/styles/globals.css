@@ -87,6 +87,15 @@ h1 {
   gap: 32px;
 }
 
+.progress {
+  gap: 8px;
+  width: 100%;
+}
+
+.progress > div:first-child {
+  align-self: center;
+}
+
 /* Animaciones */
 
 @keyframes vanish {

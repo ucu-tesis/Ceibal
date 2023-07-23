@@ -10,6 +10,7 @@ import SendIcon from "../assets/images/send_icon.svg";
 import TextContainer from "@/components/containers/TextContainer";
 import Spinner from "@/components/spinners/Spinner";
 import ModalDialog from "@/components/modals/ModalDialog";
+import ProgressBar from "@/components/progress/ProgressBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -143,13 +144,16 @@ export default function Home() {
       <main>
         <div className="container col">
           {openModal && (
-            <ModalDialog componentRef={modalRef} title="¡Genial!">
-              <span>
-                Tu lectura se ha enviado correctamente. ¡Felicidades! Ahora puedes continuar explorando y aprendiendo.
-              </span>
+            <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
+              <div className="progress col">
+              <ProgressBar value="92"></ProgressBar>
+              <span>Cantidad de pausas: 4</span>
+              <span>Cantidad de repeticiones: 4</span>
+              <span>Velocidad de lectura: 120 palabras/minuto</span>
               <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
-                Continuar
+                Aceptar
               </SecondaryButton>
+            </div>
             </ModalDialog>
           )}
           {errorModal && (
