@@ -183,10 +183,11 @@ def get_similarity_aligned(input_folder, filename, output_folder, audio_samples,
     #Alineación
     #print("Realizando alineación...")
     #Quiet does not seem to be working with clean at the same time
-    std_out = subprocess.run(["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean"], capture_output=True)
-    print(std_out)
-    print(std_out.stdout)
-    print(std_out.stderr)
+    std_out = subprocess.run(
+        ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean"],
+        # ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean", "--silent"],
+        capture_output=True
+    )
 
     #arrays de salida
     allo_aligned_dst = [0]
@@ -202,7 +203,7 @@ def get_similarity_aligned(input_folder, filename, output_folder, audio_samples,
     error_code = False
 
     if std_out.returncode != 0:
-        print("Error en MFAAAAA")
+        print("Error en MFA")
         reps_words = ["0"]
         reps_time = [0.0]
         error_code = True
