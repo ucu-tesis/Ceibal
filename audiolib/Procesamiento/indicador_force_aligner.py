@@ -64,8 +64,8 @@ def process_text_grid(folder, filename, audio, sr):
     #Lectura de archivo textgrid
     tg = textgrid.openTextgrid(os.path.join(folder, filename+'.TextGrid'), False)
 
-    entryList_words = tg.tiers["words"].entryList
-    entryList_phones = tg.tiers["phones"].entryList
+    entryList_words = tg.getTier("words").entries
+    entryList_phones = tg.getTier("phones").entries
 
     #Crea diccionario con palabras
     dict_array = [{'start':w.start, 'end':w.end, 'word':w.label} for w in entryList_words] 
