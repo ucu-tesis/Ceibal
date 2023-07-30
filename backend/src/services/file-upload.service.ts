@@ -85,9 +85,9 @@ export class FileUploadService implements MulterOptionsFactory {
         );
         data = response.data;
       } catch (error) {
-        // TODO log axios error properly
-        console.error(error);
-        console.error(error?.response?.data?.detail);
+        console.log('Unable to process audio');
+        console.error(error.message);
+        console.error(error?.response?.data); // TODO log axios error properly
       }
 
       return {
