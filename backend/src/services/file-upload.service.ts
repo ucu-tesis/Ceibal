@@ -59,13 +59,6 @@ export class FileUploadService implements MulterOptionsFactory {
       const student = await this.prismaService.student.findFirst();
       const evaluationGroupReading =
         await this.prismaService.evaluationGroupReading.findFirst();
-      await this.prismaService.recording.create({
-        data: {
-          recording_url: path,
-          student_id: student.id,
-          evaluation_group_reading_id: evaluationGroupReading.id,
-        },
-      });
 
       const formData = new FormData();
       formData.append('text', 'some text'); // TODO set proper text
@@ -89,6 +82,16 @@ export class FileUploadService implements MulterOptionsFactory {
         console.error(error.message);
         console.error(error?.response?.data); // TODO log axios error properly
       }
+
+      // TODO add created_at to recording
+      await this.prismaService.recording.create({
+        data: {
+          recording_url: path,
+          student_id: student.id,
+          evaluation_group_reading_id: evaluationGroupReading.id,
+          evaluation: data,
+        },
+      });
 
       return {
         path,
