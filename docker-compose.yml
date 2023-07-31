@@ -7,8 +7,8 @@ services:
       context: ./
       dockerfile: audiolib/Dockerfile
     volumes:
-      - $PWD/audiolib:/app/audiolib
-      - $PWD/.torchcache:/root/.cache/torch
+      - ./audiolib:/app/audiolib
+      - ./.torchcache:/root/.cache/torch
     ports:
       - "8000:8000"
     expose:
@@ -28,7 +28,7 @@ services:
       context: ./
       dockerfile: backend/Dockerfile
     volumes:
-      - $PWD/backend:/app/backend
+      - ./backend:/app/backend
       - /app/backend/node_modules
     expose:
       - ${BACKEND_PORT}
