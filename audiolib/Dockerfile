@@ -24,8 +24,8 @@ RUN pip install "uvicorn[standard]"
 
 RUN pip install python-multipart
 
-# TODO use volumes in docker compose
-# COPY ./python-alg /app/audiolib
+RUN mfa models download acoustic spanish_mfa
+RUN mfa models download dictionary spanish_latin_america_mfa
 
 # RUN conda init bash && exec /bin/bash && conda activate audiodsp && \
 #  conda install allosaurus epitran onnxruntime vosk
