@@ -33,6 +33,11 @@ export default function Home() {
   const [errorModal, setErrorModal] = useState(false);
   const [openModal, setOpen] = useState(false);
 
+  const [score, setScore] = useState<string| null>(null);
+  const [silence, setSilence] = useState<string | null>(null);
+  const [repetitions, setRepetitions] = useState<string| null>(null);
+  const [speed, setSpeed] = useState<string | null>(null);
+
   const ref = useRef(null);
   const divRef = useRef<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -41,6 +46,16 @@ export default function Home() {
   // Usar data que devuelve el hook
   const onSuccess = async (data: Response) => {
     setOpen(true);
+    const response = data as any;
+    const {
+      data: {
+        indicadores: { cantidad_de_repeticiones, cantidad_de_silencios, puntaje, velocidad_palabras },
+      },
+    } = response;
+    setScore(puntaje + "");
+    setSilence(cantidad_de_silencios + "");
+    setRepetitions(cantidad_de_repeticiones + "");
+    setSpeed(velocidad_palabras + "");
   };
 
   const onError = (data: any) => {
@@ -142,10 +157,10 @@ export default function Home() {
           {openModal && (
             <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
               <div className="progress col">
-                <ProgressBar value="92"></ProgressBar>
-                <span>Cantidad de pausas: 4</span>
-                <span>Cantidad de repeticiones: 4</span>
-                <span>Velocidad de lectura: 120 palabras/minuto</span>
+                <ProgressBar value={score ?? "50"}></ProgressBar>
+                <span>Cantidad de pausas: {silence}</span>
+                <span>Cantidad de repeticiones: {repetitions}</span>
+                <span>Velocidad de lectura: {speed} palabras/minuto</span>
                 <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
                   Aceptar
                 </SecondaryButton>
