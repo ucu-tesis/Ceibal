@@ -154,6 +154,17 @@ export default function Home() {
       </Head>
       <main>
         <div className="container col">
+        <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
+              <div className="progress col">
+                <ProgressBar value="100"></ProgressBar>
+                <span>Cantidad de pausas: {silence}</span>
+                <span>Cantidad de repeticiones: {repetitions}</span>
+                <span>Velocidad de lectura: {speed} palabras/minuto</span>
+                <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
+                  Aceptar
+                </SecondaryButton>
+              </div>
+            </ModalDialog>
           {openModal && (
             <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
               <div className="progress col">

@@ -94,6 +94,10 @@ h1 {
 
 .progress > div:first-child {
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Animaciones */

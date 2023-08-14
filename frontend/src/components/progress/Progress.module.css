@@ -16,8 +16,6 @@
   
   .progress-bar span {
     position: relative;
-    left: 32%;
-    top: 32%;
     font-weight: 600;
     font-size: 31px;
     line-height: initial;
