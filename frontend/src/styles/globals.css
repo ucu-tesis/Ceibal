@@ -16,6 +16,7 @@
   --ceibal-grey: #808080;
   --ceibal-grey-secondary: #a0aec0;
   --ceibal-overlay: rgba(0, 0, 0, 0.4);
+  --mobile-breakpoint: 500px;
 }
 
 body {
@@ -117,6 +118,15 @@ h1 {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 500px) {
+  main > .container {
+    margin: 24px;
+    gap: 64px;
   }
 }
 
