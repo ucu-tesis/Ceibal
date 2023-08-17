@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 const mozaicFont = localFont({
   src: [
@@ -27,15 +28,19 @@ const mozaicFont = localFont({
   ],
 });
 
+const client = new QueryClient();
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div>
-      <style jsx global>{`
-        body {
-          font-family: ${mozaicFont.style.fontFamily} !important;
-        }
-      `}</style>
-      <Component {...pageProps} />
-    </div>
+    <QueryClientProvider client={client}>
+      <div>
+        <style jsx global>{`
+          body {
+            font-family: ${mozaicFont.style.fontFamily} !important;
+          }
+        `}</style>
+        <Component {...pageProps} />
+      </div>
+    </QueryClientProvider>
   );
 }

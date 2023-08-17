@@ -64,8 +64,8 @@ def process_text_grid(folder, filename, audio, sr):
     #Lectura de archivo textgrid
     tg = textgrid.openTextgrid(os.path.join(folder, filename+'.TextGrid'), False)
 
-    entryList_words = tg.tierDict["words"].entryList
-    entryList_phones = tg.tierDict["phones"].entryList
+    entryList_words = tg.getTier("words").entries
+    entryList_phones = tg.getTier("phones").entries
 
     #Crea diccionario con palabras
     dict_array = [{'start':w.start, 'end':w.end, 'word':w.label} for w in entryList_words] 
@@ -183,8 +183,12 @@ def get_similarity_aligned(input_folder, filename, output_folder, audio_samples,
     #Alineación
     #print("Realizando alineación...")
     #Quiet does not seem to be working with clean at the same time
-    std_out = subprocess.run(["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean", "--silent"], capture_output=True)
-    
+    std_out = subprocess.run(
+        ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean"],
+        # ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean", "--silent"],
+        capture_output=True
+    )
+
     #arrays de salida
     allo_aligned_dst = [0]
     error = np.zeros(1) 
