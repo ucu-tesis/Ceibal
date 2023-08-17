@@ -63,6 +63,7 @@ const EvaluationList: React.FC = () => {
             <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
+        <h1>Evaluaciones</h1>
         <div className={`${styles.filters} row`}>
           <Select
             options={options}
