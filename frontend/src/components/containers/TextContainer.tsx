@@ -9,7 +9,7 @@ const TextContainer: React.FC = () => {
     era su hogar, su mundo conocido. Allí desde pequeña corría de un lado a otro. Largas andanzas que interrumpía para
     alimentarse con frutas silvestres, hojas, semillas y algunos insectos y batracios que conseguía a fuerza de mucha
     paciencia.`;
-  return <div className={`${styles.text_container}`}>{sampleText}</div>;
+  return <div tabIndex={0} className={`${styles.text_container}`}>{sampleText}</div>;
 };
 
 export default TextContainer;

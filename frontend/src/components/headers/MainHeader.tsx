@@ -9,7 +9,7 @@ const MainHeader: React.FC = () => {
         <Image id="app-logo" src={logo} alt="" />
       </div>
       <div>
-        <a>Salir</a>
+        <a tabIndex={0}>Salir</a>
       </div>
     </div>
   );

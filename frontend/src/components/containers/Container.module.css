@@ -10,3 +10,10 @@
   line-height: 100%;
   letter-spacing: -0.03em;
 }
+
+@media (max-width: 500px) {
+  .text_container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+}
