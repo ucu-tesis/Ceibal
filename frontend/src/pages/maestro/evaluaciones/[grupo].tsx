@@ -3,7 +3,15 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Badge } from "@chakra-ui/react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Badge,
+  Input,
+  InputGroup,
+  InputRightAddon,
+} from "@chakra-ui/react";
 import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import styles from "./evaluaciones.module.css";
@@ -13,16 +21,11 @@ type Option = {
   label: string;
 };
 
-type Group = {
-  name: string;
-  year: string;
-};
-
 const statusTypes: any = {
   processed: "Procesado",
   error: "Error",
   pending: "Por Procesar",
-}
+};
 
 type Evaluation = {
   student: string;
@@ -40,11 +43,14 @@ export default function Page({ params }: { params: { grupo: string } }) {
   const options: Option[] = [
     { value: undefined, label: "Estado" },
     { value: "error", label: "Error" },
-    { value: "proceso", label: "Por Procesar" },
-    { value: "procesado", label: "Procesado" },
+    { value: "pending", label: "Por Procesar" },
+    { value: "processed", label: "Procesado" },
   ];
 
   const [statusFilter, setStatus] = useState<Option | undefined>(undefined);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
+  const inputRegex = /\w|\d|\-/;
 
   const [sampleList] = useState<Evaluation[]>([
     {
@@ -74,6 +80,27 @@ export default function Page({ params }: { params: { grupo: string } }) {
   ]);
 
   const [evalList, setEvalList] = useState(sampleList);
+
+  useEffect(() => {
+    if (statusFilter?.value) {
+      const newList = sampleList.filter(({ status }) => status === statusFilter?.value);
+      console.log(statusFilter);
+      setEvalList(newList);
+    } else {
+      setEvalList(sampleList);
+    }
+  }, [statusFilter, sampleList]);
+
+  useEffect(() => {
+    if (searchValue) {
+      const searchRegex = new RegExp(searchValue);
+      const newList = sampleList.filter(({ student }) => student.toLowerCase().match(searchRegex));
+      setEvalList(newList);
+    } else {
+      setEvalList(sampleList);
+    }
+  }, [searchValue, sampleList]);
+
   return (
     <ChakraProvider>
       <Head>
@@ -91,6 +118,24 @@ export default function Page({ params }: { params: { grupo: string } }) {
         </Breadcrumb>
         <h1>{group}</h1>
         <div className={`${styles.filters} row`}>
+          <InputGroup>
+            <Input
+              width="auto"
+              onKeyDown={(e) => {
+                if (!e.key.match(inputRegex)) {
+                  e.preventDefault();
+                }
+              }}
+              maxLength={30}
+              placeholder="Nombre"
+              onChange={({ target: { value } }) => {
+                value !== "" ? setSearchValue(value.toLowerCase()) : setSearchValue(null);
+              }}
+            />
+            <InputRightAddon>
+              <SearchIcon />
+            </InputRightAddon>
+          </InputGroup>
           <Select
             options={options}
             defaultValue={options[0]}
