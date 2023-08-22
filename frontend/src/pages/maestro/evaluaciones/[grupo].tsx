@@ -3,9 +3,8 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Badge } from "@chakra-ui/react";
 import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
-import { useParams } from "next/navigation";
 import Select from "@/components/selects/Select";
 import styles from "./evaluaciones.module.css";
 
@@ -19,10 +18,10 @@ type Group = {
   year: string;
 };
 
-enum Status {
-  Processed = "Procesado",
-  Error = "Error",
-  Pending = "Por Procesar",
+const statusTypes: any = {
+  processed: "Procesado",
+  error: "Error",
+  pending: "Por Procesar",
 }
 
 type Evaluation = {
@@ -31,7 +30,7 @@ type Evaluation = {
   section: string;
   chapter: string;
   sentDate: string;
-  status: Status;
+  status: string;
 };
 
 export default function Page({ params }: { params: { grupo: string } }) {
@@ -54,7 +53,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
       section: "6",
       chapter: "4",
       sentDate: "2023-05-20 09:15",
-      status: Status.Processed,
+      status: "processed",
     },
     {
       student: "Pedro López",
@@ -62,7 +61,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
       section: "6",
       chapter: "4",
       sentDate: "2023-05-20 09:15",
-      status: Status.Error,
+      status: "error",
     },
     {
       student: "Luis Torres",
@@ -70,7 +69,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
       section: "6",
       chapter: "4",
       sentDate: "2023-05-20 09:15",
-      status: Status.Processed,
+      status: "pending",
     },
   ]);
 
@@ -90,7 +89,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
             <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1>Grupo {group}</h1>
+        <h1>{group}</h1>
         <div className={`${styles.filters} row`}>
           <Select
             options={options}
@@ -114,7 +113,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
               </Tr>
             </Thead>
             <Tbody>
-              {evalList.map(({ student, reading, chapter, section, sentDate, status}, index) => {
+              {evalList.map(({ student, reading, chapter, section, sentDate, status }, index) => {
                 return (
                   <Tr key={index}>
                     <Td>{student}</Td>
@@ -122,7 +121,9 @@ export default function Page({ params }: { params: { grupo: string } }) {
                     <Td>{section}</Td>
                     <Td>{chapter}</Td>
                     <Td>{sentDate}</Td>
-                    <Td>{status}</Td>
+                    <Td>
+                      <Badge className={`${styles.badge} ${styles[status]}`}>{statusTypes[status]}</Badge>
+                    </Td>
                     <Td textAlign="right">
                       <Link
                         href={{

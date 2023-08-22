@@ -92,7 +92,7 @@ const EvaluationList: React.FC = () => {
                       <Link
                         href={{
                           pathname: "/maestro/evaluaciones/[grupo]",
-                          query: { grupo: "a" },
+                          query: { grupo: name },
                         }}
                       >
                         Ver Resultado
