@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
-import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
+import { ChakraProvider, Th } from "@chakra-ui/react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,8 +12,9 @@ import {
   InputGroup,
   InputRightAddon,
 } from "@chakra-ui/react";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
+import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
+import ChakraTable from "@/components/tables/ChakraTable";
 import styles from "./evaluaciones.module.css";
 
 type Option = {
@@ -39,6 +40,10 @@ type Evaluation = {
 export default function Page({ params }: { params: { grupo: string } }) {
   const router = useRouter();
   const group = router.query.grupo;
+
+  const BadgeComponent = (status: string) => {
+    return <Badge className={`${styles.badge} ${styles[status]}`}>{statusTypes[status]}</Badge>;
+  };
 
   const options: Option[] = [
     { value: undefined, label: "Estado" },
@@ -79,6 +84,35 @@ export default function Page({ params }: { params: { grupo: string } }) {
     },
   ]);
 
+  const columnList = [
+    <Th key="nombre">Nombre</Th>,
+    <Th key="lectura">Lectura</Th>,
+    <Th key="seccion">Sección</Th>,
+    <Th key="capitulo">Capítulo</Th>,
+    <Th key="fechaenvio">Fecha de envío</Th>,
+    <Th key="estado">Estado</Th>,
+    <Th key="link" width="20%"></Th>,
+  ];
+
+  const toTableList = (list: Evaluation[]) => {
+    return list.map((evaluation: Evaluation) => {
+      return {
+        ...evaluation,
+        status: BadgeComponent(evaluation.status),
+        link: (
+          <Link
+            href={{
+              pathname: "/maestro/evaluaciones/resultado/[alumno]",
+              query: { alumno: evaluation.student, grupo: group },
+            }}
+          >
+            Ver Resultado
+          </Link>
+        ),
+      };
+    });
+  };
+
   const [evalList, setEvalList] = useState(sampleList);
 
   useEffect(() => {
@@ -115,6 +149,10 @@ export default function Page({ params }: { params: { grupo: string } }) {
           <BreadcrumbItem>
             <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
+
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">{group}</BreadcrumbLink>
+          </BreadcrumbItem>
         </Breadcrumb>
         <h1>{group}</h1>
         <div className={`${styles.filters} row`}>
@@ -144,47 +182,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
             }}
           ></Select>
         </div>
-        <TableContainer className={`${styles["table-border"]}`}>
-          <Table className={`${styles["main-table"]}`}>
-            <Thead>
-              <Tr>
-                <Th>Nombre</Th>
-                <Th>Lectura</Th>
-                <Th>Sección</Th>
-                <Th>Capítulo</Th>
-                <Th>Fecha de envío</Th>
-                <Th>Estado</Th>
-                <Th width="20%"></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {evalList.map(({ student, reading, chapter, section, sentDate, status }, index) => {
-                return (
-                  <Tr key={index}>
-                    <Td>{student}</Td>
-                    <Td>{reading}</Td>
-                    <Td>{section}</Td>
-                    <Td>{chapter}</Td>
-                    <Td>{sentDate}</Td>
-                    <Td>
-                      <Badge className={`${styles.badge} ${styles[status]}`}>{statusTypes[status]}</Badge>
-                    </Td>
-                    <Td textAlign="right">
-                      <Link
-                        href={{
-                          pathname: "/maestro/evaluaciones/[grupo]",
-                          query: { grupo: "a" },
-                        }}
-                      >
-                        Ver Resultado
-                      </Link>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <ChakraTable columns={columnList} data={toTableList(evalList)}></ChakraTable>
       </div>
     </ChakraProvider>
   );

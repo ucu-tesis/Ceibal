@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
+import { ChakraProvider, Th } from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import styles from "./evaluaciones.module.css";
+import ChakraTable from "@/components/tables/ChakraTable";
 
 type Option = {
   value?: string;
@@ -48,6 +49,30 @@ const EvaluationList: React.FC = () => {
     }
   }, [yearFilter, sampleList]);
 
+  const columnList = [
+    <Th key="grupo">Grupo</Th>,
+    <Th key="anio">Año escolar</Th>,
+    <Th key="link" width="40%"></Th>,
+  ];
+
+  const toTableList = (list: Group[]) => {
+    return list.map((group: Group) => {
+      return {
+        ...group,
+        link: (
+          <Link
+            href={{
+              pathname: "/maestro/evaluaciones/[grupo]",
+              query: { grupo: group.name  },
+            }}
+          >
+            Ver Resultado
+          </Link>
+        ),
+      };
+    });
+  };
+
   return (
     <ChakraProvider>
       <Head>
@@ -73,37 +98,7 @@ const EvaluationList: React.FC = () => {
             }}
           ></Select>
         </div>
-        <TableContainer className={`${styles["table-border"]}`}>
-          <Table className={`${styles["main-table"]}`}>
-            <Thead>
-              <Tr>
-                <Th>Grupo</Th>
-                <Th>Año escolar</Th>
-                <Th width="40%"></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {evalList.map(({ name, year }, index) => {
-                return (
-                  <Tr key={index}>
-                    <Td>{name}</Td>
-                    <Td>{year}</Td>
-                    <Td textAlign="right">
-                      <Link
-                        href={{
-                          pathname: "/maestro/evaluaciones/[grupo]",
-                          query: { grupo: name },
-                        }}
-                      >
-                        Ver Resultado
-                      </Link>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <ChakraTable columns={columnList} data={toTableList(evalList)}></ChakraTable>
       </div>
     </ChakraProvider>
   );
