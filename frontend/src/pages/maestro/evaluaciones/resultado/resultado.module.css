@@ -9,3 +9,37 @@
   font-weight: 600;
   text-decoration-line: underline;
 }
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.space {
+  justify-content: space-between;
+  margin-right: 15%;
+  margin-bottom: 64px;
+}
+
+.container h5 {
+  font-size: 20px;
+}
+
+.stats {
+  margin-top: 32px;
+  gap: 32px;
+}
+
+.stats.border {
+  border: 1px solid var(--ceibal-grey);
+  padding: 24px;
+}
+
+@media (max-width: 500px) {
+  .container {
+    padding: 8px;
+  }
+  .space {
+    margin-right: 5%;
+  }
+}

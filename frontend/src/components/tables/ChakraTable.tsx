@@ -21,7 +21,7 @@ const ChakraTable: React.FC<TableProps> = ({columns, data}) => {
             const rowKeys = Object.keys(row);
             return (
               <Tr key={index}>
-                {rowKeys.map((key: any, index) =>  <Td key={index}>{row[key]}</Td>)}
+                {rowKeys.map((key: any, index) =>  <Td tabIndex={0} key={index}>{row[key]}</Td>)}
               </Tr>
             );
           })}

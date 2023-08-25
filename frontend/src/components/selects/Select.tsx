@@ -19,6 +19,13 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
   const [selectValue, setValue] = useState(defaultValue);
   const [openOptions, setOpen] = useState(false);
 
+  const enterClick = (event: any) => {
+    if (event.key === "Enter") {
+      const element = event.target as HTMLElement;
+      element.click();
+    }
+  };
+
   useEffect(() => {
     window.addEventListener("click", (e) => {
       const element = e.target as HTMLElement;
@@ -33,8 +40,10 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
 
   return (
     <div
+      tabIndex={0}
       className={`${styles["select-bar"]} row`}
       ref={divRef}
+      onKeyDown={enterClick}
       onClick={() => {
         setOpen(true);
       }}
@@ -46,7 +55,9 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
           {options.map((element, index) => {
             return (
               <div
+                tabIndex={0}
                 key={index}
+                onKeyDown={enterClick}
                 onClick={(e) => {
                   e.stopPropagation();
                   setValue(element);

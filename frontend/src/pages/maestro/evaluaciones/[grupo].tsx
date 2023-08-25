@@ -85,12 +85,12 @@ export default function Page({ params }: { params: { grupo: string } }) {
   ]);
 
   const columnList = [
-    <Th key="nombre">Nombre</Th>,
-    <Th key="lectura">Lectura</Th>,
-    <Th key="seccion">Sección</Th>,
-    <Th key="capitulo">Capítulo</Th>,
-    <Th key="fechaenvio">Fecha de envío</Th>,
-    <Th key="estado">Estado</Th>,
+    <Th tabIndex={0} key="nombre">Nombre</Th>,
+    <Th tabIndex={0} key="lectura">Lectura</Th>,
+    <Th tabIndex={0} key="seccion">Sección</Th>,
+    <Th tabIndex={0} key="capitulo">Capítulo</Th>,
+    <Th tabIndex={0} key="fechaenvio">Fecha de envío</Th>,
+    <Th tabIndex={0} key="estado">Estado</Th>,
     <Th key="link" width="20%"></Th>,
   ];
 
@@ -154,7 +154,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
             <BreadcrumbLink href="#">{group}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1>{group}</h1>
+        <h1 tabIndex={0}>{group}</h1>
         <div className={`${styles.filters} row`}>
           <InputGroup>
             <Input

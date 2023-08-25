@@ -50,8 +50,8 @@ const EvaluationList: React.FC = () => {
   }, [yearFilter, sampleList]);
 
   const columnList = [
-    <Th key="grupo">Grupo</Th>,
-    <Th key="anio">Año escolar</Th>,
+    <Th tabIndex={0} key="grupo">Grupo</Th>,
+    <Th tabIndex={0}  key="anio">Año escolar</Th>,
     <Th key="link" width="40%"></Th>,
   ];
 
@@ -88,7 +88,7 @@ const EvaluationList: React.FC = () => {
             <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1>Evaluaciones</h1>
+        <h1 tabIndex={0}>Evaluaciones</h1>
         <div className={`${styles.filters} row`}>
           <Select
             options={options}

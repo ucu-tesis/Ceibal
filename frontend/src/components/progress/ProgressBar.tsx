@@ -14,8 +14,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
     conic-gradient(#4C950C ${value}%, white 0)`,
       }}
     >
-      <span>{value}</span>
-      <span>Puntos</span>
+      <span tabIndex={0}>{value}</span>
+      <span tabIndex={0}>Puntos</span>
     </div>
   );
 };

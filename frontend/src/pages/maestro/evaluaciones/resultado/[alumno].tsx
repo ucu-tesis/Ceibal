@@ -4,12 +4,8 @@ import Head from "next/head";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import ProgressBar from "@/components/progress/ProgressBar";
 import styles from "./resultado.module.css";
-
-type Option = {
-  value?: string;
-  label: string;
-};
 
 export default function Page({ params }: { params: { alumno: string; grupo: string } }) {
   const router = useRouter();
@@ -43,7 +39,22 @@ export default function Page({ params }: { params: { alumno: string; grupo: stri
             <BreadcrumbLink href="#">Resultado</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1>Resultado de Evaluación</h1>
+        <h1 tabIndex={0}>Resultado de Evaluación</h1>
+        <div className={`row ${styles.space}`}>
+          <div className={`col ${styles.stats}`}>
+            <h5 tabIndex={0}>Alumno: {student}</h5>
+            <h5 tabIndex={0}>Lectura: Coco Bandini</h5>
+            <h5 tabIndex={0}>Sección: 6</h5>
+            <h5 tabIndex={0}>Capítulo: 4</h5>
+          </div>
+          <ProgressBar value="92"></ProgressBar>
+        </div>
+        <h2 tabIndex={0}>Métricas</h2>
+        <div className={`col ${styles.stats} ${styles.border}`}>
+            <h5 tabIndex={0}>Cantidad Pausas: 4</h5>
+            <h5 tabIndex={0}>Cantidad Repeticiones 4</h5>
+            <h5 tabIndex={0}>Velocidad de lectura : 120 palabras/minuto</h5>
+        </div>
       </div>
     </ChakraProvider>
   );
