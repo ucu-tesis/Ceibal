@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { AnalysisStatus, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -68,10 +68,44 @@ async function load() {
     evaluation_group_id: testStudent.EvaluationGroups[0].id,
   };
 
-  await prisma.evaluationGroupReading.upsert({
+  const testGroup = await prisma.evaluationGroupReading.upsert({
     where: { id: 1 }, // TODO evaulationGroupReadingParams, (after adding unique constraint)
     update: {},
     create: evaulationGroupReadingParams,
+  });
+
+  await prisma.recording.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      recording_url:
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      evaluation: {},
+      evaluation_group_reading_id: testGroup.id,
+      student_id: testStudent.id,
+    },
+  });
+
+  await prisma.analysis.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      recording_id: 1,
+      status: AnalysisStatus.COMPLETED,
+      repetitions_count: 0,
+      silences_count: 0,
+      allosaurus_general_error: 0,
+      similarity_error: 0,
+      repeated_phonemes: [],
+      words_with_errors: [],
+      words_with_repetitions: [],
+      score: 0,
+      error_timestamps: [],
+      repetition_timestamps: [],
+      phoneme_velocity: 0,
+      words_velocity: 0,
+      raw_analysis: {},
+    },
   });
 }
 const main = async () => {
