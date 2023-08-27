@@ -1,0 +1,49 @@
+.container {
+  padding: 24px;
+}
+
+.filters {
+  justify-content: left;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  gap: 40px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.edit-modal {
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.edit-modal > div {
+  justify-content: center;
+  gap: 24px;
+}
+
+.add-class {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+td .badge {
+  border-radius: 8px;
+  min-width: 100px;
+  text-align: center;
+  color: white;
+  text-transform: capitalize;
+  font-size: 14px;
+  padding-top: 1px;
+}
+
+.badge.processed {
+  background: #48BB78;
+}
+
+.badge.error {
+  background: #F00;
+}
+
+.badge.pending {
+  background: #003C7D;
+}

@@ -1,0 +1,22 @@
+.table-border {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.main-table {
+  font-size: 14px;
+}
+
+.main-table tbody tr:nth-child(odd) {
+  background-color: var(--ceibal-light-grey-secondary);
+}
+
+.main-table td:last-child {
+    text-align: right;
+}
+
+.main-table a {
+  color: var(--ceibal-action-color);
+  font-weight: 700;
+}

@@ -93,14 +93,6 @@ h1 {
   width: 100%;
 }
 
-.progress > div:first-child {
-  align-self: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 /* Animaciones */
 
 @keyframes vanish {
@@ -135,4 +127,8 @@ h1 {
 
 .css-bx0blc {
   width: auto !important;
+}
+
+.css-70qvj9 {
+  flex-wrap: wrap;
 }
