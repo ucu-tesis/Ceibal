@@ -1,0 +1,27 @@
+.accordeon {
+    border: 1px solid var(--ceibal-black);
+    border-radius: 8px;
+}
+
+.accordeon > span.closed {
+    border-radius: 6px;
+}
+
+.accordeon > span {
+    display: block;
+    padding-block: 8px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background: var(--ceibal-green-secondary);
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.accordeon > span.secondary {
+    background: var(--ceibal-sky-blue);
+}
+
+.accordeon .body.open {
+    padding: 8px;
+}

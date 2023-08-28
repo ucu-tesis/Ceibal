@@ -1,0 +1,12 @@
+.container {
+  padding: 16px 64px;
+  text-align: center;
+}
+
+.container h1 {
+  color: var(--ceibal-black);
+  text-decoration-line: underline;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+}
