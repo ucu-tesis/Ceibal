@@ -20,3 +20,17 @@
   color: var(--ceibal-action-color);
   font-weight: 700;
 }
+
+.read-list-item {
+  padding: 8px;
+  text-align: left;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--ceibal-black);
+  border-bottom: none;
+  background: var(--ceibal-white);
+}
+
+.read-list-item:last-child {
+  border-bottom: 1px solid var(--ceibal-black);
+}

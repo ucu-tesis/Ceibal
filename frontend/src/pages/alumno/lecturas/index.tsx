@@ -1,6 +1,7 @@
 import React from "react";
 import PrimaryAccordion from "@/components/accordions/PrimaryAccordion";
 import SecondaryAccordion from "@/components/accordions/SecondaryAccordion";
+import ReadListTable from "@/components/tables/ReadListTable";
 import styles from "./lecturas.module.css";
 
 const BusquedaLecturas: React.FC = () => {
@@ -9,8 +10,7 @@ const BusquedaLecturas: React.FC = () => {
       <h1>Ejercicios</h1>
       <PrimaryAccordion title="Seccion">
         <SecondaryAccordion title="Capitulo">
-            <span>Timotea se va de viaje</span>
-            <span>Quiero ser Suárez</span>
+          <ReadListTable data={["Timotea se va de viaje", "Quiero ser Suárez"]}></ReadListTable>
         </SecondaryAccordion>
       </PrimaryAccordion>
     </div>
