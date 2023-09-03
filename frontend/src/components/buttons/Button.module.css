@@ -77,3 +77,44 @@
   background-color: var(--ceibal-black);
   color: var(--ceibal-white);
 }
+
+.card-button {
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--ceibal-green);
+  background: #e7b062;
+  padding: 12px 16px;
+  gap: 18px;
+  width: 85%;
+}
+
+.card-button img {
+  max-height: 70px;
+  max-width: 70px;
+}
+
+.card-button span {
+  flex: 1;
+  flex-direction: column;
+  text-align: start;
+  font-size: 24px;
+}
+
+@media (max-width: 500px) {
+  .card-button {
+    border-radius: 8px;
+    gap: 8px;
+    padding: 8px 16px;
+  }
+
+  .card-button img {
+    aspect-ratio: 4;
+    max-height: 50px;
+    max-width: 50px;
+  }
+
+  .card-button span {
+    font-size: 18px;
+  }
+}
