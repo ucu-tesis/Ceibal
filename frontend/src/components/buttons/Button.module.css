@@ -87,6 +87,13 @@
   padding: 12px 16px;
   gap: 18px;
   width: 85%;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.card-button:hover {
+  cursor: pointer;
+  transform: scale(1.25);
+  background-color: #ffcc80;
 }
 
 .card-button img {
@@ -106,6 +113,17 @@
     border-radius: 8px;
     gap: 8px;
     padding: 8px 16px;
+  }
+
+  /* Disable hover for mobile.  */
+  .card-button:hover {
+    transform: scale(1);
+    background: #e7b062;
+  }
+
+  .card-button:active {
+    transform: scale(1.25);
+    background-color: #ffcc80;
   }
 
   .card-button img {
