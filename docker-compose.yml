@@ -22,7 +22,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+      - ./backend/pg-init-scripts:/docker-entrypoint-initdb.d
   api:
     build:
       context: ./
@@ -37,6 +37,7 @@ services:
     environment:
       - "SEED_DATABASE=${SEED_DATABASE}"
       - "DATABASE_URL=postgresql://postgres:password@db:5432/ceibal_development?schema=public"
+      - "TEST_DB=postgresql://postgres:password@db:5432/ceibal_test?schema=public"
     depends_on:
       - db
 

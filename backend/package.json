@@ -14,11 +14,12 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test": "DATABASE_URL=$TEST_DB jest",
+    "test:watch": "DATABASE_URL=$TEST_DB jest --watch",
+    "test:cov": "DATABASE_URL=$TEST_DB jest --coverage",
+    "test:debug": "DATABASE_URL=$TEST_DB  node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "DATABASE_URL=$TEST_DB  jest --config ./test/jest-e2e.json",
+    "test:migrate": "DATABASE_URL=$TEST_DB prisma migrate reset"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.326.0",
@@ -75,7 +76,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/../test/testSetup.ts"
+    ]
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

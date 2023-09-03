@@ -1,0 +1,35 @@
+#!/bin/bash
+
+ENV_ARG=
+
+function check_docker {
+  docker -v > /dev/null 2>&1
+
+  if [ $? -eq 127 ]; then
+    echo "$(tput setaf 1)Docker not found$(tput sgr 0)"
+    echo ""
+    echo "Follow the instructions in https://docs.docker.com/docker-for-mac/install/"
+
+    exit 1
+  fi
+}
+
+function terminal {
+  docker-compose $ENV_ARG exec api /bin/sh
+}
+
+if [[ "$@" =~ --release ]]; then
+  ENV_ARG="-f docker-compose.release.yml"
+else
+  ENV_ARG="-f docker-compose.yml"
+fi
+
+# Check dependencies
+
+check_docker
+
+# Process user commands
+
+case "$1" in
+  * )  terminal $@ ;;
+esac
