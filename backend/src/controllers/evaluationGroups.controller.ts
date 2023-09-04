@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
@@ -30,5 +30,30 @@ export class EvaluationGroupsController {
       take: pageSize,
     });
     return evaluationGroups;
+  }
+
+  @Get('/:evaluationGroupId')
+  // @UseGuards(AuthGuard)
+  async getOne(
+    @Param('evaluationGroupId') evaluationGroupId: number,
+  ): Promise<EvaluationGroup> {
+    const evaluationGroup =
+      await this.prismaService.evaluationGroup.findUniqueOrThrow({
+        where: {
+          id: Number(evaluationGroupId),
+        },
+        include: {
+          Students: {
+            select: {
+              id: true,
+              cedula: true,
+              first_name: true,
+              last_name: true,
+              email: true,
+            },
+          },
+        },
+      });
+    return evaluationGroup;
   }
 }

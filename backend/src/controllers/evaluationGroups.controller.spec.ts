@@ -77,4 +77,54 @@ describe('EvaluationGroupsController', () => {
       });
     });
   });
+
+  describe('getOne', () => {
+    it('returns a group and its students when it exists', async () => {
+      const teacher = await prismaService.user.create({
+        data: {
+          cedula: '1234',
+          email: 'alice@email.com',
+          first_name: 'Alice',
+          last_name: 'Wonders',
+          password_hash: 'Password',
+        },
+      });
+      const evaluationGroup = await prismaService.evaluationGroup.create({
+        data: {
+          name: 'group1',
+          school_year: 2023,
+          Teacher: { connect: { id: teacher.id } },
+          Creator: { connect: { id: teacher.id } },
+        },
+      });
+      const student = await prismaService.student.create({
+        data: {
+          cedula: '50000',
+          email: 'drago@student.com',
+          first_name: 'Drago',
+          last_name: 'Berto',
+          EvaluationGroups: {
+            connect: { id: evaluationGroup.id },
+          },
+        },
+      });
+      expect(await controller.getOne(evaluationGroup.id)).toEqual({
+        id: expect.any(Number),
+        name: 'group1',
+        school_data: null,
+        school_year: 2023,
+        teacher_id: teacher.id,
+        created_by: teacher.id,
+        Students: [
+          {
+            id: student.id,
+            first_name: 'Drago',
+            last_name: 'Berto',
+            cedula: '50000',
+            email: 'drago@student.com',
+          },
+        ],
+      });
+    });
+  });
 });
