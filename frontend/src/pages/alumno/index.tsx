@@ -37,6 +37,13 @@ const StudentHomeScreen: React.FC = () => {
           />
         </div>
       </div>
+      <style jsx global>
+        {`
+          body {
+            background: #faebdf;
+          }
+        `}
+      </style>
     </>
   );
 };
