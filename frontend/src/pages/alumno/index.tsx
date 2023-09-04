@@ -6,8 +6,12 @@ import Image from "next/image";
 import ChicaLeyendo from "../../assets/images/chica_leyendo.svg";
 import PodioPrimerLugar from "../../assets/images/podio_primer_lugar.svg";
 import Trofeo from "../../assets/images/trofeo.svg";
+import { useRouter } from "next/router";
 
 const StudentHomeScreen: React.FC = () => {
+  const router = useRouter();
+  const currentPathName = router.pathname;
+
   return (
     <>
       <Head>
@@ -22,17 +26,17 @@ const StudentHomeScreen: React.FC = () => {
         <div className={`${styles["button-container"]} col`}>
           <CardButton
             leftIcon={<Image src={ChicaLeyendo} alt="" />}
-            onClick={() => console.log("Button 1")}
+            onClick={() => router.push(`${currentPathName}/lecturas`)}
             text="Divertirme leyendo"
           />
           <CardButton
             leftIcon={<Image src={PodioPrimerLugar} alt="" />}
-            onClick={() => console.log("Button 2")}
+            onClick={() => router.push(`${currentPathName}`)} // TODO: Modify URL when progress page is done.
             text="Ver mi progreso"
           />
           <CardButton
             leftIcon={<Image src={Trofeo} alt="" />}
-            onClick={() => console.log("Button 3")}
+            onClick={() => router.push(`${currentPathName}`)} // TODO: Modify URL when rewards page is done.
             text="Ver mi colección de premios"
           />
         </div>
