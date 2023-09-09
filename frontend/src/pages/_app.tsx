@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import MainHeader from "@/components/headers/MainHeader";
 
 const mozaicFont = localFont({
   src: [
@@ -39,6 +40,8 @@ export default function App({ Component, pageProps }: AppProps) {
             font-family: ${mozaicFont.style.fontFamily} !important;
           }
         `}</style>
+        <MainHeader />
+        <hr />
         <Component {...pageProps} />
       </div>
     </QueryClientProvider>

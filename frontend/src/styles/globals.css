@@ -38,7 +38,6 @@ code {
 
 #header {
   padding-inline: 20px;
-  padding-right: 50px;
   justify-content: space-between;
   align-items: center;
   font-style: normal;
@@ -49,7 +48,19 @@ code {
 }
 
 #header a {
+  margin-right: 50px;
   cursor: pointer;
+}
+
+#header div {
+  text-align: end;
+  /* Make sure all divs are equal size so they are properly distributed with
+  container's justify-content. */
+  width: 142px;
+}
+
+#header div img {
+  max-height: 77px;
 }
 
 .row {
