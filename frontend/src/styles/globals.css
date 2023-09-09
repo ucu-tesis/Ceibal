@@ -26,7 +26,8 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 .container {
@@ -36,18 +37,30 @@ code {
 }
 
 #header {
-  margin-inline: 20px;
-  margin-right: 50px;
+  padding-inline: 20px;
   justify-content: space-between;
   align-items: center;
   font-style: normal;
   font-weight: 600;
   font-size: 20px;
   line-height: 100%;
+  background-color: white;
 }
 
 #header a {
+  margin-right: 50px;
   cursor: pointer;
+}
+
+#header div {
+  text-align: end;
+  /* Make sure all divs are equal size so they are properly distributed with
+  container's justify-content. */
+  width: 142px;
+}
+
+#header div img {
+  max-height: 77px;
 }
 
 .row {
@@ -121,7 +134,6 @@ h1 {
     gap: 64px;
   }
 }
-
 
 /* Fix Chakra */
 
