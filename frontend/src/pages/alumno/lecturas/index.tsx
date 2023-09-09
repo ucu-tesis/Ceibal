@@ -10,9 +10,23 @@ const BusquedaLecturas: React.FC = () => {
       <h1>Ejercicios</h1>
       <PrimaryAccordion title="Seccion">
         <SecondaryAccordion title="Capitulo">
-          <ReadListTable data={["Timotea se va de viaje", "Quiero ser Suárez"]}></ReadListTable>
+          <ReadListTable
+            data={[
+              "Timotea se va de viaje",
+              "Quiero ser Suárez",
+              "Diógenes no quiere ser ratón",
+              "Los fantasmas de la escuela !pasaron de clase!",
+            ]}
+          ></ReadListTable>
         </SecondaryAccordion>
       </PrimaryAccordion>
+      <style jsx global>
+        {`
+          body {
+            background: #faebdf;
+          }
+        `}
+      </style>
     </div>
   );
 };

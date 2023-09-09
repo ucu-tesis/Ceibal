@@ -28,7 +28,7 @@
   border-radius: 4px;
   border: 1px solid var(--ceibal-black);
   border-bottom: none;
-  background: var(--ceibal-white);
+  background: inherit;
 }
 
 .read-list-item:last-child {

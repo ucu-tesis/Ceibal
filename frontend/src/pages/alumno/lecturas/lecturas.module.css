@@ -10,3 +10,10 @@
   font-style: normal;
   font-weight: 600;
 }
+
+@media (min-width: 1440px) {
+  .container {
+    padding: 16px 144px;
+    text-align: center;
+  }
+}

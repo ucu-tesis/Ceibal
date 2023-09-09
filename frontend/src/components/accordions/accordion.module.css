@@ -8,7 +8,6 @@
 }
 
 .accordeon > span {
-    display: block;
     font-size: 24px;
     font-weight: 500;
     padding-block: 8px;
@@ -19,6 +18,26 @@
     cursor: pointer;
     width: 100%;
     transition: box-shadow linear 0.2s;
+    justify-content: center;
+    align-items: center;
+}
+
+.accordeon > span div {
+    margin-left: auto;
+}
+
+.accordeon > span div img {
+    width: 16px;
+    height: 16px;
+}
+
+.accordeon > span div:last-child {
+    margin-right: 16px;
+    transition: transform linear 0.1s;
+}
+
+.accordeon > span:not(.closed) div:last-child {
+    transform: rotate(-90deg);
 }
 
 .accordeon span:not(.closed):focus {
@@ -26,11 +45,17 @@
 }
 
 .accordeon > span.secondary {
-    background: var(--ceibal-sky-blue);
+    background-color: var(--ceibal-sky-blue);
     font-size: 16px;
     text-align: left;
     padding-left: 8px;
     width: auto;
+    justify-content: left;
+    align-items: center;
+}
+
+.accordeon > span.secondary div:first-child {
+    margin-left: unset;
 }
 
 .accordeon span.secondary:not(.closed):focus {
