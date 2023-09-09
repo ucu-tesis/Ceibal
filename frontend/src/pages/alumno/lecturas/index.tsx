@@ -15,7 +15,7 @@ const BusquedaLecturas: React.FC = () => {
               "Timotea se va de viaje",
               "Quiero ser Suárez",
               "Diógenes no quiere ser ratón",
-              "Los fantasmas de la escuela !pasaron de clase!",
+              "Los fantasmas de la escuela pasaron de clase!",
             ]}
           ></ReadListTable>
         </SecondaryAccordion>
@@ -23,7 +23,7 @@ const BusquedaLecturas: React.FC = () => {
       <style jsx global>
         {`
           body {
-            background: #faebdf;
+            background: var(--ceibal-student-background);
           }
         `}
       </style>
