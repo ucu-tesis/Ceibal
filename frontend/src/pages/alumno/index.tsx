@@ -44,7 +44,7 @@ const StudentHomeScreen: React.FC = () => {
       <style jsx global>
         {`
           body {
-            background: #faebdf;
+            background: var(--ceibal-student-background);
           }
         `}
       </style>

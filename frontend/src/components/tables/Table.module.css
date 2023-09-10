@@ -20,3 +20,28 @@
   color: var(--ceibal-action-color);
   font-weight: 700;
 }
+
+.read-list-item {
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--ceibal-black);
+  border-bottom: none;
+  background: inherit;
+  background-image: url(../../assets/images/chevron_right.svg);
+  background-repeat: no-repeat;
+  background-position-x: 99%;
+  background-position-y: center;
+  background-size: 16px;
+  transition: background-color ease-in-out 0.2s;
+}
+
+.read-list-item:hover{
+  background-color: #ffcc80;
+}
+
+.read-list-item:last-child {
+  border-bottom: 1px solid var(--ceibal-black);
+}
