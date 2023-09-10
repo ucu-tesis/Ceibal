@@ -16,17 +16,17 @@ export class AnalysisController {
   constructor(private prismaService: PrismaService) {}
 
   @Get('/')
-  // @UseGuards(AuthGuard) // Login deshabilitado hasta integrar SSO
+  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
   async studentGetAll(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
     @Query('request') request: Request,
-    @Query('ci') ci: string, // TODO Eliminar cuando se integre SSO
+    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis[]> {
     if (!page) page = 0;
     if (!pageSize) pageSize = 20;
 
-    // const ci = request['user'].ci;
+    // TODO: const ci = request['user'].ci;
 
     const analyses = await this.prismaService.analysis.findMany({
       where: {
@@ -44,13 +44,13 @@ export class AnalysisController {
   }
 
   @Get('/:analysisId')
-  // @UseGuards(AuthGuard) // Login deshabilitado hasta integrar SSO
+  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
   async studentGetSingle(
     @Param('analysisId') analysisId: number,
     @Query('request') request: Request,
-    @Query('ci') ci: string, // Eliminar cuando se integre SSO
+    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis> {
-    // const ci = request['user'].ci;
+    // TODO: const ci = request['user'].ci;
 
     const analysis = await this.prismaService.analysis.findFirst({
       where: {
@@ -64,7 +64,7 @@ export class AnalysisController {
     });
 
     if (!analysis) {
-      throw new NotFoundException('Análisis no encontrado');
+      throw new NotFoundException('Analysis not found');
     }
 
     return analysis;
