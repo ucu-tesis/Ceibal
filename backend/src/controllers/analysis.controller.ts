@@ -21,7 +21,7 @@ export class AnalysisController {
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
     @Query('request') request: Request,
-    @Query('ci') ci: string, // Eliminar cuando se integre SSO
+    @Query('ci') ci: string, // TODO Eliminar cuando se integre SSO
   ): Promise<Analysis[]> {
     if (!page) page = 0;
     if (!pageSize) pageSize = 20;
