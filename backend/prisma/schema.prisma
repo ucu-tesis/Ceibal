@@ -69,4 +69,34 @@ model Recording {
   evaluation_group_reading_id Int
   Student                     Student                @relation(fields: [student_id], references: [id])
   student_id                  Int
+  Analysis                    Analysis[]
+}
+
+model Analysis {
+  id                       Int            @id @default(autoincrement())
+  recording_id             Int
+  status                   AnalysisStatus
+  repetitions_count        Int
+  silences_count           Int
+  allosaurus_general_error Int
+  similarity_error         Int
+  repeated_phonemes        String[]
+  words_with_errors        String[]
+  words_with_repetitions   String[]
+  score                    Float
+  error_timestamps         Float[]
+  repetition_timestamps    Float[]
+  phoneme_velocity         Float
+  words_velocity           Float
+  raw_analysis             Json
+  Recording                Recording      @relation(fields: [recording_id], references: [id])
+  created_at               DateTime       @default(now())
+  updated_at               DateTime       @updatedAt
+}
+
+enum AnalysisStatus {
+  PENDING
+  WORKING
+  COMPLETED
+  FAILED
 }
