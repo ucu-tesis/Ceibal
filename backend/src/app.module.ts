@@ -9,6 +9,7 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TeachersController } from './controllers/teachers.controller';
+import { EvaluationGroupsController } from './controllers/evaluationGroups.controller';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TeachersController } from './controllers/teachers.controller';
     RecordingsController,
     AuthController,
     TeachersController,
+    EvaluationGroupsController,
   ],
   providers: [AppService, FileUploadService, PrismaService, AuthService],
 })

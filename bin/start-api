@@ -1,0 +1,48 @@
+#!/bin/bash
+
+CONFIG=.env
+ENV_ARG=
+
+function check_base_config {
+  if [ ! -f $CONFIG ]; then
+    echo "$(tput setaf 2)Creating configuration file $(tput setaf 9)"
+
+    cp .env.sample .env
+  fi
+}
+
+function check_docker {
+  docker -v > /dev/null 2>&1
+
+  if [ $? -eq 127 ]; then
+    echo "$(tput setaf 1)Docker not found$(tput sgr 0)"
+    echo ""
+    echo "Follow the instructions in https://docs.docker.com/docker-for-mac/install/"
+
+    exit 1
+  fi
+}
+
+function up {
+  docker-compose $ENV_ARG up --build --remove-orphans api
+}
+
+if [[ "$@" =~ --release ]]; then
+  ENV_ARG="-f docker-compose.release.yml"
+else
+  ENV_ARG="-f docker-compose.yml"
+fi
+
+# Check configurations
+
+check_base_config
+
+# Check dependencies
+
+check_docker
+
+# Process user commands
+
+case "$1" in
+  * )  up $@ ;;
+esac
