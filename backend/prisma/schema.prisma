@@ -90,6 +90,8 @@ model Analysis {
   words_velocity           Float
   raw_analysis             Json
   Recording                Recording      @relation(fields: [recording_id], references: [id])
+  created_at               DateTime       @default(now())
+  updated_at               DateTime       @updatedAt
 }
 
 enum AnalysisStatus {

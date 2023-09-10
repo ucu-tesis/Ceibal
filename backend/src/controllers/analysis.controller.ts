@@ -38,6 +38,9 @@ export class AnalysisController {
       },
       skip: page * pageSize,
       take: pageSize,
+      orderBy: {
+        created_at: 'desc',
+      },
     });
 
     return analyses;
