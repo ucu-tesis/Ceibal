@@ -35,7 +35,7 @@ export class RecordingsController {
   async getAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('studentId') studentId: string,
-  ): Promise<Recording[]> {
+  ): Promise<{ data: Recording[] }> {
     const recordings = await this.prismaService.recording.findMany({
       where: {
         student_id: Number(studentId),
@@ -46,7 +46,7 @@ export class RecordingsController {
       skip: page * pageSize,
       take: pageSize,
     });
-    return recordings;
+    return { data: recordings };
   }
 
   @Get('/:recordingId')

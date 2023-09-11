@@ -12,14 +12,16 @@ export class TeachersController {
   @UseGuards(AuthGuard)
   async getAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
-  ): Promise<User[]> {
+  ): Promise<{ data: User[] }> {
     const users = await this.prismaService.user.findMany({
       skip: page * pageSize,
       take: pageSize,
     });
-    return users.map((user) => {
-      user.password_hash = undefined;
-      return user;
-    });
+    return {
+      data: users.map((user) => {
+        user.password_hash = undefined;
+        return user;
+      }),
+    };
   }
 }

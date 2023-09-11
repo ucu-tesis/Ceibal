@@ -12,7 +12,7 @@ export class EvaluationGroupsController {
   async getAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('ci') ci: string, // TODO remove after adding sso
-  ): Promise<EvaluationGroup[]> {
+  ): Promise<{ data: EvaluationGroup[] }> {
     if (!ci) {
       throw new Error('Must provide a filter');
     }
@@ -26,7 +26,7 @@ export class EvaluationGroupsController {
       skip: page * pageSize,
       take: pageSize,
     });
-    return evaluationGroups;
+    return { data: evaluationGroups };
   }
 
   @Get('/:evaluationGroupId')

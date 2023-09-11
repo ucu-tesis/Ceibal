@@ -23,7 +23,7 @@ export class AnalysisController {
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('request') request: Request,
     @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
-  ): Promise<Analysis[]> {
+  ): Promise<{ data: Analysis[] }> {
     // TODO: const ci = request['user'].ci;
 
     const analyses = await this.prismaService.analysis.findMany({
@@ -41,7 +41,7 @@ export class AnalysisController {
       },
     });
 
-    return analyses;
+    return { data: analyses };
   }
 
   @Get('/:analysisId')
