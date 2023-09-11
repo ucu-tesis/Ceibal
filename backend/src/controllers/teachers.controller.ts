@@ -2,6 +2,7 @@ import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { Pagination } from 'src/decorators/pagination.decorator';
 
 @Controller('teachers')
 export class TeachersController {
@@ -10,11 +11,8 @@ export class TeachersController {
   @Get('/')
   @UseGuards(AuthGuard)
   async getAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number,
+    @Pagination() { page, pageSize }: { page: number; pageSize: number },
   ): Promise<User[]> {
-    if (!page) page = 0;
-    if (!pageSize) pageSize = 20;
     const users = await this.prismaService.user.findMany({
       skip: page * pageSize,
       take: pageSize,

@@ -12,6 +12,7 @@ import { FileUploadService } from 'src/services/file-upload.service';
 import { File } from 'multer';
 import { Recording } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { Pagination } from 'src/decorators/pagination.decorator';
 
 @Controller('recordings')
 export class RecordingsController {
@@ -32,12 +33,9 @@ export class RecordingsController {
   @Get('/')
   // @UseGuards(AuthGuard)
   async getAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number,
+    @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('studentId') studentId: string,
   ): Promise<Recording[]> {
-    if (!page) page = 0;
-    if (!pageSize) pageSize = 20;
     const recordings = await this.prismaService.recording.findMany({
       where: {
         student_id: Number(studentId),

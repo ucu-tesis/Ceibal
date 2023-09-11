@@ -10,6 +10,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { Analysis } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Request } from 'express';
+import { Pagination } from 'src/decorators/pagination.decorator';
 
 // TODO consider converting this into a "student" controller with all other student-facing logic
 @Controller('analysis')
@@ -19,14 +20,10 @@ export class AnalysisController {
   @Get('/')
   // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
   async studentGetAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number,
+    @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('request') request: Request,
     @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis[]> {
-    if (!page) page = 0;
-    if (!pageSize) pageSize = 20;
-
     // TODO: const ci = request['user'].ci;
 
     const analyses = await this.prismaService.analysis.findMany({
