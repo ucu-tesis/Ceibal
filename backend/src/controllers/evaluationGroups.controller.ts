@@ -35,7 +35,7 @@ export class EvaluationGroupsController {
   @Get('/:evaluationGroupId')
   // @UseGuards(AuthGuard)
   async getOne(
-    @Param('evaluationGroupId') evaluationGroupId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
     const evaluationGroup =
       await this.prismaService.evaluationGroup.findUniqueOrThrow({

@@ -11,6 +11,7 @@ import { Analysis } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Request } from 'express';
 
+// TODO consider converting this into a "student" controller with all other student-facing logic
 @Controller('analysis')
 export class AnalysisController {
   constructor(private prismaService: PrismaService) {}
