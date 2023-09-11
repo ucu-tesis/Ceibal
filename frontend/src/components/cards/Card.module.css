@@ -1,0 +1,21 @@
+.read-card {
+    border-radius: 10px;
+    border: 1px solid var(--ceibal-black);
+    background: #00A096;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    gap: 20px;
+    padding: 16px 32px;
+}
+
+.read-card span {
+    color: #000;
+    text-align: center;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.read-card img {
+    height: 200px;
+    width: auto;
+}
