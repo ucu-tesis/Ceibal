@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
+import { TestFactory } from '../testFactory';
 
 const defaultPagination = { page: 0, pageSize: 20 };
 
@@ -42,40 +43,21 @@ describe('EvaluationGroupsController', () => {
       });
 
       describe('when there are groups', () => {
-        let testTeacher;
-        beforeEach(async () => {
-          testTeacher = await prismaService.user.create({
-            data: {
-              cedula: ci,
-              email: 'alice@email.com',
-              first_name: 'Alice',
-              last_name: 'Wonders',
-              GroupsOwned: {
-                create: {
-                  name: 'group1',
-                  school_year: 2023,
-                  Creator: {
-                    connect: {
-                      cedula: ci,
-                    },
-                  },
-                },
-              },
-              password_hash: null,
-            },
-          });
-        });
-
         it('returns the groups that match the filter, with pagination info', async () => {
+          const testTeacher = await TestFactory.createTeacher({ cedula: ci });
+          const testEvaluationGroup = await TestFactory.createEvaluationGroup({
+            teacherId: testTeacher.id,
+          });
+
           expect(await controller.getAll(defaultPagination, ci)).toEqual({
             data: [
               {
-                id: expect.any(Number),
-                created_by: testTeacher.id,
-                name: 'group1',
+                id: testEvaluationGroup.id,
+                name: testEvaluationGroup.name,
+                school_year: testEvaluationGroup.school_year,
                 school_data: null,
-                school_year: 2023,
                 teacher_id: testTeacher.id,
+                created_by: testTeacher.id,
               },
             ],
           });
@@ -86,37 +68,22 @@ describe('EvaluationGroupsController', () => {
 
   describe('getOne', () => {
     it('returns a group and its students when it exists', async () => {
-      const teacher = await prismaService.user.create({
-        data: {
-          cedula: '1234',
-          email: 'alice@email.com',
-          first_name: 'Alice',
-          last_name: 'Wonders',
-          password_hash: 'Password',
-        },
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      const evaluationGroup = await TestFactory.createEvaluationGroup({
+        teacherId: teacher.id,
       });
-      const evaluationGroup = await prismaService.evaluationGroup.create({
+      const student = await TestFactory.createStudent({});
+      await prismaService.student.update({
+        where: { id: student.id },
         data: {
-          name: 'group1',
-          school_year: 2023,
-          Teacher: { connect: { id: teacher.id } },
-          Creator: { connect: { id: teacher.id } },
-        },
-      });
-      const student = await prismaService.student.create({
-        data: {
-          cedula: '50000',
-          email: 'drago@student.com',
-          first_name: 'Drago',
-          last_name: 'Berto',
           EvaluationGroups: {
             connect: { id: evaluationGroup.id },
           },
         },
       });
       expect(await controller.getOne(String(evaluationGroup.id))).toEqual({
-        id: expect.any(Number),
-        name: 'group1',
+        id: evaluationGroup.id,
+        name: evaluationGroup.name,
         school_data: null,
         school_year: 2023,
         teacher_id: teacher.id,
@@ -124,10 +91,10 @@ describe('EvaluationGroupsController', () => {
         Students: [
           {
             id: student.id,
-            first_name: 'Drago',
-            last_name: 'Berto',
-            cedula: '50000',
-            email: 'drago@student.com',
+            first_name: student.first_name,
+            last_name: student.last_name,
+            cedula: student.cedula,
+            email: student.email,
           },
         ],
       });
