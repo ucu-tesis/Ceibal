@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
+import { AnalysisStatus, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -106,6 +106,37 @@ export class TestFactory {
         student_id: studentId,
         evaluation_group_reading_id: evaluationGroupReadingId,
         recording_url: faker.internet.url(),
+        ...attributes,
+      },
+    });
+  }
+
+  static async createAnalysis({
+    recordingId,
+    ...attributes
+  }: {
+    recordingId?: number;
+  }) {
+    if (!recordingId) {
+      recordingId = (await TestFactory.createRecording({})).id;
+    }
+    return prisma.analysis.create({
+      data: {
+        recording_id: recordingId,
+        status: AnalysisStatus.COMPLETED,
+        repetitions_count: 0,
+        silences_count: 0,
+        allosaurus_general_error: 0,
+        similarity_error: 0,
+        repeated_phonemes: [],
+        words_with_errors: [],
+        words_with_repetitions: [],
+        score: faker.number.int(100),
+        error_timestamps: [],
+        repetition_timestamps: [],
+        phoneme_velocity: 0,
+        words_velocity: 0,
+        raw_analysis: {},
         ...attributes,
       },
     });

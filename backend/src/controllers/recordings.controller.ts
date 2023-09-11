@@ -36,6 +36,11 @@ export class RecordingsController {
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('studentId') studentId: string,
   ): Promise<{ data: Recording[] }> {
+    if (!studentId) {
+      throw new Error('Must provide studentId as part of the query');
+    }
+    // TODO throw error when student is not found + test it
+
     const recordings = await this.prismaService.recording.findMany({
       where: {
         student_id: Number(studentId),
