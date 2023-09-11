@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EvaluationGroupsController } from './evaluationGroups.controller';
+import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
 
-// TODO remove this: consider turning these into route tests (integration tests)
 const defaultPagination = { page: 0, pageSize: 20 };
 
 describe('EvaluationGroupsController', () => {
