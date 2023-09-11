@@ -84,7 +84,8 @@
     },
     "setupFilesAfterEnv": [
       "<rootDir>/../test/testSetup.ts"
-    ]
+    ],
+    "maxWorkers": 1
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"

@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EvaluationGroupsController } from './evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
 
+// TODO remove this: consider turning these into route tests (integration tests)
+const defaultPagination = { page: 0, pageSize: 20 };
+
 describe('EvaluationGroupsController', () => {
   let controller: EvaluationGroupsController;
 
@@ -22,9 +25,9 @@ describe('EvaluationGroupsController', () => {
   describe('getAll', () => {
     describe('when no ci is passed', () => {
       it('throws an error', async () => {
-        await expect(controller.getAll(null, null, null)).rejects.toEqual(
-          new Error('Must provide a filter'),
-        );
+        await expect(
+          controller.getAll(defaultPagination, null),
+        ).rejects.toEqual(new Error('Must provide a filter'));
       });
     });
 
@@ -33,7 +36,9 @@ describe('EvaluationGroupsController', () => {
 
       describe('when there are no groups', () => {
         it('returns an empty array', async () => {
-          await expect(controller.getAll(null, null, ci)).resolves.toEqual([]);
+          await expect(
+            controller.getAll(defaultPagination, ci),
+          ).resolves.toEqual({ data: [] });
         });
       });
 
@@ -63,16 +68,18 @@ describe('EvaluationGroupsController', () => {
         });
 
         it('returns the groups that match the filter, with pagination info', async () => {
-          expect(await controller.getAll(null, null, ci)).toEqual([
-            {
-              id: expect.any(Number),
-              created_by: testTeacher.id,
-              name: 'group1',
-              school_data: null,
-              school_year: 2023,
-              teacher_id: testTeacher.id,
-            },
-          ]);
+          expect(await controller.getAll(defaultPagination, ci)).toEqual({
+            data: [
+              {
+                id: expect.any(Number),
+                created_by: testTeacher.id,
+                name: 'group1',
+                school_data: null,
+                school_year: 2023,
+                teacher_id: testTeacher.id,
+              },
+            ],
+          });
         });
       });
     });
@@ -108,7 +115,7 @@ describe('EvaluationGroupsController', () => {
           },
         },
       });
-      expect(await controller.getOne(evaluationGroup.id)).toEqual({
+      expect(await controller.getOne(String(evaluationGroup.id))).toEqual({
         id: expect.any(Number),
         name: 'group1',
         school_data: null,
