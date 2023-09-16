@@ -15,7 +15,7 @@ import {
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import ChakraTable from "@/components/tables/ChakraTable";
-import styles from "./evaluaciones.module.css";
+import styles from "./grupos.module.css";
 
 type Option = {
   value?: string;
@@ -38,11 +38,15 @@ type Evaluation = {
 };
 
 export default function Page({ params }: { params: { grupo: string } }) {
-  const router = useRouter();
-  const group = router.query.grupo;
+  const { query } = useRouter();
+  const group = query.grupo;
 
   const BadgeComponent = (status: string) => {
-    return <Badge className={`${styles.badge} ${styles[status]}`}>{statusTypes[status]}</Badge>;
+    return (
+      <Badge className={`${styles.badge} ${styles[status]}`}>
+        {statusTypes[status]}
+      </Badge>
+    );
   };
 
   const options: Option[] = [
@@ -85,12 +89,24 @@ export default function Page({ params }: { params: { grupo: string } }) {
   ]);
 
   const columnList = [
-    <Th tabIndex={0} key="nombre">Nombre</Th>,
-    <Th tabIndex={0} key="lectura">Lectura</Th>,
-    <Th tabIndex={0} key="seccion">Sección</Th>,
-    <Th tabIndex={0} key="capitulo">Capítulo</Th>,
-    <Th tabIndex={0} key="fechaenvio">Fecha de envío</Th>,
-    <Th tabIndex={0} key="estado">Estado</Th>,
+    <Th tabIndex={0} key="nombre">
+      Nombre
+    </Th>,
+    <Th tabIndex={0} key="lectura">
+      Lectura
+    </Th>,
+    <Th tabIndex={0} key="seccion">
+      Sección
+    </Th>,
+    <Th tabIndex={0} key="capitulo">
+      Capítulo
+    </Th>,
+    <Th tabIndex={0} key="fechaenvio">
+      Fecha de envío
+    </Th>,
+    <Th tabIndex={0} key="estado">
+      Estado
+    </Th>,
     <Th key="link" width="20%"></Th>,
   ];
 
@@ -102,7 +118,7 @@ export default function Page({ params }: { params: { grupo: string } }) {
         link: (
           <Link
             href={{
-              pathname: "/maestro/evaluaciones/resultado/[alumno]",
+              pathname: "/maestro/grupo/resultado/[alumno]",
               query: { alumno: evaluation.student, grupo: group },
             }}
           >
@@ -117,7 +133,9 @@ export default function Page({ params }: { params: { grupo: string } }) {
 
   useEffect(() => {
     if (statusFilter?.value) {
-      const newList = sampleList.filter(({ status }) => status === statusFilter?.value);
+      const newList = sampleList.filter(
+        ({ status }) => status === statusFilter?.value
+      );
       console.log(statusFilter);
       setEvalList(newList);
     } else {
@@ -128,7 +146,9 @@ export default function Page({ params }: { params: { grupo: string } }) {
   useEffect(() => {
     if (searchValue) {
       const searchRegex = new RegExp(searchValue);
-      const newList = sampleList.filter(({ student }) => student.toLowerCase().match(searchRegex));
+      const newList = sampleList.filter(({ student }) =>
+        student.toLowerCase().match(searchRegex)
+      );
       setEvalList(newList);
     } else {
       setEvalList(sampleList);
@@ -138,16 +158,16 @@ export default function Page({ params }: { params: { grupo: string } }) {
   return (
     <ChakraProvider>
       <Head>
-        <title>Evaluaciones</title>
+        <title>Grupos</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
@@ -167,7 +187,9 @@ export default function Page({ params }: { params: { grupo: string } }) {
               maxLength={30}
               placeholder="Nombre"
               onChange={({ target: { value } }) => {
-                value !== "" ? setSearchValue(value.toLowerCase()) : setSearchValue(null);
+                value !== ""
+                  ? setSearchValue(value.toLowerCase())
+                  : setSearchValue(null);
               }}
             />
             <InputRightAddon>
@@ -182,7 +204,10 @@ export default function Page({ params }: { params: { grupo: string } }) {
             }}
           ></Select>
         </div>
-        <ChakraTable columns={columnList} data={toTableList(evalList)}></ChakraTable>
+        <ChakraTable
+          columns={columnList}
+          data={toTableList(evalList)}
+        ></ChakraTable>
       </div>
     </ChakraProvider>
   );

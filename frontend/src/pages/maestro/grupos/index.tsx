@@ -5,7 +5,7 @@ import { ChakraProvider, Th } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
-import styles from "./evaluaciones.module.css";
+import styles from "./grupos.module.css";
 import ChakraTable from "@/components/tables/ChakraTable";
 
 type Option = {
@@ -50,8 +50,12 @@ const EvaluationList: React.FC = () => {
   }, [yearFilter, sampleList]);
 
   const columnList = [
-    <Th tabIndex={0} key="grupo">Grupo</Th>,
-    <Th tabIndex={0}  key="anio">Año escolar</Th>,
+    <Th tabIndex={0} key="grupo">
+      Grupo
+    </Th>,
+    <Th tabIndex={0} key="anio">
+      Año escolar
+    </Th>,
     <Th key="link" width="40%"></Th>,
   ];
 
@@ -62,8 +66,8 @@ const EvaluationList: React.FC = () => {
         link: (
           <Link
             href={{
-              pathname: "/maestro/evaluaciones/[grupo]",
-              query: { grupo: group.name  },
+              pathname: "/maestro/grupos/[grupo]",
+              query: { grupo: group.name },
             }}
           >
             Ver Resultado
@@ -76,19 +80,19 @@ const EvaluationList: React.FC = () => {
   return (
     <ChakraProvider>
       <Head>
-        <title>Evaluaciones</title>
+        <title>Grupos</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbLink href="#">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
             <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>Evaluaciones</h1>
+        <h1 tabIndex={0}>Grupos</h1>
         <div className={`${styles.filters} row`}>
           <Select
             options={options}
@@ -98,7 +102,10 @@ const EvaluationList: React.FC = () => {
             }}
           ></Select>
         </div>
-        <ChakraTable columns={columnList} data={toTableList(evalList)}></ChakraTable>
+        <ChakraTable
+          columns={columnList}
+          data={toTableList(evalList)}
+        ></ChakraTable>
       </div>
     </ChakraProvider>
   );
