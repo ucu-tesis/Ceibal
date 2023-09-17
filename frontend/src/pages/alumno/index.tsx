@@ -31,7 +31,7 @@ const StudentHomeScreen: React.FC = () => {
           />
           <CardButton
             leftIcon={<Image src={PodioPrimerLugar} alt="" />}
-            onClick={() => router.push(`${currentPathName}`)} // TODO: Modify URL when progress page is done.
+            onClick={() => router.push(`${currentPathName}/miprogreso`)}
             text="Ver mi progreso"
           />
           <CardButton
