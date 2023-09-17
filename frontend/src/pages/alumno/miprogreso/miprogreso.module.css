@@ -1,12 +1,6 @@
 .container {
     padding: 16px;
     gap: 16px;
-    justify-content: start;
+    justify-content: center;
     flex-wrap: wrap;
-}
-
-@media (max-width: 500px) {
-    .container {
-        justify-content: center;
-    }
 }
