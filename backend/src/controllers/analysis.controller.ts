@@ -9,10 +9,12 @@ import {
 import { Analysis } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Request } from 'express';
+import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { AuthService } from 'src/services/auth.service';
 import { UsersService } from 'src/services/user.service';
 
+// TODO consider converting this into a "student" controller with all other student-facing logic
 @Controller('analysis')
 export class AnalysisController {
   constructor(
@@ -23,12 +25,9 @@ export class AnalysisController {
   @Get('/')
   @UseGuards(StudentGuard)
   async studentGetAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number,
-  ): Promise<Analysis[]> {
-    if (!page) page = 0;
-    if (!pageSize) pageSize = 20;
-
+    @Pagination() { page, pageSize }: { page: number; pageSize: number },
+    @Query('request') request: Request,
+  ): Promise<{ data: Analysis[] }> {
     const user = this.userService.get();
 
     const analyses = await this.prismaService.analysis.findMany({
@@ -46,7 +45,7 @@ export class AnalysisController {
       },
     });
 
-    return analyses;
+    return { data: analyses };
   }
 
   @Get('/:analysisId')
