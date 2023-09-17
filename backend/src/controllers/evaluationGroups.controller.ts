@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
+import { Pagination } from 'src/decorators/pagination.decorator';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('evaluationGroups')
@@ -9,13 +10,9 @@ export class EvaluationGroupsController {
   @Get('/')
   // @UseGuards(AuthGuard)
   async getAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number, // TODO fix passing as query param
+    @Pagination() { page, pageSize }: { page: number; pageSize: number },
     @Query('ci') ci: string, // TODO remove after adding sso
-  ): Promise<EvaluationGroup[]> {
-    if (!page) page = 0;
-    if (!pageSize) pageSize = 20;
-
+  ): Promise<{ data: EvaluationGroup[] }> {
     if (!ci) {
       throw new Error('Must provide a filter');
     }
@@ -29,13 +26,13 @@ export class EvaluationGroupsController {
       skip: page * pageSize,
       take: pageSize,
     });
-    return evaluationGroups;
+    return { data: evaluationGroups };
   }
 
   @Get('/:evaluationGroupId')
   // @UseGuards(AuthGuard)
   async getOne(
-    @Param('evaluationGroupId') evaluationGroupId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
     const evaluationGroup =
       await this.prismaService.evaluationGroup.findUniqueOrThrow({
