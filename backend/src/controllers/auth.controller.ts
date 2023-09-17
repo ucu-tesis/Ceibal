@@ -1,44 +1,38 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Post,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { LoginUserRequest } from 'src/models/requests/login-user.request';
-import { SignUpUserRequest } from 'src/models/requests/sign-up-user.request';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { GoogleGuard } from 'src/guards/google.guard';
 import { AuthService } from 'src/services/auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
-  @Post('login')
-  async login(@Body() user: LoginUserRequest) {
-    if (!user.ci || !user.password) {
-      throw new BadRequestException('La cédula y contraseña son requeridos');
-    }
-    if (this.authService.validateUser(user)) {
-      return {
-        message: 'success',
-        token: this.authService.createToken(user),
-      };
-    } else {
-      throw new UnauthorizedException('CI o contraseña incorrectos');
-    }
+  @Get('google')
+  @UseGuards(GoogleGuard)
+  async googleAuth() {
+    return;
   }
 
-  @Post('sign-up')
-  async signUp(@Body() user: SignUpUserRequest) {
-    if (
-      !user.ci ||
-      !user.password ||
-      !user.email ||
-      !user.first_name ||
-      !user.last_name
-    ) {
-      throw new BadRequestException('All fields are required');
-    }
-    return await this.authService.signUp(user);
+  @Get('google/callback')
+  @UseGuards(GoogleGuard)
+  async googleAuthCallback(@Req() req) {
+    console.log('controller', req.user);
+    return {
+      message: 'success',
+      token: this.authService.createTokenWithPayload(req.user),
+    };
+  }
+
+  @Get('refresh')
+  async refresh(@Req() req, @Res() res) {
+    const token = this.authService.createTokenWithPayload(req.user);
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    res.redirect(this.configService.get('FRONTEND_URL'));
   }
 }

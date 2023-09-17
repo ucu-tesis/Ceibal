@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { User } from '@prisma/client';
+import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('teachers')
@@ -8,7 +8,7 @@ export class TeachersController {
   constructor(private prismaService: PrismaService) {}
 
   @Get('/')
-  @UseGuards(AuthGuard)
+  @UseGuards(TeacherGuard)
   async getAll(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,

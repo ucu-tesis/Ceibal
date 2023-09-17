@@ -6,33 +6,36 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { Analysis } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Request } from 'express';
+import { StudentGuard } from 'src/guards/student.guard';
+import { AuthService } from 'src/services/auth.service';
+import { UsersService } from 'src/services/user.service';
 
 @Controller('analysis')
 export class AnalysisController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private userService: UsersService,
+  ) {}
 
   @Get('/')
-  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
+  @UseGuards(StudentGuard)
   async studentGetAll(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
-    @Query('request') request: Request,
-    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis[]> {
     if (!page) page = 0;
     if (!pageSize) pageSize = 20;
 
-    // TODO: const ci = request['user'].ci;
+    const user = this.userService.get();
 
     const analyses = await this.prismaService.analysis.findMany({
       where: {
         Recording: {
           Student: {
-            cedula: ci,
+            cedula: user.ci,
           },
         },
       },
@@ -47,20 +50,18 @@ export class AnalysisController {
   }
 
   @Get('/:analysisId')
-  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
+  @UseGuards(StudentGuard)
   async studentGetSingle(
     @Param('analysisId') analysisId: number,
-    @Query('request') request: Request,
-    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis> {
-    // TODO: const ci = request['user'].ci;
+    const user = this.userService.get();
 
     const analysis = await this.prismaService.analysis.findFirst({
       where: {
         id: analysisId,
         Recording: {
           Student: {
-            cedula: ci,
+            cedula: user.ci,
           },
         },
       },

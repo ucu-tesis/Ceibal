@@ -10,6 +10,8 @@ import { AuthService } from './services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TeachersController } from './controllers/teachers.controller';
 import { EvaluationGroupsController } from './controllers/evaluationGroups.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -30,6 +32,13 @@ import { EvaluationGroupsController } from './controllers/evaluationGroups.contr
     TeachersController,
     EvaluationGroupsController,
   ],
-  providers: [AppService, FileUploadService, PrismaService, AuthService],
+  providers: [
+    AppService,
+    FileUploadService,
+    PrismaService,
+    AuthService,
+    JwtStrategy,
+    GoogleStrategy,
+  ],
 })
 export class AppModule {}

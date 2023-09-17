@@ -22,7 +22,7 @@ describe('EvaluationGroupsController', () => {
   describe('getAll', () => {
     describe('when no ci is passed', () => {
       it('throws an error', async () => {
-        await expect(controller.getAll(null, null, null)).rejects.toEqual(
+        await expect(controller.getAll(null, null)).rejects.toEqual(
           new Error('Must provide a filter'),
         );
       });
@@ -33,7 +33,7 @@ describe('EvaluationGroupsController', () => {
 
       describe('when there are no groups', () => {
         it('returns an empty array', async () => {
-          await expect(controller.getAll(null, null, ci)).resolves.toEqual([]);
+          await expect(controller.getAll(null, null)).resolves.toEqual([]);
         });
       });
 
@@ -63,7 +63,7 @@ describe('EvaluationGroupsController', () => {
         });
 
         it('returns the groups that match the filter, with pagination info', async () => {
-          expect(await controller.getAll(null, null, ci)).toEqual([
+          expect(await controller.getAll(null, null)).toEqual([
             {
               id: expect.any(Number),
               created_by: testTeacher.id,
