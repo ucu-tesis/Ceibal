@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
@@ -7,153 +7,82 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  Badge,
   Input,
   InputGroup,
   InputRightAddon,
 } from "@chakra-ui/react";
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import Select from "@/components/selects/Select";
 import ChakraTable from "@/components/tables/ChakraTable";
 import styles from "./grupos.module.css";
+import useFetchGroupStudents, {
+  StudentWithFullName,
+} from "@/pages/api/teachers/hooks/useFetchGroupStudents";
+import useFilteredStudents from "./hooks/useFilteredStudents";
+import LoadingPage from "@/components/loadingPage/LoadingPage";
+import ErrorPage from "@/components/errorPage/ErrorPage";
 
-type Option = {
-  value?: string;
-  label: string;
-};
+const ERROR_MESSAGE = "buscar los alumnos del grupo";
 
-const statusTypes: any = {
-  processed: "Procesado",
-  error: "Error",
-  pending: "Por Procesar",
-};
+const columnList = [
+  <Th tabIndex={0} key="nombre">
+    Nombre
+  </Th>,
+  <Th tabIndex={0} key="documento">
+    Documento
+  </Th>,
+  <Th tabIndex={0} key="correo">
+    Correo
+  </Th>,
+  <Th tabIndex={0} key="tareas-realizadas">
+    Tareas Realizadas
+  </Th>,
+  <Th tabIndex={0} key="tareas-pendientes">
+    Tareas Pendientes
+  </Th>,
+  <Th key="link" width="20%"></Th>,
+];
 
-type Evaluation = {
-  student: string;
-  reading: string;
-  section: string;
-  chapter: string;
-  sentDate: string;
-  status: string;
-};
+const toTableList = (
+  students: StudentWithFullName[],
+  groupId: number,
+  groupName: string
+) =>
+  students.map(
+    ({ fullName, cedula, email, assignments_done, assignments_pending }) => ({
+      fullName,
+      cedula,
+      email,
+      assignments_done,
+      assignments_pending,
+      link: (
+        <Link
+          href={{
+            pathname: "/maestro/grupos/[grupo]/resultado/[alumno]",
+            query: { grupo: groupId, alumno: fullName, groupName },
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
-export default function Page({ params }: { params: { grupo: string } }) {
+export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
-  const group = query.grupo;
+  const groupId = query.grupo;
+  const { data, isLoading, isError } = useFetchGroupStudents(Number(groupId));
+  const [searchQuery, setSearchQuery] = useState("");
+  const { groupName, students } = data ?? { groupName: "", students: [] };
+  const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
 
-  const BadgeComponent = (status: string) => {
-    return (
-      <Badge className={`${styles.badge} ${styles[status]}`}>
-        {statusTypes[status]}
-      </Badge>
-    );
-  };
+  const inputRegex = /\w|\d|\-|\s/;
 
-  const options: Option[] = [
-    { value: undefined, label: "Estado" },
-    { value: "error", label: "Error" },
-    { value: "pending", label: "Por Procesar" },
-    { value: "processed", label: "Procesado" },
-  ];
-
-  const [statusFilter, setStatus] = useState<Option | undefined>(undefined);
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-
-  const inputRegex = /\w|\d|\-/;
-
-  const [sampleList] = useState<Evaluation[]>([
-    {
-      student: "Ana García",
-      reading: "Coco Bandini",
-      section: "6",
-      chapter: "4",
-      sentDate: "2023-05-20 09:15",
-      status: "processed",
-    },
-    {
-      student: "Pedro López",
-      reading: "Coco Bandini",
-      section: "6",
-      chapter: "4",
-      sentDate: "2023-05-20 09:15",
-      status: "error",
-    },
-    {
-      student: "Luis Torres",
-      reading: "Coco Bandini",
-      section: "6",
-      chapter: "4",
-      sentDate: "2023-05-20 09:15",
-      status: "pending",
-    },
-  ]);
-
-  const columnList = [
-    <Th tabIndex={0} key="nombre">
-      Nombre
-    </Th>,
-    <Th tabIndex={0} key="lectura">
-      Lectura
-    </Th>,
-    <Th tabIndex={0} key="seccion">
-      Sección
-    </Th>,
-    <Th tabIndex={0} key="capitulo">
-      Capítulo
-    </Th>,
-    <Th tabIndex={0} key="fechaenvio">
-      Fecha de envío
-    </Th>,
-    <Th tabIndex={0} key="estado">
-      Estado
-    </Th>,
-    <Th key="link" width="20%"></Th>,
-  ];
-
-  const toTableList = (list: Evaluation[]) => {
-    return list.map((evaluation: Evaluation) => {
-      return {
-        ...evaluation,
-        status: BadgeComponent(evaluation.status),
-        link: (
-          <Link
-            href={{
-              pathname: "/maestro/grupo/resultado/[alumno]",
-              query: { alumno: evaluation.student, grupo: group },
-            }}
-          >
-            Ver Resultado
-          </Link>
-        ),
-      };
-    });
-  };
-
-  const [evalList, setEvalList] = useState(sampleList);
-
-  useEffect(() => {
-    if (statusFilter?.value) {
-      const newList = sampleList.filter(
-        ({ status }) => status === statusFilter?.value
-      );
-      console.log(statusFilter);
-      setEvalList(newList);
-    } else {
-      setEvalList(sampleList);
-    }
-  }, [statusFilter, sampleList]);
-
-  useEffect(() => {
-    if (searchValue) {
-      const searchRegex = new RegExp(searchValue);
-      const newList = sampleList.filter(({ student }) =>
-        student.toLowerCase().match(searchRegex)
-      );
-      setEvalList(newList);
-    } else {
-      setEvalList(sampleList);
-    }
-  }, [searchValue, sampleList]);
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+  if (isError) {
+    return <ErrorPage intendedAction={ERROR_MESSAGE} />;
+  }
 
   return (
     <ChakraProvider>
@@ -171,10 +100,10 @@ export default function Page({ params }: { params: { grupo: string } }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{group}</BreadcrumbLink>
+            <BreadcrumbLink href="#">{groupName}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>{group}</h1>
+        <h1 tabIndex={0}>{groupName}</h1>
         <div className={`${styles.filters} row`}>
           <InputGroup>
             <Input
@@ -185,28 +114,19 @@ export default function Page({ params }: { params: { grupo: string } }) {
                 }
               }}
               maxLength={30}
-              placeholder="Nombre"
+              placeholder="Documento o nombre"
               onChange={({ target: { value } }) => {
-                value !== ""
-                  ? setSearchValue(value.toLowerCase())
-                  : setSearchValue(null);
+                setSearchQuery(value.toLowerCase());
               }}
             />
             <InputRightAddon>
               <SearchIcon />
             </InputRightAddon>
           </InputGroup>
-          <Select
-            options={options}
-            defaultValue={options[0]}
-            onChange={(value) => {
-              setStatus(value);
-            }}
-          ></Select>
         </div>
         <ChakraTable
           columns={columnList}
-          data={toTableList(evalList)}
+          data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
         ></ChakraTable>
       </div>
     </ChakraProvider>
