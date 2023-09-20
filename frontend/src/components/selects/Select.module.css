@@ -18,13 +18,14 @@
   border-radius: 5px;
   background: #fff;
   box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.09);
+  z-index: 2;
 }
 
 .options div {
-  font-size: 10px;
+  font-size: 14px;
   padding: 12px 16px;
 }
 
 .options div:hover {
-   background-color: var(--ceibal-light-grey-secondary);
+  background-color: var(--ceibal-light-grey-secondary);
 }
