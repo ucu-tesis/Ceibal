@@ -1,4 +1,4 @@
-import { Group } from "@/pages/api/teachers/teachers";
+import { Group } from "@/api/teachers/teachers";
 import { useMemo } from "react";
 
 const groupFilter =

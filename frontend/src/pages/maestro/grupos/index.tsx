@@ -7,10 +7,10 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import styles from "./grupos.module.css";
 import ChakraTable from "@/components/tables/ChakraTable";
-import useFetchGroups from "@/pages/api/teachers/hooks/useFetchGroups";
-import useFilteredGroups from "./hooks/useFilteredGroups";
-import useGroupFilterOptions from "./hooks/useGroupFilterOptions";
-import { Group } from "@/pages/api/teachers/teachers";
+import useFetchGroups from "@/api/teachers/hooks/useFetchGroups";
+import useFilteredGroups from "../../../hooks/teachers/useFilteredGroups";
+import useGroupFilterOptions from "../../../hooks/teachers/useGroupFilterOptions";
+import { Group } from "@/api/teachers/teachers";
 
 const TEACHER_CI = 10001; // TODO: Replace when auth integration is done.
 

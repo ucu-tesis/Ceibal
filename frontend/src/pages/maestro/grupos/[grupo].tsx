@@ -16,12 +16,10 @@ import ChakraTable from "@/components/tables/ChakraTable";
 import styles from "./grupos.module.css";
 import useFetchGroupStudents, {
   StudentWithFullName,
-} from "@/pages/api/teachers/hooks/useFetchGroupStudents";
-import useFilteredStudents from "./hooks/useFilteredStudents";
+} from "@/api/teachers/hooks/useFetchGroupStudents";
+import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
-
-const ERROR_MESSAGE = "buscar los alumnos del grupo";
 
 const columnList = [
   <Th tabIndex={0} key="nombre">
@@ -81,7 +79,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     return <LoadingPage />;
   }
   if (isError) {
-    return <ErrorPage intendedAction={ERROR_MESSAGE} />;
+    return <ErrorPage intendedAction="buscar los alumnos del grupo" />;
   }
 
   return (
