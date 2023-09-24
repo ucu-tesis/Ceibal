@@ -5,6 +5,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -13,12 +14,15 @@ import { File } from 'multer';
 import { Recording } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
+import { StudentGuard } from 'src/guards/student.guard';
+import { UserService } from 'src/services/user.service';
 
 @Controller('recordings')
 export class RecordingsController {
   constructor(
     private readonly fileUploadService: FileUploadService,
     private prismaService: PrismaService,
+    private userService: UserService,
   ) {}
 
   // TODO consider moving this to a "student" controller with all other student-facing logic
@@ -27,27 +31,24 @@ export class RecordingsController {
   async upload(
     @UploadedFile() file: File,
   ): Promise<{ path: string; data: any }> {
-    return this.fileUploadService.uploadFileToS3(file);
+    const user = this.userService.get();
+    return this.fileUploadService.uploadFileToS3(file, user.id);
   }
 
   @Get('/')
-  // @UseGuards(AuthGuard)
+  @UseGuards(StudentGuard)
   async getAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
-    @Query('studentId') studentId: string,
   ): Promise<{ data: Recording[] }> {
-    if (!studentId) {
-      throw new Error('Must provide studentId as part of the query');
-    }
-    // TODO throw error when student is not found + test it
+    const user = this.userService.get();
 
     const recordings = await this.prismaService.recording.findMany({
       where: {
-        student_id: Number(studentId),
+        student_id: user.id,
       },
-      // orderBy: {
-      //   created_at: 'desc', // TODO add this column
-      // },
+      orderBy: {
+        created_at: 'desc',
+      },
       skip: page * pageSize,
       take: pageSize,
     });
@@ -55,11 +56,14 @@ export class RecordingsController {
   }
 
   @Get('/:recordingId')
-  // @UseGuards(AuthGuard)
+  @UseGuards(StudentGuard)
   async getOne(@Param('recordingId') recordingId: string): Promise<Recording> {
-    const recording = await this.prismaService.recording.findUniqueOrThrow({
+    const user = this.userService.get();
+
+    const recording = await this.prismaService.recording.findFirstOrThrow({
       where: {
         id: Number(recordingId),
+        student_id: user.id,
       },
       include: {
         Analysis: true,

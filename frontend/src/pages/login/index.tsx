@@ -24,13 +24,19 @@ const Login: React.FC = () => {
         <div className={`${styles["col"]}`}>
           <Image src={LogoCeibal} alt=""></Image>
           <p>Inicio de Sesión</p>
-          <InputText placeholder="Documento"></InputText>
-          <InputPassword placeholder="Contraseña"></InputPassword>
-          <RoundedButton variant={"black" as keyof Object}>
-            <div>Continuar</div>
+          <RoundedButton variant="white">
+            <div>Acceder con Google</div>
             <Image src={RightIcon} alt=""></Image>
           </RoundedButton>
-          <span>Si aún no te has registrado como usuario/a y quieres acceder a las plataformas, haz <Link href="/registro">clic aquí</Link></span>
+          <RoundedButton variant="black">
+            <div>Login de prueba: Estudiante</div>
+            <Image src={RightIcon} alt=""></Image>
+          </RoundedButton>
+          <RoundedButton variant="black">
+            <div>Login de prueba: Maestro</div>
+            <Image src={RightIcon} alt=""></Image>
+          </RoundedButton>
+          <span>Si aún no te has registrado como usuario/a y quieres acceder a las plataformas, haz <Link href="https://aulas.ceibal.edu.uy/registrarme">clic aquí</Link></span>
         </div>
         <div></div>
       </div>

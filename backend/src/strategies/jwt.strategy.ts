@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma.service';
 import { AuthService } from 'src/services/auth.service';
 
 export type JwtPayload = {
-  ci: string;
+  id: number;
   type: 'teacher' | 'student';
   email: string;
   firstName: string;
@@ -36,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: JwtPayload): Promise<JwtPayload> {
     if (payload.type === 'teacher') {
       const user = await this.prisma.user.findUnique({
-        where: { cedula: payload.ci },
+        where: { id: payload.id },
       });
       if (user) {
         return this.authService.createTeacherPayload(user);
@@ -44,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
     if (payload.type === 'student') {
       const student = await this.prisma.student.findUnique({
-        where: { cedula: payload.ci },
+        where: { id: payload.id },
       });
       if (student) {
         return this.authService.createStudentPayload(student);

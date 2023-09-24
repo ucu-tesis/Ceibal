@@ -4,7 +4,7 @@ import { JwtPayload } from 'src/strategies/jwt.strategy';
 import { Request } from 'express';
 
 @Injectable({ scope: Scope.REQUEST })
-export class UsersService {
+export class UserService {
   constructor(@Inject(REQUEST) private readonly request: Request) {}
 
   get(): JwtPayload {

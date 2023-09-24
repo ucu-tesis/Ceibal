@@ -67,6 +67,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
+  border: none;
 }
 
 .rounded.black {
@@ -76,6 +77,16 @@
   line-height: 28px;
   background-color: var(--ceibal-black);
   color: var(--ceibal-white);
+}
+
+.rounded.white {
+  max-width: 352px;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+  background-color: var(--ceibal-white);
+  color: var(--ceibal-black);
+  border: 1px solid var(--ceibal-black);
 }
 
 .card-button {

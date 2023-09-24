@@ -1,16 +1,15 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
-import { AuthService } from 'src/services/auth.service';
-import { UsersService } from 'src/services/user.service';
+import { UserService } from 'src/services/user.service';
 
 @Controller('evaluationGroups')
 export class EvaluationGroupsController {
   constructor(
     private prismaService: PrismaService,
-    private userService: UsersService,
+    private userService: UserService,
   ) {}
 
   @Get('/')
@@ -23,7 +22,7 @@ export class EvaluationGroupsController {
     const evaluationGroups = await this.prismaService.evaluationGroup.findMany({
       where: {
         Teacher: {
-          cedula: user.ci,
+          id: user.id,
         },
       },
       skip: page * pageSize,
@@ -37,11 +36,11 @@ export class EvaluationGroupsController {
   async getOne(
     @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
-    // TODO: Acá falta validar que el grupo de evaluación pertenezca al maestro
     const evaluationGroup =
-      await this.prismaService.evaluationGroup.findUniqueOrThrow({
+      await this.prismaService.evaluationGroup.findFirstOrThrow({
         where: {
           id: Number(evaluationGroupId),
+          teacher_id: this.userService.get().id,
         },
         include: {
           Students: {

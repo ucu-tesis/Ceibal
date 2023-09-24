@@ -12,6 +12,7 @@ import { TeachersController } from './controllers/teachers.controller';
 import { EvaluationGroupsController } from './controllers/evaluationGroups.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
     FileUploadService,
     PrismaService,
     AuthService,
+    UserService,
     JwtStrategy,
     GoogleStrategy,
   ],

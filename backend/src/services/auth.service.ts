@@ -8,7 +8,6 @@ import { SignUpUserRequest } from 'src/models/requests/sign-up-user.request';
 import { LoginUserRequest } from 'src/models/requests/login-user.request';
 import { JwtPayload } from 'src/strategies/jwt.strategy';
 import { Student, User } from '@prisma/client';
-import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +40,7 @@ export class AuthService {
   }
 
   createTokenWithPayload(payload: JwtPayload): string {
-    return this.jwtService.sign(payload, { expiresIn: '7d' });
+    return this.jwtService.sign(payload, { expiresIn: '30d' });
   }
 
   createTeacherToken(user: User): string {
@@ -56,7 +55,7 @@ export class AuthService {
 
   createTeacherPayload(user: User): JwtPayload {
     return {
-      ci: user.cedula,
+      id: user.id,
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,
@@ -66,7 +65,7 @@ export class AuthService {
 
   createStudentPayload(user: Student): JwtPayload {
     return {
-      ci: user.cedula,
+      id: user.id,
       email: user.email,
       firstName: user.first_name,
       lastName: user.last_name,

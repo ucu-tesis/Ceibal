@@ -39,7 +39,10 @@ export class FileUploadService implements MulterOptionsFactory {
     };
   }
 
-  async uploadFileToS3(file: File): Promise<{ path: string; data: any }> {
+  async uploadFileToS3(
+    file: File,
+    studentId: number,
+  ): Promise<{ path: string; data: any }> {
     const bucket = this.configService.get('AWS_BUCKET');
     const filename = `${Date.now()}-${file.originalname}`;
     const params = {
@@ -56,7 +59,6 @@ export class FileUploadService implements MulterOptionsFactory {
         'AWS_REGION',
       )}.amazonaws.com/${filename}`;
 
-      const student = await this.prismaService.student.findFirst();
       const evaluationGroupReading =
         await this.prismaService.evaluationGroupReading.findFirst();
 
@@ -87,7 +89,7 @@ export class FileUploadService implements MulterOptionsFactory {
       await this.prismaService.recording.create({
         data: {
           recording_url: path,
-          student_id: student.id,
+          student_id: studentId,
           evaluation_group_reading_id: evaluationGroupReading.id,
           evaluation: data,
         },
