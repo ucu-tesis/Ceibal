@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
-import { ChakraProvider, Th } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,7 +12,9 @@ import {
   InputRightAddon,
 } from "@chakra-ui/react";
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import ChakraTable from "@/components/tables/ChakraTable";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
 import styles from "./grupos.module.css";
 import useFetchGroupStudents, {
   StudentWithFullName,
@@ -21,23 +23,13 @@ import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 
-const columnList = [
-  <Th tabIndex={0} key="nombre">
-    Nombre
-  </Th>,
-  <Th tabIndex={0} key="documento">
-    Documento
-  </Th>,
-  <Th tabIndex={0} key="correo">
-    Correo
-  </Th>,
-  <Th tabIndex={0} key="tareas-realizadas">
-    Tareas Realizadas
-  </Th>,
-  <Th tabIndex={0} key="tareas-pendientes">
-    Tareas Pendientes
-  </Th>,
-  <Th key="link" width="20%"></Th>,
+const columns: ChakraTableColumn[] = [
+  { label: "Nombre" },
+  { label: "Documento" },
+  { label: "Correo" },
+  { label: "Tareas Realizadas" },
+  { label: "Tareas Pendientes" },
+  { label: "", reactKey: "link", width: "20%" },
 ];
 
 const toTableList = (
@@ -123,7 +115,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </InputGroup>
         </div>
         <ChakraTable
-          columns={columnList}
+          columns={columns}
           data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
         ></ChakraTable>
       </div>

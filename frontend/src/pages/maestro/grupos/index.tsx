@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { ChakraProvider, Th } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import styles from "./grupos.module.css";
-import ChakraTable from "@/components/tables/ChakraTable";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
 import useFetchGroups from "@/api/teachers/hooks/useFetchGroups";
 import useFilteredGroups from "../../../hooks/teachers/useFilteredGroups";
 import useGroupFilterOptions from "../../../hooks/teachers/useGroupFilterOptions";
@@ -19,14 +21,10 @@ type Option = {
   label: string;
 };
 
-const columnList = [
-  <Th tabIndex={0} key="grupo">
-    Grupo
-  </Th>,
-  <Th tabIndex={0} key="anio">
-    Año
-  </Th>,
-  <Th key="link" width="40%"></Th>,
+const columns: ChakraTableColumn[] = [
+  { label: "Grupo" },
+  { label: "Año", reactKey: "anio" },
+  { label: "", reactKey: "link", width: "40%" },
 ];
 
 const toTableList = (groups: Group[]) => {
@@ -80,7 +78,7 @@ const EvaluationList: React.FC = () => {
           ></Select>
         </div>
         <ChakraTable
-          columns={columnList}
+          columns={columns}
           data={toTableList(filteredGroups)}
         ></ChakraTable>
       </div>
