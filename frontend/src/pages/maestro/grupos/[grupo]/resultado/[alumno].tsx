@@ -7,10 +7,16 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import ProgressBar from "@/components/progress/ProgressBar";
 import styles from "./resultado.module.css";
 
-export default function Page({ params }: { params: { alumno: string; grupo: string } }) {
+interface Params {
+  alumno: string;
+  grupo: number;
+  groupName: string;
+}
+
+export default function Page({ params }: { params: Params }) {
   const router = useRouter();
   const student = router.query.alumno;
-  const group = router.query.grupo;
+  const group = router.query.groupName;
 
   return (
     <ChakraProvider>
@@ -51,9 +57,9 @@ export default function Page({ params }: { params: { alumno: string; grupo: stri
         </div>
         <h2 tabIndex={0}>Métricas</h2>
         <div className={`col ${styles.stats} ${styles.border}`}>
-            <h5 tabIndex={0}>Cantidad Pausas: 4</h5>
-            <h5 tabIndex={0}>Cantidad Repeticiones 4</h5>
-            <h5 tabIndex={0}>Velocidad de lectura : 120 palabras/minuto</h5>
+          <h5 tabIndex={0}>Cantidad Pausas: 4</h5>
+          <h5 tabIndex={0}>Cantidad Repeticiones 4</h5>
+          <h5 tabIndex={0}>Velocidad de lectura : 120 palabras/minuto</h5>
         </div>
       </div>
     </ChakraProvider>

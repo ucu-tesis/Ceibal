@@ -12,7 +12,37 @@ const MiProgreso: React.FC = () => {
         <title>Mi Progreso</title>
       </Head>
       <div className={`${styles.container} row`}>
-        <ReadCard title="Quiero ser Suarez">
+        <ReadCard title="Quiero ser Suarez" stars={5}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={3}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={4}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={2}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={5}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={1}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={5}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={3}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={3}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={2}>
+          <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
+        </ReadCard>
+        <ReadCard title="Quiero ser Suarez" stars={4}>
           <Image src={SuarezReading} alt="Quiero ser Suarez"></Image>
         </ReadCard>
       </div>

@@ -95,6 +95,7 @@
   border-radius: 10px;
   border: 1px solid var(--ceibal-green);
   background: #e7b062;
+  color: var(--ceibal-black);
   padding: 12px 16px;
   gap: 18px;
   width: 85%;

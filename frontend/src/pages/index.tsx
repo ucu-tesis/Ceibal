@@ -11,7 +11,7 @@ import TextContainer from "@/components/containers/TextContainer";
 import Spinner from "@/components/spinners/Spinner";
 import ModalDialog from "@/components/modals/ModalDialog";
 import ProgressBar from "@/components/progress/ProgressBar";
-import useFileUpload from "./api/hooks/useFileUpload";
+import useFileUpload from "../hooks/students/useFileUpload";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,9 +33,9 @@ export default function Home() {
   const [errorModal, setErrorModal] = useState(false);
   const [openModal, setOpen] = useState(false);
 
-  const [score, setScore] = useState<string| null>(null);
+  const [score, setScore] = useState<string | null>(null);
   const [silence, setSilence] = useState<string | null>(null);
-  const [repetitions, setRepetitions] = useState<string| null>(null);
+  const [repetitions, setRepetitions] = useState<string | null>(null);
   const [speed, setSpeed] = useState<string | null>(null);
 
   const ref = useRef(null);
@@ -49,7 +49,12 @@ export default function Home() {
     const response = data as any;
     const {
       data: {
-        indicadores: { cantidad_de_repeticiones, cantidad_de_silencios, puntaje, velocidad_palabras },
+        indicadores: {
+          cantidad_de_repeticiones,
+          cantidad_de_silencios,
+          puntaje,
+          velocidad_palabras,
+        },
       },
     } = response;
     setScore(puntaje + "");
@@ -60,10 +65,11 @@ export default function Home() {
 
   const onError = (data: any) => {
     console.error("Error uploading file:", data?.status);
+    console.log(`error: ${JSON.stringify(error)}`);
     setErrorModal(true);
   };
 
-  const { mutate, isLoading } = useFileUpload(onSuccess, onError);
+  const { mutate, isLoading, error } = useFileUpload(onSuccess, onError);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -155,13 +161,19 @@ export default function Home() {
       <main>
         <div className="container col">
           {openModal && (
-            <ModalDialog componentRef={modalRef} title="Resultado De Evaluacion">
+            <ModalDialog
+              componentRef={modalRef}
+              title="Resultado De Evaluacion"
+            >
               <div className="progress col">
                 <ProgressBar value={score ?? "50"}></ProgressBar>
                 <span>Cantidad de pausas: {silence}</span>
                 <span>Cantidad de repeticiones: {repetitions}</span>
                 <span>Velocidad de lectura: {speed} palabras/minuto</span>
-                <SecondaryButton onClick={closeModal} variant={"blueFill" as keyof Object}>
+                <SecondaryButton
+                  onClick={closeModal}
+                  variant={"blueFill" as keyof Object}
+                >
                   Aceptar
                 </SecondaryButton>
               </div>
@@ -170,9 +182,13 @@ export default function Home() {
           {errorModal && (
             <ModalDialog componentRef={errorModalRef} title="Ups">
               <span>
-                Lo sentimos, tu lectura no se ha podido enviar. Inténtalo de nuevo más tarde o pide ayuda a un adulto.
+                Lo sentimos, tu lectura no se ha podido enviar. Inténtalo de
+                nuevo más tarde o pide ayuda a un adulto.
               </span>
-              <SecondaryButton onClick={closeErrorModal} variant={"redFill" as keyof Object}>
+              <SecondaryButton
+                onClick={closeErrorModal}
+                variant={"redFill" as keyof Object}
+              >
                 Cerrar
               </SecondaryButton>
             </ModalDialog>
@@ -187,11 +203,17 @@ export default function Home() {
                 onRecording={onRecording}
               ></Recorder>
               {sendActive && (
-                <PrimaryButton buttonRef={ref} onClick={onSend} variant={"large" as keyof Object}>
+                <PrimaryButton
+                  buttonRef={ref}
+                  onClick={onSend}
+                  variant={"large" as keyof Object}
+                >
                   <div>
                     <Image src={SendIcon} alt=""></Image>
                   </div>
-                  <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Enviar</div>
+                  <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+                    Enviar
+                  </div>
                 </PrimaryButton>
               )}
             </>

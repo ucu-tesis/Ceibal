@@ -19,3 +19,31 @@
     height: 200px;
     width: auto;
 }
+
+.stars {
+    gap: 8px;
+    justify-content: center;
+}
+
+.stars img {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 500px) {
+    .read-card {
+        padding: 12px 24px;
+        gap: 16px;
+    }
+    .read-card span {
+        font-size: 12px;
+    }
+    .read-card img {
+        height: 150px;
+        width: auto;
+    }
+    .stars img {
+        width: 14px;
+        height: 14px;
+    }
+}
