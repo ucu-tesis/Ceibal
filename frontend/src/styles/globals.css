@@ -64,6 +64,10 @@ code {
   max-height: 77px;
 }
 
+#header .name {
+  padding-right: 15px;
+}
+
 .row {
   display: flex;
   flex-direction: row;

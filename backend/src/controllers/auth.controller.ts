@@ -65,6 +65,13 @@ export class AuthController {
     throw new Error('User not found');
   }
 
+  @Get('logout')
+  @UseGuards(AnyAuthGuard)
+  async logout(@Res() res) {
+    res.clearCookie('access_token');
+    res.redirect(this.configService.get('FRONTEND_URL') + '/login');
+  }
+
   /**
    * This is a fake login endpoint that is only available in development and staging.
    * It logs in the as first student in the database.
@@ -72,7 +79,7 @@ export class AuthController {
   @Get('fake-student')
   async fakeStudentLogin(@Res() res) {
     if (
-      this.configService.get('ENVIRONMENT') !== 'development' ||
+      this.configService.get('ENVIRONMENT') !== 'development' &&
       this.configService.get('ENVIRONMENT') !== 'staging'
     ) {
       return res.status(403).send('Forbidden');
@@ -83,6 +90,7 @@ export class AuthController {
       httpOnly: true,
       maxAge: this.cookieDuration,
     });
+    res.redirect(this.configService.get('FRONTEND_URL') + '/alumno');
   }
 
   /**
@@ -92,7 +100,7 @@ export class AuthController {
   @Get('fake-teacher')
   async fakeTeacherLogin(@Res() res) {
     if (
-      this.configService.get('ENVIRONMENT') !== 'development' ||
+      this.configService.get('ENVIRONMENT') !== 'development' &&
       this.configService.get('ENVIRONMENT') !== 'staging'
     ) {
       return res.status(403).send('Forbidden');
@@ -103,5 +111,6 @@ export class AuthController {
       httpOnly: true,
       maxAge: this.cookieDuration,
     });
+    res.redirect(this.configService.get('FRONTEND_URL') + '/maestro');
   }
 }

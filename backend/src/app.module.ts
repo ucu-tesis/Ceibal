@@ -13,7 +13,7 @@ import { EvaluationGroupsController } from './controllers/evaluationGroups.contr
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { UserService } from './services/user.service';
-import { UnauthorizedFilter } from './filters/unauthorized.filter';
+import { ForbiddenFilter } from './filters/forbidden.filter';
 import { APP_FILTER } from '@nestjs/core';
 
 @Module({
@@ -38,7 +38,7 @@ import { APP_FILTER } from '@nestjs/core';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: UnauthorizedFilter,
+      useClass: ForbiddenFilter,
     },
     AppService,
     FileUploadService,

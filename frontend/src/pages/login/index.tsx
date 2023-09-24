@@ -8,15 +8,19 @@ import RightIconBlack from "../../assets/images/right_icon_black.svg";
 import RoundedButton from "@/components/buttons/RoundedButton";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useUser } from "@/providers/UserContext";
 
 const Login: React.FC = () => {
-  useEffect(() => {
-    document.getElementById("header")?.remove();
-    document.querySelector("hr")?.remove();
-  }, []);
-
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  const user = useUser();
+
+  if (user?.type === "teacher") {
+    router.replace("/maestro");
+  } else if (user?.type === "student") {
+    router.replace("/alumno");
+  }
 
   const goToGoogleAuth = () => {
     router.push(`${backendUrl}/auth/google`);

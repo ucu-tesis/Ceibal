@@ -3,6 +3,8 @@ import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import MainHeader from "@/components/headers/MainHeader";
+import { UserProvider } from "@/providers/UserContext";
+import { useRouter } from "next/router";
 
 const mozaicFont = localFont({
   src: [
@@ -32,18 +34,24 @@ const mozaicFont = localFont({
 const client = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const showHeader =
+    router.pathname.startsWith("/alumno") ||
+    router.pathname.startsWith("/maestro");
   return (
-    <QueryClientProvider client={client}>
-      <div>
-        <style jsx global>{`
-          body {
-            font-family: ${mozaicFont.style.fontFamily} !important;
-          }
-        `}</style>
-        <MainHeader />
-        <hr />
-        <Component {...pageProps} />
-      </div>
-    </QueryClientProvider>
+    <UserProvider>
+      <QueryClientProvider client={client}>
+        <div>
+          <style jsx global>{`
+            body {
+              font-family: ${mozaicFont.style.fontFamily} !important;
+            }
+          `}</style>
+          {showHeader && <MainHeader />}
+          {showHeader && <hr />}
+          <Component {...pageProps} />
+        </div>
+      </QueryClientProvider>
+    </UserProvider>
   );
 }
