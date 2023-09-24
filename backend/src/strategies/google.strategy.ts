@@ -27,6 +27,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     googleProfile: any,
     done: VerifyCallback,
   ): Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, name, emails, photos } = googleProfile;
 
     const user = await this.prismaService.user.findFirst({
