@@ -5,6 +5,7 @@ import Image from "next/image";
 import LogoCeibal from "../../assets/images/logo_ceibal.png";
 import RightIcon from "../../assets/images/right_icon.svg";
 import RightIconBlack from "../../assets/images/right_icon_black.svg";
+import GoogleIcon from "../../assets/images/google.svg";
 import RoundedButton from "@/components/buttons/RoundedButton";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -44,6 +45,7 @@ const Login: React.FC = () => {
           <Image src={LogoCeibal} alt=""></Image>
           <p>Inicio de Sesión</p>
           <RoundedButton variant="white" onClick={goToGoogleAuth}>
+            <Image src={GoogleIcon} alt="" aria-hidden="true"></Image>
             <div>Ingresar con Google</div>
             <Image src={RightIconBlack} alt="" aria-hidden="true"></Image>
           </RoundedButton>
