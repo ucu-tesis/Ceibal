@@ -6,15 +6,13 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Select from "@/components/selects/Select";
 import styles from "./grupos.module.css";
-import ChakraTable, {
-  ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
+import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import useFetchGroups from "@/api/teachers/hooks/useFetchGroups";
 import useFilteredGroups from "../../../hooks/teachers/useFilteredGroups";
 import useGroupFilterOptions from "../../../hooks/teachers/useGroupFilterOptions";
 import { Group } from "@/api/teachers/teachers";
 
-const TEACHER_CI = 10001; // TODO: Replace when auth integration is done.
+const TEACHER_CI = 2; // TODO: Replace when auth integration is done.
 
 type Option = {
   value?: string;
@@ -77,10 +75,7 @@ const EvaluationList: React.FC = () => {
             }}
           ></Select>
         </div>
-        <ChakraTable
-          columns={columns}
-          data={toTableList(filteredGroups)}
-        ></ChakraTable>
+        <ChakraTable columns={columns} data={toTableList(filteredGroups)}></ChakraTable>
       </div>
     </ChakraProvider>
   );

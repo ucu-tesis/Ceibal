@@ -3,22 +3,12 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import { ChakraProvider } from "@chakra-ui/react";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Input,
-  InputGroup,
-  InputRightAddon,
-} from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import ChakraTable, {
-  ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
+import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import styles from "./grupos.module.css";
-import useFetchGroupStudents, {
-  StudentWithFullName,
-} from "@/api/teachers/hooks/useFetchGroupStudents";
+import useFetchGroupStudents, { StudentWithFullName } from "@/api/teachers/hooks/useFetchGroupStudents";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
@@ -32,30 +22,24 @@ const columns: ChakraTableColumn[] = [
   { label: "", reactKey: "link", width: "20%" },
 ];
 
-const toTableList = (
-  students: StudentWithFullName[],
-  groupId: number,
-  groupName: string
-) =>
-  students.map(
-    ({ fullName, cedula, email, assignments_done, assignments_pending }) => ({
-      fullName,
-      cedula,
-      email,
-      assignments_done,
-      assignments_pending,
-      link: (
-        <Link
-          href={{
-            pathname: "/maestro/grupos/[grupo]/resultado/[alumno]",
-            query: { grupo: groupId, alumno: fullName, groupName },
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    })
-  );
+const toTableList = (students: StudentWithFullName[], groupId: number, groupName: string) =>
+  students.map(({ fullName, cedula, email, assignments_done, assignments_pending }) => ({
+    fullName,
+    cedula,
+    email,
+    assignments_done,
+    assignments_pending,
+    link: (
+      <Link
+        href={{
+          pathname: "/maestro/grupos/[grupo]/resultado/[alumno]",
+          query: { grupo: groupId, alumno: fullName, groupName },
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
@@ -94,30 +78,41 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>{groupName}</h1>
-        <div className={`${styles.filters} row`}>
-          <InputGroup>
-            <Input
-              width="auto"
-              onKeyDown={(e) => {
-                if (!e.key.match(inputRegex)) {
-                  e.preventDefault();
-                }
-              }}
-              maxLength={30}
-              placeholder="Documento o nombre"
-              onChange={({ target: { value } }) => {
-                setSearchQuery(value.toLowerCase());
-              }}
-            />
-            <InputRightAddon>
-              <SearchIcon />
-            </InputRightAddon>
-          </InputGroup>
-        </div>
-        <ChakraTable
-          columns={columns}
-          data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
-        ></ChakraTable>
+        <Tabs>
+          <TabList>
+            <Tab>Alumnos</Tab>
+            <Tab>Tareas</Tab>
+            <Tab>Estadísticas</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <div className={`${styles.filters} row`}>
+                <InputGroup>
+                  <Input
+                    width="auto"
+                    onKeyDown={(e) => {
+                      if (!e.key.match(inputRegex)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    maxLength={30}
+                    placeholder="Documento o nombre"
+                    onChange={({ target: { value } }) => {
+                      setSearchQuery(value.toLowerCase());
+                    }}
+                  />
+                  <InputRightAddon>
+                    <SearchIcon />
+                  </InputRightAddon>
+                </InputGroup>
+              </div>
+              <ChakraTable
+                columns={columns}
+                data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
+              ></ChakraTable>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
     </ChakraProvider>
   );
