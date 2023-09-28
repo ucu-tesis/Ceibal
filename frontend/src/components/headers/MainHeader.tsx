@@ -26,7 +26,7 @@ const MainHeader: React.FC = () => {
         />
       )}
       <div>
-        <a>Salir</a>
+        <a className="log-out-link">Salir</a>
       </div>
     </div>
   );
