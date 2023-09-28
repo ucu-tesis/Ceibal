@@ -1,26 +1,28 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
 import { Pagination } from 'src/decorators/pagination.decorator';
+import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
+import { UserService } from 'src/services/user.service';
 
 @Controller('evaluationGroups')
 export class EvaluationGroupsController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private userService: UserService,
+  ) {}
 
   @Get('/')
-  // @UseGuards(AuthGuard)
+  @UseGuards(TeacherGuard)
   async getAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
-    @Query('ci') ci: string, // TODO remove after adding sso
   ): Promise<{ data: EvaluationGroup[] }> {
-    if (!ci) {
-      throw new Error('Must provide a filter');
-    }
+    const user = this.userService.get();
 
     const evaluationGroups = await this.prismaService.evaluationGroup.findMany({
       where: {
         Teacher: {
-          cedula: ci,
+          id: user.id,
         },
       },
       skip: page * pageSize,
@@ -30,14 +32,15 @@ export class EvaluationGroupsController {
   }
 
   @Get('/:evaluationGroupId')
-  // @UseGuards(AuthGuard)
+  @UseGuards(TeacherGuard)
   async getOne(
     @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
     const evaluationGroup =
-      await this.prismaService.evaluationGroup.findUniqueOrThrow({
+      await this.prismaService.evaluationGroup.findFirstOrThrow({
         where: {
           id: Number(evaluationGroupId),
+          teacher_id: this.userService.get().id,
         },
         include: {
           Students: {

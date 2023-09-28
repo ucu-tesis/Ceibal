@@ -10,6 +10,11 @@ import { AuthService } from './services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TeachersController } from './controllers/teachers.controller';
 import { EvaluationGroupsController } from './controllers/evaluationGroups.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { UserService } from './services/user.service';
+import { ForbiddenFilter } from './filters/forbidden.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -30,6 +35,18 @@ import { EvaluationGroupsController } from './controllers/evaluationGroups.contr
     TeachersController,
     EvaluationGroupsController,
   ],
-  providers: [AppService, FileUploadService, PrismaService, AuthService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ForbiddenFilter,
+    },
+    AppService,
+    FileUploadService,
+    PrismaService,
+    AuthService,
+    UserService,
+    JwtStrategy,
+    GoogleStrategy,
+  ],
 })
 export class AppModule {}

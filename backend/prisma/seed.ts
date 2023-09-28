@@ -35,6 +35,7 @@ async function load() {
     },
     include: { GroupsOwned: true },
   });
+  await addSSOUsers(testTeacher);
 
   const testStudent = await prisma.student.upsert({
     where: { cedula: '50000' },
@@ -105,6 +106,88 @@ async function load() {
       phoneme_velocity: 0,
       words_velocity: 0,
       raw_analysis: {},
+    },
+  });
+}
+
+async function addSSOUsers(testTeacher) {
+  // Students
+  await prisma.student.upsert({
+    where: { cedula: '88888880' },
+    update: {},
+    create: {
+      cedula: '88888880',
+      email: 'ucu.tesis.ceibal@gmail.com',
+      first_name: 'Cosme',
+      last_name: 'Fulanito',
+      EvaluationGroups: {
+        connect: { id: testTeacher.GroupsOwned[0].id },
+      },
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+    },
+    include: { EvaluationGroups: true },
+  });
+
+  // Teachers
+  await prisma.user.upsert({
+    where: { cedula: '99999990' },
+    update: {},
+    create: {
+      cedula: '99999990',
+      email: 'paolo.a.mazza@gmail.com',
+      first_name: 'Paolo',
+      last_name: 'Mazza',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+    },
+  });
+  await prisma.user.upsert({
+    where: { cedula: '99999991' },
+    update: {},
+    create: {
+      cedula: '99999991',
+      email: 'gcabrera243@gmail.com',
+      first_name: 'Gastón',
+      last_name: 'Cabrera',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+    },
+  });
+  await prisma.user.upsert({
+    where: { cedula: '99999992' },
+    update: {},
+    create: {
+      cedula: '99999992',
+      email: 'farchiten@gmail.com',
+      first_name: 'Alexis',
+      last_name: 'Dotta',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+    },
+  });
+  await prisma.user.upsert({
+    where: { cedula: '99999993' },
+    update: {},
+    create: {
+      cedula: '99999993',
+      email: 'marcos.de.oliveira.madeira@gmail.com',
+      first_name: 'Marcos',
+      last_name: 'De Olivera',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+    },
+  });
+  await prisma.user.upsert({
+    where: { cedula: '99999994' },
+    update: {},
+    create: {
+      cedula: '99999994',
+      email: 'vextil@gmail.com',
+      first_name: 'Joaquín',
+      last_name: 'Cuitiño',
+      password_hash:
+        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
     },
   });
 }

@@ -32,7 +32,7 @@ const Registro: React.FC = () => {
           <InputText placeholder="Documento"></InputText>
           <InputPassword placeholder="Contraseña"></InputPassword>
           <InputPassword placeholder="Repetir Contraseña"></InputPassword>
-          <RoundedButton variant={"black" as keyof Object}>
+          <RoundedButton variant="black">
             <div>Registrarse</div>
             <Image src={RightIcon} alt=""></Image>
           </RoundedButton>

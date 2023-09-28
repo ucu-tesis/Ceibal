@@ -1,37 +1,35 @@
 import {
   Controller,
   Get,
-  Query,
   UseGuards,
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { Analysis } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { Request } from 'express';
 import { Pagination } from 'src/decorators/pagination.decorator';
+import { StudentGuard } from 'src/guards/student.guard';
+import { UserService } from 'src/services/user.service';
 
 // TODO consider converting this into a "student" controller with all other student-facing logic
 @Controller('analysis')
 export class AnalysisController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private userService: UserService,
+  ) {}
 
   @Get('/')
-  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
+  @UseGuards(StudentGuard)
   async studentGetAll(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
-    @Query('request') request: Request,
-    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<{ data: Analysis[] }> {
-    // TODO: const ci = request['user'].ci;
+    const user = this.userService.get();
 
     const analyses = await this.prismaService.analysis.findMany({
       where: {
         Recording: {
-          Student: {
-            cedula: ci,
-          },
+          student_id: user.id,
         },
       },
       skip: page * pageSize,
@@ -45,21 +43,17 @@ export class AnalysisController {
   }
 
   @Get('/:analysisId')
-  // @UseGuards(AuthGuard) // TODO: Habilitar login cuando se integre SSO
+  @UseGuards(StudentGuard)
   async studentGetSingle(
     @Param('analysisId') analysisId: number,
-    @Query('request') request: Request,
-    @Query('ci') ci: string, // TODO: Eliminar cuando se integre SSO
   ): Promise<Analysis> {
-    // TODO: const ci = request['user'].ci;
+    const user = this.userService.get();
 
     const analysis = await this.prismaService.analysis.findFirst({
       where: {
         id: analysisId,
         Recording: {
-          Student: {
-            cedula: ci,
-          },
+          student_id: user.id,
         },
       },
     });

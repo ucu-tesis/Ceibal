@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 
 interface RoundedButtonProps {
   onClick?: () => void;
-  variant: keyof Object;
+  variant: 'black' | 'white';
   children: string | JSX.Element | JSX.Element[];
 }
 
@@ -19,7 +19,8 @@ const mozaicFont = localFont({
 
 const RoundedButton: React.FC<RoundedButtonProps> = ({ children, variant, onClick }) => {
   const classVariants = {
-    black: styles["black"],
+    'black': styles["black"],
+    'white': styles["white"],
   };
   return (
     <button

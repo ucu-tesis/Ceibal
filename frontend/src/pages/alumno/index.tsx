@@ -7,9 +7,11 @@ import ChicaLeyendo from "../../assets/images/chica_leyendo.svg";
 import PodioPrimerLugar from "../../assets/images/podio_primer_lugar.svg";
 import Trofeo from "../../assets/images/trofeo.svg";
 import { useRouter } from "next/router";
+import { useUser } from "@/providers/UserContext";
 
 const StudentHomeScreen: React.FC = () => {
   const router = useRouter();
+  const user = useUser();
   const currentPathName = router.pathname;
 
   return (
@@ -20,7 +22,8 @@ const StudentHomeScreen: React.FC = () => {
       <div className={`${styles.background} col`}>
         <h1>¡Qué alegría encontrarte,</h1>
         <h1 className={`${styles["student-name"]}`}>
-          Laura<span>!</span>
+          {user.firstName}
+          <span>!</span>
         </h1>
         <h2>¿Qué quieres hacer hoy?</h2>
         <div className={`${styles["button-container"]} col`}>
