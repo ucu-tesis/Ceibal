@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, SetStateAction } from "react";
 import PrimaryButton from "./buttons/PrimaryButton";
 import RecordIcon from "../assets/images/record_icon.svg";
 import StopIcon from "../assets/images/stop_icon.svg";
@@ -14,6 +14,8 @@ interface RecorderProps {
   newRecord?: boolean;
   onRecording: () => void;
   componentRef: React.LegacyRef<HTMLDivElement> | undefined;
+  bufferSource: AudioBufferSourceNode | null;
+  setBufferSource: React.Dispatch<SetStateAction<AudioBufferSourceNode | null>>;
 }
 
 const mozaicFont = localFont({
@@ -25,12 +27,20 @@ const mozaicFont = localFont({
   ],
 });
 
-const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording, componentRef }) => {
+const Recorder: React.FC<RecorderProps> = ({
+  onComplete,
+  newRecord,
+  onRecording,
+  componentRef,
+  bufferSource,
+  setBufferSource,
+}) => {
   const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [bufferSource, setBufferSource] = useState<AudioBufferSourceNode | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
 
   useEffect(() => {
@@ -39,8 +49,16 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
     }
   }, [newRecord]);
 
+  const stopAudioPlayback = () => {
+    if (bufferSource && playing) {
+      bufferSource.stop();
+      setPlaying(false);
+    }
+  };
+
   const startRecording = async () => {
     try {
+      stopAudioPlayback();
       onRecording();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -67,7 +85,9 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
   };
 
   const stopRecording = () => {
-    const buttonElement = document.getElementById("primary-button") as HTMLElement;
+    const buttonElement = document.getElementById(
+      "primary-button"
+    ) as HTMLElement;
     if (mediaRecorder) {
       buttonElement.style.transform = "scale(0.75)";
       setTimeout(() => {
@@ -96,9 +116,8 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
 
       setBufferSource(newBufferSource);
       setPlaying(true);
-    } else if (bufferSource && playing) {
-      bufferSource.stop();
-      setPlaying(false);
+    } else {
+      stopAudioPlayback();
     }
   };
 
@@ -106,17 +125,27 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
     <div ref={componentRef} id="recorder" className="row">
       {arrayBuffer && !recording ? (
         <>
-          <SecondaryButton onClick={startRecording} variant={"noFill" as keyof Object}>
+          <SecondaryButton
+            onClick={startRecording}
+            variant={"noFill" as keyof Object}
+          >
             <div>
               <Image src={RecordAgainIcon} alt=""></Image>
             </div>
-            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar otra vez</div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+              Grabar otra vez
+            </div>
           </SecondaryButton>
-          <SecondaryButton onClick={toggleAudioPlayback} variant={"outlined" as keyof Object}>
+          <SecondaryButton
+            onClick={toggleAudioPlayback}
+            variant={"outlined" as keyof Object}
+          >
             <div>
               <Image src={playing ? PauseIcon : PlayIcon} alt=""></Image>
             </div>
-            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>{playing ? "Parar" : "Reproducir"}</div>
+            <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+              {playing ? "Parar" : "Reproducir"}
+            </div>
           </SecondaryButton>
         </>
       ) : (
@@ -130,14 +159,18 @@ const Recorder: React.FC<RecorderProps> = ({ onComplete, newRecord, onRecording,
               <div>
                 <Image src={StopIcon} alt=""></Image>
               </div>
-              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Parar</div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+                Parar
+              </div>
             </>
           ) : (
             <>
               <div>
                 <Image src={RecordIcon} alt=""></Image>
               </div>
-              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>Grabar</div>
+              <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+                Grabar
+              </div>
             </>
           )}
         </PrimaryButton>

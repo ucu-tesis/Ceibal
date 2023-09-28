@@ -27,6 +27,8 @@ const mozaicFont = localFont({
 export default function Home() {
   const [sendActive, setSendActive] = useState(false);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
+  const [bufferSource, setBufferSource] =
+    useState<AudioBufferSourceNode | null>(null);
   const [mimeType, setMimetype] = useState<string>("");
   const [newRecord, setNewRecord] = useState(false);
 
@@ -100,6 +102,7 @@ export default function Home() {
   }
 
   const onSend = () => {
+    bufferSource?.stop();
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => {
         setSendActive(false);
@@ -201,6 +204,8 @@ export default function Home() {
                 onComplete={onComplete}
                 newRecord={newRecord}
                 onRecording={onRecording}
+                bufferSource={bufferSource}
+                setBufferSource={setBufferSource}
               ></Recorder>
               {sendActive && (
                 <PrimaryButton
