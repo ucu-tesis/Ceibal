@@ -1,32 +1,21 @@
 import React, { useState, useRef } from "react";
 import Head from "next/head";
-import { Inter } from "next/font/google";
-import localFont from "next/font/local";
 import Recorder from "@/components/Recorder";
 import Image from "next/image";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import SecondaryButton from "@/components/buttons/SecondaryButton";
-import SendIcon from "../assets/images/send_icon.svg";
+import SendIcon from "../../../assets/images/send_icon.svg";
 import TextContainer from "@/components/containers/TextContainer";
 import Spinner from "@/components/spinners/Spinner";
 import ModalDialog from "@/components/modals/ModalDialog";
 import ProgressBar from "@/components/progress/ProgressBar";
-import useFileUpload from "../../../hooks/students/useFileUpload";
+import useFileUpload from "@/hooks/students/useFileUpload";
 
-const inter = Inter({ subsets: ["latin"] });
-
-const mozaicFont = localFont({
-  src: [
-    {
-      path: "../assets/fonts/ceibalmozaic-regular-webfont.woff2",
-      style: "normal",
-    },
-  ],
-});
-
-function RecordScreen() {
+export default function RecordScreen() {
   const [sendActive, setSendActive] = useState(false);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
+  const [bufferSource, setBufferSource] =
+    useState<AudioBufferSourceNode | null>(null);
   const [mimeType, setMimetype] = useState<string>("");
   const [newRecord, setNewRecord] = useState(false);
 
@@ -100,6 +89,7 @@ function RecordScreen() {
   }
 
   const onSend = () => {
+    bufferSource?.stop();
     if (buffer) {
       uploadFile(buffer, mimeType).then(() => {
         setSendActive(false);
@@ -201,6 +191,8 @@ function RecordScreen() {
                 onComplete={onComplete}
                 newRecord={newRecord}
                 onRecording={onRecording}
+                bufferSource={bufferSource}
+                setBufferSource={setBufferSource}
               ></Recorder>
               {sendActive && (
                 <PrimaryButton
@@ -211,7 +203,7 @@ function RecordScreen() {
                   <div>
                     <Image src={SendIcon} alt=""></Image>
                   </div>
-                  <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+                  <div>
                     Enviar
                   </div>
                 </PrimaryButton>
@@ -225,5 +217,3 @@ function RecordScreen() {
     </>
   );
 }
-
-export default RecordScreen;

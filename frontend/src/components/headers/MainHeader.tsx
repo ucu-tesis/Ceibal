@@ -31,7 +31,7 @@ const MainHeader: React.FC = () => {
       )}
       <div>
         <span className="name">{user?.firstName}</span>
-        <Link href={backendUrl + '/auth/logout'}>Salir</Link>
+        <Link href={backendUrl + '/auth/logout'} className="log-out-link">Salir</Link>
       </div>
     </div>
   );

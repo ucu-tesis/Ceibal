@@ -41,9 +41,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <UserProvider>
       <QueryClientProvider client={client}>
-        <div>
+        <div className={mozaicFont.className}>
           <style jsx global>{`
-            body {
+            body, html, button, input {
               font-family: ${mozaicFont.style.fontFamily} !important;
             }
           `}</style>

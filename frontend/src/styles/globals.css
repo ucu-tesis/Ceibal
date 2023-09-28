@@ -111,6 +111,15 @@ h1 {
   width: 100%;
 }
 
+.log-out-link {
+  color: var(--ceibal-black);
+}
+
+.log-out-link:hover {
+  cursor: pointer;
+  color: var(--ceibal-red);
+}
+
 /* Animaciones */
 
 @keyframes vanish {
