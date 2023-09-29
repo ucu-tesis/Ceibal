@@ -12,8 +12,16 @@
   background-color: var(--ceibal-light-grey-secondary);
 }
 
+.simple .main-table tbody tr {
+  background-color: white;
+}
+
 .main-table td:last-child {
     text-align: right;
+}
+
+.simple .main-table tbody td {
+  text-align: left;
 }
 
 .main-table a {

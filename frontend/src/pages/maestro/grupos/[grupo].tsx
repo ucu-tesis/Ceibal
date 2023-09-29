@@ -13,6 +13,12 @@ import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 
+interface Task {
+  section: string;
+  chapter: string;
+  reading: string;
+}
+
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
   { label: "Documento" },
@@ -20,6 +26,14 @@ const columns: ChakraTableColumn[] = [
   { label: "Tareas Realizadas" },
   { label: "Tareas Pendientes" },
   { label: "", reactKey: "link", width: "20%" },
+];
+
+const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
+
+const taskList: Task[] = [
+  { chapter: "4", section: "6", reading: "Coco Bandini" },
+  { chapter: "5", section: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
+  { chapter: "8", section: "2", reading: "Diogenes" },
 ];
 
 const toTableList = (students: StudentWithFullName[], groupId: number, groupName: string) =>
@@ -110,6 +124,26 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 columns={columns}
                 data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
               ></ChakraTable>
+            </TabPanel>
+            <TabPanel>
+              <div className={`${styles.filters} row`}>
+                <InputGroup>
+                  <Input
+                    width="auto"
+                    onKeyDown={(e) => {
+                      if (!e.key.match(inputRegex)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    maxLength={30}
+                    placeholder="Lectura"
+                  />
+                  <InputRightAddon>
+                    <SearchIcon />
+                  </InputRightAddon>
+                </InputGroup>
+              </div>
+              <ChakraTable variant="simple" columns={taskColumns} data={taskList}></ChakraTable>
             </TabPanel>
           </TabPanels>
         </Tabs>
