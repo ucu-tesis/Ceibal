@@ -47,3 +47,17 @@ td .badge {
 .badge.pending {
   background: #003C7D;
 }
+
+.primary {
+  background-color: var(--ceibal-green) !important;
+  border-radius: 24px !important;
+  color: white !important;
+}
+
+.space {
+  justify-content: space-between;
+}
+
+.desc {
+  gap: 16px;
+}
