@@ -22,8 +22,10 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import styles from "./grupos.module.css";
 import useFetchGroupStudents, { StudentWithFullName } from "@/api/teachers/hooks/useFetchGroupStudents";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
+import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
+import Select from "@/components/selects/Select";
 
 interface Task {
   section: string;
@@ -94,13 +96,33 @@ const toTableListModal = (tasks: Task[]) =>
     ...task,
   }));
 
+type Option = {
+  value?: string;
+  label: string;
+};
+
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
   const { data, isLoading, isError } = useFetchGroupStudents(Number(groupId));
   const [searchQuery, setSearchQuery] = useState("");
+  const [taskSearchQuery, setTaskSearchQuery] = useState("");
+  const [modalTaskSearchQuery, setModalTaskSearchQuery] = useState("");
+  const [sectionOption, setSectionOption] = useState<string|undefined>(undefined);
   const { groupName, students } = data ?? { groupName: "", students: [] };
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
+  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption);
+  const { filteredTasks: filteredTasksModal } = useFilteredTasks(taskList, modalTaskSearchQuery);
+
+  const defaultOption: Option = {
+    label: "Todas",
+    value: undefined,
+  };
+
+  const sectionOptions: Option[] = [
+    ...taskList.map(({ section }) => ({ label: section, value: section })),
+    defaultOption,
+  ];
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -181,6 +203,9 @@ export default function Page({ params }: { params: { grupo: number } }) {
                         e.preventDefault();
                       }
                     }}
+                    onChange={({ target: { value } }) => {
+                      setTaskSearchQuery(value.toLowerCase());
+                    }}
                     maxLength={30}
                     placeholder="Lectura"
                   />
@@ -188,8 +213,15 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     <SearchIcon />
                   </InputRightAddon>
                 </InputGroup>
+                <Select
+                  defaultValue={defaultOption}
+                  options={sectionOptions}
+                  onChange={(option) => {
+                    setSectionOption(option.value);
+                  }}
+                ></Select>
               </div>
-              <ChakraTable columns={taskColumns} data={toTableListTask(taskList)}></ChakraTable>
+              <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -217,6 +249,9 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       e.preventDefault();
                     }
                   }}
+                  onChange={({ target: { value } }) => {
+                    setModalTaskSearchQuery(value.toLowerCase());
+                  }}
                   maxLength={30}
                   placeholder="Lectura"
                 />
@@ -225,7 +260,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 </InputRightAddon>
               </InputGroup>
             </div>
-            <ChakraTable variant="simple" columns={taskColumnsModal} data={toTableListModal(taskList)}></ChakraTable>
+            <ChakraTable
+              variant="simple"
+              columns={taskColumnsModal}
+              data={toTableListModal(filteredTasksModal)}
+            ></ChakraTable>
           </ModalBody>
           <ModalFooter>
             <Button onClick={onClose} className={styles.primary} variant="solid">
