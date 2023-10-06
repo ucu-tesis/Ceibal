@@ -59,7 +59,9 @@ td .badge {
 }
 
 .desc {
-  gap: 16px;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .flex-center {

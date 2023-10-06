@@ -26,6 +26,7 @@ import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import Select from "@/components/selects/Select";
+import InputDate from "@/components/inputs/InputDate";
 
 interface Task {
   section: string;
@@ -257,12 +258,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <ModalHeader tabIndex={0}>Crear Tarea</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <div className={`${styles.desc} col`}>
-              <div className="row">
+            <div>
+              <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
-              </div>
-              <div className="row">
-                <span tabIndex={0}>Textos:</span>
+                <InputDate></InputDate>
               </div>
             </div>
             <div className={`${styles.filters} row`}>
