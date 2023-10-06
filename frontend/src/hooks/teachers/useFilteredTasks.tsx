@@ -8,13 +8,14 @@ interface Task {
 }
 
 const taskFilter =
-  (query: string, sectionFilter?: string) =>
-  ({ reading, section }: Task) =>
+  (query: string, sectionFilter?: string, chapterFilter?: string) =>
+  ({ reading, section, chapter }: Task) =>
     (reading.toLowerCase().includes(query) || reading.startsWith(query)) &&
-    (sectionFilter ? sectionFilter === section : true);
+    (sectionFilter ? sectionFilter === section : true) &&
+    (chapterFilter ? chapterFilter === chapter : true);
 
-const useFilteredTasks = (tasks: Task[], query: string, section?: string) => {
-  const filteredTasks = useMemo(() => tasks.filter(taskFilter(query, section)), [tasks, query, section]);
+const useFilteredTasks = (tasks: Task[], query: string, section?: string, chapter?: string) => {
+  const filteredTasks = useMemo(() => tasks.filter(taskFilter(query, section, chapter)), [tasks, query, section, chapter]);
   return { filteredTasks };
 };
 

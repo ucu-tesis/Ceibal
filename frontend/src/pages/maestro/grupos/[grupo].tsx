@@ -52,9 +52,9 @@ const taskColumnsModal: ChakraTableColumn[] = [
 ];
 
 const taskList: Task[] = [
-  { chapter: "4", section: "6", reading: "Coco Bandini" },
-  { chapter: "5", section: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
-  { chapter: "8", section: "2", reading: "Diogenes" },
+  { section: "6", chapter: "4", reading: "Coco Bandini" },
+  { section: "5", chapter: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
+  { section: "2", chapter: "8", reading: "Diogenes" },
 ];
 
 const toTableList = (students: StudentWithFullName[], groupId: number, groupName: string) =>
@@ -108,20 +108,38 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
   const [modalTaskSearchQuery, setModalTaskSearchQuery] = useState("");
-  const [sectionOption, setSectionOption] = useState<string|undefined>(undefined);
+  const [sectionOption, setSectionOption] = useState<string | undefined>(undefined);
+  const [sectionOptionModal, setSectionOptionModal] = useState<string | undefined>(undefined);
+  const [chapterOption, setChapterOption] = useState<string | undefined>(undefined);
+  const [chapterOptionModal, setChapterOptionModal] = useState<string | undefined>(undefined);
   const { groupName, students } = data ?? { groupName: "", students: [] };
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
-  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption);
-  const { filteredTasks: filteredTasksModal } = useFilteredTasks(taskList, modalTaskSearchQuery);
+  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption, chapterOption);
+  const { filteredTasks: filteredTasksModal } = useFilteredTasks(
+    taskList,
+    modalTaskSearchQuery,
+    sectionOptionModal,
+    chapterOptionModal
+  );
 
   const defaultOption: Option = {
     label: "Todas",
     value: undefined,
   };
 
+  const defaultOptionChapters: Option = {
+    label: "Todos",
+    value: undefined,
+  };
+
   const sectionOptions: Option[] = [
     ...taskList.map(({ section }) => ({ label: section, value: section })),
     defaultOption,
+  ];
+
+  const chapterOptions: Option[] = [
+    ...taskList.map(({ chapter }) => ({ label: chapter, value: chapter })),
+    defaultOptionChapters,
   ];
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -220,6 +238,13 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     setSectionOption(option.value);
                   }}
                 ></Select>
+                <Select
+                  defaultValue={defaultOptionChapters}
+                  options={chapterOptions}
+                  onChange={(option) => {
+                    setChapterOption(option.value);
+                  }}
+                ></Select>
               </div>
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
@@ -228,20 +253,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
       </div>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent minWidth="700px">
-          <ModalHeader>Crear Tarea</ModalHeader>
+        <ModalContent className={styles["modal-content"]}>
+          <ModalHeader tabIndex={0}>Crear Tarea</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <div className={`${styles.desc} col`}>
               <div className="row">
-                <span>Fecha límite:</span>
+                <span tabIndex={0}>Fecha límite:</span>
               </div>
               <div className="row">
-                <span>Textos:</span>
+                <span tabIndex={0}>Textos:</span>
               </div>
             </div>
             <div className={`${styles.filters} row`}>
-              <InputGroup>
+              <InputGroup className={styles.small}>
                 <Input
                   width="auto"
                   onKeyDown={(e) => {
@@ -259,6 +284,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <SearchIcon />
                 </InputRightAddon>
               </InputGroup>
+              <Select
+                defaultValue={defaultOption}
+                options={sectionOptions}
+                onChange={(option) => {
+                  setSectionOptionModal(option.value);
+                }}
+              ></Select>
+              <Select
+                defaultValue={defaultOptionChapters}
+                options={chapterOptions}
+                onChange={(option) => {
+                  setChapterOptionModal(option.value);
+                }}
+              ></Select>
             </div>
             <ChakraTable
               variant="simple"
@@ -266,7 +305,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               data={toTableListModal(filteredTasksModal)}
             ></ChakraTable>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className={styles["flex-center"]}>
             <Button onClick={onClose} className={styles.primary} variant="solid">
               Crear tarea
             </Button>

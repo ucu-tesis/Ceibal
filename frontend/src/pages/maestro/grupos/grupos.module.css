@@ -61,3 +61,27 @@ td .badge {
 .desc {
   gap: 16px;
 }
+
+.flex-center {
+  justify-content: center;
+}
+
+.small {
+  max-width: 180px;
+}
+
+.modal-content {
+  min-width: 700px;
+}
+
+@media (max-width: 500px) {
+  .container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .modal-content {
+    min-width: auto;
+  }
+}
