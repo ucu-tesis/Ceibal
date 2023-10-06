@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
+import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, CategoryScale, ChartData } from "chart.js";
+import { Line } from "react-chartjs-2";
 import {
   ChakraProvider,
   Button,
@@ -147,6 +149,28 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const inputRegex = /\w|\d|\-|\s/;
 
+  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale);
+
+  const dataChart = {
+    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+    datasets: [
+      {
+        id: 1,
+        label: "A",
+        data: [5, 6, 7, 4, 3, 5],
+        backgroundColor: "#B1A5FF",
+        borderColor: "#B1A5FF",
+      },
+      {
+        id: 2,
+        label: "B",
+        data: [3, 2, 1, 4, 7, 3],
+        backgroundColor: "#FBE38E",
+        borderColor: "#FBE38E",
+      },
+    ],
+  };
+
   if (isLoading) {
     return <LoadingPage />;
   }
@@ -248,6 +272,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 ></Select>
               </div>
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
+            </TabPanel>
+            <TabPanel>
+              <div className={styles.canvas}>
+                <Line data={dataChart}></Line>
+              </div>
             </TabPanel>
           </TabPanels>
         </Tabs>

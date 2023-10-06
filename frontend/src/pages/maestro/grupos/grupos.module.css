@@ -76,6 +76,11 @@ td .badge {
   min-width: 700px;
 }
 
+.canvas {
+  height: 300px;
+  max-width: 802px;
+}
+
 @media (max-width: 500px) {
   .container {
     padding: 16px;

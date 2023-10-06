@@ -18,11 +18,13 @@
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.1",
     "axios": "^1.5.0",
+    "chart.js": "^4.4.0",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.2",
     "framer-motion": "^10.12.17",
     "next": "13.3.2",
     "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
   }
