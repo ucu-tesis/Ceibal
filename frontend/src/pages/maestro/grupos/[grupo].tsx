@@ -125,7 +125,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     chapterOptionModal
   );
 
-  const defaultOption: Option = {
+  const defaultOptionSections: Option = {
     label: "Todas",
     value: undefined,
   };
@@ -137,7 +137,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const sectionOptions: Option[] = [
     ...taskList.map(({ section }) => ({ label: section, value: section })),
-    defaultOption,
+    defaultOptionSections,
   ];
 
   const chapterOptions: Option[] = [
@@ -256,20 +256,26 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     <SearchIcon />
                   </InputRightAddon>
                 </InputGroup>
-                <Select
-                  defaultValue={defaultOption}
-                  options={sectionOptions}
-                  onChange={(option) => {
-                    setSectionOption(option.value);
-                  }}
-                ></Select>
-                <Select
-                  defaultValue={defaultOptionChapters}
-                  options={chapterOptions}
-                  onChange={(option) => {
-                    setChapterOption(option.value);
-                  }}
-                ></Select>
+                <div className="col">
+                  <label>Sección</label>
+                  <Select
+                    defaultValue={defaultOptionSections}
+                    options={sectionOptions}
+                    onChange={(option) => {
+                      setSectionOption(option.value);
+                    }}
+                  ></Select>
+                </div>
+                <div className="col">
+                  <label>Capítulo</label>
+                  <Select
+                    defaultValue={defaultOptionChapters}
+                    options={chapterOptions}
+                    onChange={(option) => {
+                      setChapterOption(option.value);
+                    }}
+                  ></Select>
+                </div>
               </div>
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
@@ -312,20 +318,26 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <SearchIcon />
                 </InputRightAddon>
               </InputGroup>
-              <Select
-                defaultValue={defaultOption}
-                options={sectionOptions}
-                onChange={(option) => {
-                  setSectionOptionModal(option.value);
-                }}
-              ></Select>
-              <Select
-                defaultValue={defaultOptionChapters}
-                options={chapterOptions}
-                onChange={(option) => {
-                  setChapterOptionModal(option.value);
-                }}
-              ></Select>
+              <div className="col">
+                <label>Sección</label>
+                <Select
+                  defaultValue={defaultOptionSections}
+                  options={sectionOptions}
+                  onChange={(option) => {
+                    setSectionOptionModal(option.value);
+                  }}
+                ></Select>
+              </div>
+              <div className="col">
+                <label>Capítulo</label>
+                <Select
+                  defaultValue={defaultOptionChapters}
+                  options={chapterOptions}
+                  onChange={(option) => {
+                    setChapterOptionModal(option.value);
+                  }}
+                ></Select>
+              </div>
             </div>
             <ChakraTable
               variant="simple"

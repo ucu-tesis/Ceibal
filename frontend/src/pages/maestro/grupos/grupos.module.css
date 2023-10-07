@@ -6,9 +6,16 @@
   justify-content: left;
   margin-top: 8px;
   margin-bottom: 24px;
+  align-items: end;
   gap: 40px;
   flex-wrap: wrap;
   row-gap: 8px;
+}
+
+.filters label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
 }
 
 .edit-modal {
