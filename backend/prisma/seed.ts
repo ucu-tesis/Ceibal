@@ -83,10 +83,29 @@ async function load() {
     },
   });
 
+  const testReading4 = await prisma.reading.create({
+    data: {
+      title: 'The Art of War - Sun Tzu',
+      imageUrl: 'https://picsum.photos/300/400',
+      content:
+        'Quisque id diam vel quam elementum. Mi eget mauris pharetra et ultrices neque ornare aenean euismod. Iaculis at erat pellentesque adipiscing commodo elit. Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+    },
+  });
+
+  const testReading5 = await prisma.reading.create({
+    data: {
+      title: '100 Páginas en blanco: Edición Limitada',
+      imageUrl: 'https://picsum.photos/300/400',
+      content:
+        'Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+    },
+  });
+
   const groupReading1 = await prisma.evaluationGroupReading.create({
     data: {
       reading_id: testReading1.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-08-10'),
     },
   });
 
@@ -94,6 +113,7 @@ async function load() {
     data: {
       reading_id: testReading2.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-10-10'),
     },
   });
 
@@ -101,12 +121,29 @@ async function load() {
     data: {
       reading_id: testReading3.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-09-10'),
     },
   });
 
   await addStudentReading(1, groupReading1.id);
   await addStudentReading(1, groupReading2.id);
   await addStudentReading(1, groupReading3.id);
+
+  await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading4.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-09-10'),
+    },
+  });
+
+  await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading5.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-09-10'),
+    },
+  });
 }
 
 async function addSSOUsers(testTeacher) {

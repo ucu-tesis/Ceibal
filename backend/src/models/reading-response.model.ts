@@ -9,4 +9,7 @@ export class ReadingResponse {
 
 export class ReadingsResponse {
   Readings: ReadingResponse[];
+  total: number;
+  page: number;
+  page_size: number;
 }
