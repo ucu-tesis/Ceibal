@@ -19,10 +19,11 @@ export interface ChakraTableColumn {
 interface TableProps {
   columns: ChakraTableColumn[];
   data: any[];
+  variant?: string;
 }
 
-const ChakraTable: React.FC<TableProps> = ({ columns, data }) => (
-  <TableContainer className={`${styles["table-border"]}`}>
+const ChakraTable: React.FC<TableProps> = ({ columns, data, variant }) => (
+  <TableContainer className={`${styles["table-border"]} ${variant ? styles[variant] : ""}`}>
     <Table className={`${styles["main-table"]}`}>
       <Thead>
         <Tr>
