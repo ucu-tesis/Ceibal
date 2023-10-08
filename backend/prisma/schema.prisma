@@ -49,6 +49,7 @@ model Reading {
   id                      Int                      @id @default(autoincrement())
   title                   String
   content                 String
+  imageUrl                String?
   EvaluationGroupReadings EvaluationGroupReading[]
 }
 

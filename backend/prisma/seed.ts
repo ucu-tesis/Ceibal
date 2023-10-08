@@ -1,4 +1,5 @@
 import { AnalysisStatus, PrismaClient } from '@prisma/client';
+import { randomInt } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -35,9 +36,10 @@ async function load() {
     },
     include: { GroupsOwned: true },
   });
+
   await addSSOUsers(testTeacher);
 
-  const testStudent = await prisma.student.upsert({
+  await prisma.student.upsert({
     where: { cedula: '50000' },
     update: {},
     create: {
@@ -54,60 +56,57 @@ async function load() {
     include: { EvaluationGroups: true },
   });
 
-  const testReading = await prisma.reading.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      title: 'Test reading',
+  const testReading1 = await prisma.reading.create({
+    data: {
+      title: 'Quiero ser Súarez',
+      imageUrl: 'https://picsum.photos/300/400',
       content:
-        'Blablabla some long text, Blablabla some long text. Blablabla some long text.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
     },
   });
 
-  const evaulationGroupReadingParams = {
-    reading_id: testReading.id,
-    evaluation_group_id: testStudent.EvaluationGroups[0].id,
-  };
-
-  const testGroup = await prisma.evaluationGroupReading.upsert({
-    where: { id: 1 }, // TODO evaulationGroupReadingParams, (after adding unique constraint)
-    update: {},
-    create: evaulationGroupReadingParams,
-  });
-
-  await prisma.recording.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      recording_url:
-        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-      evaluation: {},
-      evaluation_group_reading_id: testGroup.id,
-      student_id: testStudent.id,
+  const testReading2 = await prisma.reading.create({
+    data: {
+      title: 'Diógenes no quiere ser ratón',
+      imageUrl: 'https://picsum.photos/300/400',
+      content:
+        'Elementum curabitur vitae nunc sed velit. Vel turpis nunc eget lorem dolor. Nisl purus in mollis nunc sed id semper risus in. Blandit aliquam etiam erat velit scelerisque in. Laoreet id donec ultrices tincidunt arcu non sodales neque. Fermentum dui faucibus in ornare quam viverra orci. Velit laoreet id donec ultrices tincidunt arcu. Adipiscing bibendum est ultricies integer. Purus faucibus ornare suspendisse sed nisi lacus sed viverra tellus. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Imperdiet nulla malesuada pellentesque elit eget gravida cum. Praesent semper feugiat nibh sed pulvinar proin gravida hendrerit. Viverra mauris in aliquam sem fringilla ut morbi. Convallis tellus id interdum velit laoreet id donec. Dui faucibus in ornare quam viverra orci. In eu mi bibendum neque.',
     },
   });
 
-  await prisma.analysis.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      recording_id: 1,
-      status: AnalysisStatus.COMPLETED,
-      repetitions_count: 0,
-      silences_count: 0,
-      allosaurus_general_error: 0,
-      similarity_error: 0,
-      repeated_phonemes: [],
-      words_with_errors: [],
-      words_with_repetitions: [],
-      score: 0,
-      error_timestamps: [],
-      repetition_timestamps: [],
-      phoneme_velocity: 0,
-      words_velocity: 0,
-      raw_analysis: {},
+  const testReading3 = await prisma.reading.create({
+    data: {
+      title: 'Física Teórica. Mecánica Quántica: 1',
+      imageUrl: 'https://picsum.photos/300/400',
+      content:
+        'Dictum varius duis at consectetur lorem. Commodo viverra maecenas accumsan lacus vel facilisis volutpat est. Quisque id diam vel quam elementum. Mi eget mauris pharetra et ultrices neque ornare aenean euismod. Iaculis at erat pellentesque adipiscing commodo elit. Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
     },
   });
+
+  const groupReading1 = await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading1.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+    },
+  });
+
+  const groupReading2 = await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading2.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+    },
+  });
+
+  const groupReading3 = await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading3.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+    },
+  });
+
+  await addStudentReading(1, groupReading1.id);
+  await addStudentReading(1, groupReading2.id);
+  await addStudentReading(1, groupReading3.id);
 }
 
 async function addSSOUsers(testTeacher) {
@@ -191,6 +190,39 @@ async function addSSOUsers(testTeacher) {
     },
   });
 }
+
+async function addStudentReading(studentId, groupReadingId) {
+  const recording = await prisma.recording.create({
+    data: {
+      recording_url:
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      evaluation: {},
+      evaluation_group_reading_id: groupReadingId,
+      student_id: studentId,
+    },
+  });
+
+  await prisma.analysis.create({
+    data: {
+      recording_id: recording.id,
+      status: AnalysisStatus.COMPLETED,
+      repetitions_count: randomInt(0, 4),
+      silences_count: randomInt(0, 4),
+      allosaurus_general_error: 0,
+      similarity_error: 0,
+      repeated_phonemes: [],
+      words_with_errors: [],
+      words_with_repetitions: [],
+      score: randomInt(50, 100),
+      error_timestamps: [],
+      repetition_timestamps: [],
+      phoneme_velocity: randomInt(10, 40),
+      words_velocity: randomInt(10, 40),
+      raw_analysis: {},
+    },
+  });
+}
+
 const main = async () => {
   try {
     await load();
