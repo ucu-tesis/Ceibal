@@ -90,6 +90,9 @@ export class StudentsController {
       },
       skip: page * pageSize,
       take: pageSize,
+      orderBy: {
+        due_date: 'asc',
+      },
     });
 
     const totalReadings = await this.prismaService.evaluationGroupReading.count(
