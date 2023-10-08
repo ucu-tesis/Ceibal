@@ -15,7 +15,7 @@ export class StudentsController {
 
   @Get('/readings/completed')
   @UseGuards(StudentGuard)
-  async getReadings(
+  async getCompletedReadings(
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
   ): Promise<ReadingsResponse> {
     const user = this.userService.get();
