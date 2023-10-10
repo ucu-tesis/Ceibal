@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.8'
 
 services:
   audiolib:
@@ -27,6 +27,8 @@ services:
     build:
       context: ./
       dockerfile: backend/Dockerfile
+    # init: true # NOTE: seems to not be working, so we override stop_grace_period instead
+    stop_grace_period: 2s
     volumes:
       - ./backend:/app/backend
       - /app/backend/node_modules
@@ -36,6 +38,7 @@ services:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     environment:
       - "SEED_DATABASE=${SEED_DATABASE}"
+      - "DEBUG_INIT=${DEBUG_INIT}"
       - "DATABASE_URL=postgresql://postgres:password@db:5432/ceibal_development?schema=public"
       - "TEST_DB=postgresql://postgres:password@db:5432/ceibal_test?schema=public"
     depends_on:

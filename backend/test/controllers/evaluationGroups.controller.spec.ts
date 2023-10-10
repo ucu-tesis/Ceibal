@@ -23,33 +23,35 @@ describe('EvaluationGroupsController', () => {
   });
 
   describe('getAll', () => {
-    describe('when no ci is passed', () => {
+    describe('when no userId is passed', () => {
       it('throws an error', async () => {
-        await expect(
-          controller.getAll(defaultPagination, null),
-        ).rejects.toEqual(new Error('Must provide a filter'));
+        const errorMessage = await controller
+          .getAll(null, defaultPagination)
+          .catch((e) => e.message);
+        expect(errorMessage).toContain('Unknown arg `id` in where.Teacher.id');
       });
     });
 
-    describe('when ci is passed', () => {
-      const ci = '1234';
-
+    describe('when userId is passed', () => {
       describe('when there are no groups', () => {
         it('returns an empty array', async () => {
+          const testTeacher = await TestFactory.createTeacher({});
           await expect(
-            controller.getAll(defaultPagination, ci),
+            controller.getAll(testTeacher.id, defaultPagination),
           ).resolves.toEqual({ data: [] });
         });
       });
 
       describe('when there are groups', () => {
         it('returns the groups that match the filter, with pagination info', async () => {
-          const testTeacher = await TestFactory.createTeacher({ cedula: ci });
+          const testTeacher = await TestFactory.createTeacher({});
           const testEvaluationGroup = await TestFactory.createEvaluationGroup({
             teacherId: testTeacher.id,
           });
 
-          expect(await controller.getAll(defaultPagination, ci)).toEqual({
+          expect(
+            await controller.getAll(testTeacher.id, defaultPagination),
+          ).toEqual({
             data: [
               {
                 id: testEvaluationGroup.id,
@@ -81,7 +83,9 @@ describe('EvaluationGroupsController', () => {
           },
         },
       });
-      expect(await controller.getOne(String(evaluationGroup.id))).toEqual({
+      expect(
+        await controller.getOne(teacher.id, String(evaluationGroup.id)),
+      ).toEqual({
         id: evaluationGroup.id,
         name: evaluationGroup.name,
         school_data: null,
