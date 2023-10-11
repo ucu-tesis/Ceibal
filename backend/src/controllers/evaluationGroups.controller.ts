@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
@@ -33,30 +33,30 @@ export class EvaluationGroupsController {
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
-    // TODO throw 404 (or 422) if not found
-    const evaluationGroup =
-      await this.prismaService.evaluationGroup.findFirstOrThrow({
-        where: {
-          id: Number(evaluationGroupId),
-          teacher_id: userId,
-        },
-        include: {
-          Students: {
-            select: {
-              id: true,
-              cedula: true,
-              first_name: true,
-              last_name: true,
-              email: true,
-            },
-          },
-          EvaluationGroupReadings: {
-            include: { Recording: true },
+    const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
+      where: {
+        id: Number(evaluationGroupId),
+        teacher_id: userId,
+      },
+      include: {
+        Students: {
+          select: {
+            id: true,
+            cedula: true,
+            first_name: true,
+            last_name: true,
+            email: true,
           },
         },
-      });
+        EvaluationGroupReadings: {
+          include: { Recording: true },
+        },
+      },
+    });
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
 
-    // TODO add tests for this
     const students = evaluationGroup.Students.map((s) => ({
       ...s,
       assignments_done: 0,
