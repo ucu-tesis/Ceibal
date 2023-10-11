@@ -33,6 +33,7 @@ export class EvaluationGroupsController {
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
   ): Promise<EvaluationGroup> {
+    // TODO throw 404 (or 422) if not found
     const evaluationGroup =
       await this.prismaService.evaluationGroup.findFirstOrThrow({
         where: {
@@ -49,8 +50,35 @@ export class EvaluationGroupsController {
               email: true,
             },
           },
+          EvaluationGroupReadings: {
+            include: { Recording: true },
+          },
         },
       });
+
+    // TODO add tests for this
+    const students = evaluationGroup.Students.map((s) => ({
+      ...s,
+      assignments_done: 0,
+      assignments_pending: 0,
+    }));
+
+    evaluationGroup.EvaluationGroupReadings.forEach((reading) => {
+      const doneStudentsMap = {};
+      reading.Recording.forEach((recording) => {
+        doneStudentsMap[recording.student_id] = true;
+      });
+      students.forEach((student) => {
+        if (doneStudentsMap[student.id]) {
+          student.assignments_done += 1;
+        } else {
+          student.assignments_pending += 1;
+        }
+      });
+    });
+
+    evaluationGroup.Students = students;
+    delete evaluationGroup.EvaluationGroupReadings;
     return evaluationGroup;
   }
 }

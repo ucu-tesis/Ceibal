@@ -7,6 +7,6 @@ export class StudentGuard extends AuthGuard('jwt') {
     if (user && user.type === 'student') {
       return user;
     }
-    throw err || new Error('You are not a student');
+    throw err || new Error('You are not a student'); // TODO respond with 401 or 403 instead of 500
   }
 }
