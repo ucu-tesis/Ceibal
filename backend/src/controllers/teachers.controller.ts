@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';

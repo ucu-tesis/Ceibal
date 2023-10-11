@@ -1,4 +1,10 @@
-import { Controller, Get, HttpException, Param, UnprocessableEntityException, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UnprocessableEntityException,
+  UseGuards,
+} from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
