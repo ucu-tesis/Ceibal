@@ -75,6 +75,7 @@ describe('EvaluationGroupsController', () => {
         teacherId: teacher.id,
       });
       const student = await TestFactory.createStudent({});
+      const student2 = await TestFactory.createStudent({});
       await prismaService.student.update({
         where: { id: student.id },
         data: {
@@ -82,6 +83,22 @@ describe('EvaluationGroupsController', () => {
             connect: { id: evaluationGroup.id },
           },
         },
+      });
+      await prismaService.student.update({
+        where: { id: student2.id },
+        data: {
+          EvaluationGroups: {
+            connect: { id: evaluationGroup.id },
+          },
+        },
+      });
+      const evaluationGroupReading =
+        await TestFactory.createEvaluationGroupReading({
+          evaluationGroupId: evaluationGroup.id,
+        });
+      await TestFactory.createRecording({
+        evaluationGroupReadingId: evaluationGroupReading.id,
+        studentId: student.id,
       });
       expect(
         await controller.getOne(teacher.id, String(evaluationGroup.id)),
@@ -99,6 +116,17 @@ describe('EvaluationGroupsController', () => {
             last_name: student.last_name,
             cedula: student.cedula,
             email: student.email,
+            assignments_done: 1,
+            assignments_pending: 0,
+          },
+          {
+            id: student2.id,
+            first_name: student2.first_name,
+            last_name: student2.last_name,
+            cedula: student2.cedula,
+            email: student2.email,
+            assignments_done: 0,
+            assignments_pending: 1,
           },
         ],
       });
