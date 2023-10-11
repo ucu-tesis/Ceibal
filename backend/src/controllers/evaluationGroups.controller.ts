@@ -1,8 +1,8 @@
 import {
   Controller,
   Get,
+  NotFoundException,
   Param,
-  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
@@ -60,7 +60,7 @@ export class EvaluationGroupsController {
       },
     });
     if (!evaluationGroup) {
-      throw new UnprocessableEntityException('Evaluation group not found');
+      throw new NotFoundException('Evaluation group not found');
     }
 
     const students = evaluationGroup.Students.map((s) => ({

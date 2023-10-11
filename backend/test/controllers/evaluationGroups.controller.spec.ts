@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
 import { TestFactory } from '../testFactory';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 const defaultPagination = { page: 0, pageSize: 20 };
 
@@ -73,7 +73,7 @@ describe('EvaluationGroupsController', () => {
     it('throws an error when group does not exist', async () => {
       const teacher = await TestFactory.createTeacher({ cedula: '1234' });
       await expect(controller.getOne(teacher.id, '1')).rejects.toThrow(
-        new UnprocessableEntityException('Evaluation group not found'),
+        new NotFoundException('Evaluation group not found'),
       );
     });
 
