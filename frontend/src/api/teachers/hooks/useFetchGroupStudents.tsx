@@ -11,8 +11,8 @@ export type StudentWithFullName = Student & {
 
 const addFullName = (student: Student): StudentWithFullName => ({
   ...student,
-  assignments_done: 3, //TODO: Remove - Should come from backend. @farchi
-  assignments_pending: 4, //TODO: Remove - Should come from backend. @farchi
+  assignments_done: student.assignments_done,
+  assignments_pending: student.assignments_pending,
   fullName: `${student.first_name} ${student.last_name}`,
 });
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AnyAuthGuard } from 'src/guards/any-auth.guard';
 import { GoogleGuard } from 'src/guards/google.guard';
@@ -77,14 +77,16 @@ export class AuthController {
    * It logs in the as first student in the database.
    */
   @Get('fake-student')
-  async fakeStudentLogin(@Res() res) {
+  async fakeStudentLogin(@Res() res, @Query('idOverride') idOverride: string) {
     if (
       this.configService.get('ENVIRONMENT') !== 'development' &&
       this.configService.get('ENVIRONMENT') !== 'staging'
     ) {
       return res.status(403).send('Forbidden');
     }
-    const student = await this.prisma.student.findFirst();
+    const student = await this.prisma.student.findFirst({
+      where: idOverride ? { id: Number(idOverride) } : undefined,
+    });
     const token = this.authService.createStudentToken(student);
     res.cookie('access_token', token, {
       httpOnly: true,
@@ -98,14 +100,16 @@ export class AuthController {
    * It logs in the as first teacher in the database.
    */
   @Get('fake-teacher')
-  async fakeTeacherLogin(@Res() res) {
+  async fakeTeacherLogin(@Res() res, @Query('idOverride') idOverride: string) {
     if (
       this.configService.get('ENVIRONMENT') !== 'development' &&
       this.configService.get('ENVIRONMENT') !== 'staging'
     ) {
       return res.status(403).send('Forbidden');
     }
-    const teacher = await this.prisma.user.findFirst();
+    const teacher = await this.prisma.user.findFirst({
+      where: idOverride ? { id: Number(idOverride) } : undefined,
+    });
     const token = this.authService.createTeacherToken(teacher);
     res.cookie('access_token', token, {
       httpOnly: true,

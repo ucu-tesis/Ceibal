@@ -25,16 +25,19 @@ describe('RecordingsController', () => {
 
   describe('getAll', () => {
     it('throws an error when studentId is not passed', async () => {
-      await expect(controller.getAll(defaultPagination, null)).rejects.toEqual(
-        new Error('Must provide studentId as part of the query'),
+      const errorMessage = await controller
+        .getAll(null, defaultPagination)
+        .catch((e) => e.message);
+      expect(errorMessage).toContain(
+        'Argument student_id for where.student_id must not be null',
       );
     });
 
     describe('when there are no recordings', () => {
       it('returns an empty array', async () => {
-        const studentId = '1';
+        const student = await TestFactory.createStudent({});
         await expect(
-          controller.getAll(defaultPagination, studentId),
+          controller.getAll(student.id, defaultPagination),
         ).resolves.toEqual({ data: [] });
       });
     });
@@ -44,9 +47,9 @@ describe('RecordingsController', () => {
         const recording1 = await TestFactory.createRecording({});
         await TestFactory.createRecording({}); // should not be found since its for another student
 
-        const studentId = String(recording1.student_id);
+        const studentId = recording1.student_id;
 
-        expect(await controller.getAll(defaultPagination, studentId)).toEqual({
+        expect(await controller.getAll(studentId, defaultPagination)).toEqual({
           data: [
             {
               id: recording1.id,
@@ -55,6 +58,7 @@ describe('RecordingsController', () => {
               student_id: recording1.student_id,
               recording_url: recording1.recording_url,
               evaluation: null,
+              created_at: expect.any(Date),
             },
           ],
         });
@@ -69,13 +73,16 @@ describe('RecordingsController', () => {
         recordingId: recording.id,
       });
       await TestFactory.createAnalysis({}); // should not be found since its for another recording
-      expect(await controller.getOne(String(recording.id))).toEqual({
+      expect(
+        await controller.getOne(recording.student_id, String(recording.id)),
+      ).toEqual({
         id: recording.id,
         evaluation_group_reading_id: recording.evaluation_group_reading_id,
         student_id: recording.student_id,
         recording_url: recording.recording_url,
         Analysis: [analysis],
         evaluation: null,
+        created_at: expect.any(Date),
       });
     });
   });
