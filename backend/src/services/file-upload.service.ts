@@ -8,6 +8,7 @@ import {
 import { diskStorage, File } from 'multer';
 import { PrismaService } from 'src/prisma.service';
 import axios from 'axios';
+import { AnalysisStatus } from '@prisma/client';
 
 @Injectable()
 export class FileUploadService implements MulterOptionsFactory {
@@ -86,14 +87,34 @@ export class FileUploadService implements MulterOptionsFactory {
       }
 
       // TODO add created_at to recording
-      await this.prismaService.recording.create({
+      const recording = await this.prismaService.recording.create({
         data: {
           recording_url: path,
           student_id: studentId,
           evaluation_group_reading_id: evaluationGroupReading.id,
-          evaluation: data,
         },
       });
+      if (data) {
+        await this.prismaService.analysis.create({
+          data: {
+            status: AnalysisStatus.COMPLETED,
+            repetitions_count: data.cantidad_de_repeticiones,
+            silences_count: data.cantidad_de_silencios,
+            allosaurus_general_error: data.error_general_allosaurus,
+            similarity_error: data.error_similitud,
+            repeated_phonemes: data.fonemas_repetidos,
+            words_with_errors: data.palabras_con_errores,
+            words_with_repetitions: data.palabras_con_repeticiones,
+            score: data.puntaje,
+            error_timestamps: data.tiempo_errores,
+            repetition_timestamps: data.tiempo_repeticiones,
+            phoneme_velocity: data.velocidad_fonemas,
+            words_velocity: data.velocidad_palabras,
+            raw_analysis: data,
+            recording_id: recording.id,
+          },
+        });
+      }
 
       return {
         path,
