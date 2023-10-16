@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
 import { TestFactory } from '../testFactory';
-import { NotFoundException } from '@nestjs/common';
+import { UnprocessableEntityException } from '@nestjs/common';
 
 const defaultPagination = { page: 0, pageSize: 20 };
 
@@ -11,7 +11,7 @@ describe('EvaluationGroupsController', () => {
 
   let prismaService: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [EvaluationGroupsController],
       providers: [PrismaService],
@@ -26,10 +26,9 @@ describe('EvaluationGroupsController', () => {
   describe('getAll', () => {
     describe('when no userId is passed', () => {
       it('throws an error', async () => {
-        const errorMessage = await controller
-          .getAll(null, defaultPagination)
-          .catch((e) => e.message);
-        expect(errorMessage).toContain('Unknown arg `id` in where.Teacher.id');
+        await expect(
+          controller.getAll(null, defaultPagination),
+        ).rejects.toThrow('Unknown arg `id` in where.Teacher.id');
       });
     });
 
@@ -73,7 +72,7 @@ describe('EvaluationGroupsController', () => {
     it('throws an error when group does not exist', async () => {
       const teacher = await TestFactory.createTeacher({ cedula: '1234' });
       await expect(controller.getOne(teacher.id, '1')).rejects.toThrow(
-        new NotFoundException('Evaluation group not found'),
+        new UnprocessableEntityException('Evaluation group not found'),
       );
     });
 
@@ -160,6 +159,81 @@ describe('EvaluationGroupsController', () => {
           },
         ],
       });
+    });
+  });
+
+  describe('createAssignment', () => {
+    it('creates the assignment properly when passed valid data', async () => {
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      const evaluationGroup = await TestFactory.createEvaluationGroup({
+        teacherId: teacher.id,
+      });
+      const reading = await TestFactory.createReading({});
+      const payload = {
+        reading_id: reading.id,
+        due_date: new Date('2024-09-10').toISOString(),
+      };
+      expect(
+        await controller.createAssignment(
+          teacher.id,
+          String(evaluationGroup.id),
+          payload,
+        ),
+      ).toEqual({
+        id: expect.any(Number),
+        evaluation_group_id: evaluationGroup.id,
+        reading_id: reading.id,
+      });
+    });
+
+    it('throws an error if the evaluation group does not exist', async () => {
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      const reading = await TestFactory.createReading({});
+      const payload = {
+        reading_id: reading.id,
+        due_date: new Date('2024-09-10').toISOString(),
+      };
+      await expect(
+        controller.createAssignment(teacher.id, '1', payload),
+      ).rejects.toThrow('Evaluation group not found');
+    });
+
+    it('throws an error if the reading does not exist', async () => {
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      const evaluationGroup = await TestFactory.createEvaluationGroup({
+        teacherId: teacher.id,
+      });
+      const payload = {
+        reading_id: 1,
+        due_date: new Date('2024-09-10').toISOString(),
+      };
+      await expect(
+        controller.createAssignment(
+          teacher.id,
+          String(evaluationGroup.id),
+          payload,
+        ),
+      ).rejects.toThrow('Reading not found');
+    });
+
+    it('throws an error if the group does not belong to the teacher', async () => {
+      const teacher1 = await TestFactory.createTeacher({ cedula: '1234' });
+      const teacher2 = await TestFactory.createTeacher({ cedula: '5678' });
+      const evaluationGroup = await TestFactory.createEvaluationGroup({
+        teacherId: teacher1.id,
+      });
+      const reading = await TestFactory.createReading({});
+      const payload = {
+        reading_id: reading.id,
+        due_date: new Date('2024-09-10').toISOString(),
+      };
+      await expect(
+        controller.createAssignment(
+          teacher2.id,
+          String(evaluationGroup.id),
+          payload,
+        ),
+      ).rejects.toThrow('Evaluation group not found');
     });
   });
 });

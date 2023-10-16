@@ -13,7 +13,7 @@ describe('RecordingsController', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let prismaService: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [RecordingsController],
       providers: [ConfigService, FileUploadService, PrismaService],
