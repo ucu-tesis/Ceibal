@@ -38,7 +38,7 @@ export class EvaluationGroupsController {
   async getOne(
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
-  ): Promise<EvaluationGroup> {
+  ) {
     const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
       where: {
         id: Number(evaluationGroupId),
@@ -55,7 +55,7 @@ export class EvaluationGroupsController {
           },
         },
         EvaluationGroupReadings: {
-          include: { Recording: true },
+          include: { Recording: true, Reading: true },
         },
       },
     });
@@ -83,8 +83,22 @@ export class EvaluationGroupsController {
       });
     });
 
-    evaluationGroup.Students = students;
-    delete evaluationGroup.EvaluationGroupReadings;
-    return evaluationGroup;
+    return {
+      id: evaluationGroup.id,
+      name: evaluationGroup.name,
+      school_data: evaluationGroup.school_data,
+      school_year: evaluationGroup.school_year,
+      teacher_id: evaluationGroup.teacher_id,
+      created_by: evaluationGroup.created_by,
+      Students: students,
+      Assignments: evaluationGroup.EvaluationGroupReadings.map((r) => ({
+        evaluation_group_reading_id: r.id,
+        reading_id: r.Reading.id,
+        reading_title: r.Reading.title,
+        // TODO chapter: r.Reading.chapter, add `chapter` to db schema
+        // TODO section: r.Reading.section, add `section` to db schema
+        // TODO due_date: r.due_date, wait for student-readings-api PR to be merged
+      })),
+    };
   }
 }

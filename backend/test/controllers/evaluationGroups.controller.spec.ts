@@ -100,13 +100,23 @@ describe('EvaluationGroupsController', () => {
           },
         },
       });
-      const evaluationGroupReading =
+      const evaluationGroupReading1 =
+        await TestFactory.createEvaluationGroupReading({
+          evaluationGroupId: evaluationGroup.id,
+        });
+      const evaluationGroupReading2 =
         await TestFactory.createEvaluationGroupReading({
           evaluationGroupId: evaluationGroup.id,
         });
       await TestFactory.createRecording({
-        evaluationGroupReadingId: evaluationGroupReading.id,
+        evaluationGroupReadingId: evaluationGroupReading1.id,
         studentId: student.id,
+      });
+      const associatedReading1 = await prismaService.reading.findFirstOrThrow({
+        where: { id: evaluationGroupReading1.reading_id },
+      });
+      const associatedReading2 = await prismaService.reading.findFirstOrThrow({
+        where: { id: evaluationGroupReading2.reading_id },
       });
       expect(
         await controller.getOne(teacher.id, String(evaluationGroup.id)),
@@ -125,7 +135,7 @@ describe('EvaluationGroupsController', () => {
             cedula: student.cedula,
             email: student.email,
             assignments_done: 1,
-            assignments_pending: 0,
+            assignments_pending: 1,
           },
           {
             id: student2.id,
@@ -134,7 +144,19 @@ describe('EvaluationGroupsController', () => {
             cedula: student2.cedula,
             email: student2.email,
             assignments_done: 0,
-            assignments_pending: 1,
+            assignments_pending: 2,
+          },
+        ],
+        Assignments: [
+          {
+            evaluation_group_reading_id: evaluationGroupReading1.id,
+            reading_id: associatedReading1.id,
+            reading_title: associatedReading1.title,
+          },
+          {
+            evaluation_group_reading_id: evaluationGroupReading2.id,
+            reading_id: associatedReading2.id,
+            reading_title: associatedReading2.title,
           },
         ],
       });
