@@ -49,6 +49,7 @@ model Reading {
   id                      Int                      @id @default(autoincrement())
   title                   String
   content                 String
+  image_url               String?
   EvaluationGroupReadings EvaluationGroupReading[]
 }
 
@@ -59,6 +60,8 @@ model EvaluationGroupReading {
   EvaluationGroup     EvaluationGroup @relation(fields: [evaluation_group_id], references: [id])
   evaluation_group_id Int
   Recording           Recording[]
+  due_date            DateTime
+  created_at          DateTime        @default(now())
 }
 
 model Recording {
