@@ -2,9 +2,9 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Post,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
@@ -70,7 +70,7 @@ export class EvaluationGroupsController {
       },
     });
     if (!evaluationGroup) {
-      throw new NotFoundException('Evaluation group not found');
+      throw new UnprocessableEntityException('Evaluation group not found');
     }
 
     const students = evaluationGroup.Students.map((s) => ({
@@ -119,11 +119,24 @@ export class EvaluationGroupsController {
     @Param('evaluationGroupId') evaluationGroupId: string,
     @Body() createDTO: CreateAssignmentDTO,
   ) {
-    // TODO should we check that the group belongs to the teacher that is creating the assignment?
+    const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
+      {
+        where: { id: Number(evaluationGroupId) },
+      },
+    );
+    if (!evaluationGroup || evaluationGroup.teacher_id !== userId) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+    const reading = await this.prismaService.reading.findUnique({
+      where: { id: createDTO.reading_id },
+    });
+    if (!reading) {
+      throw new UnprocessableEntityException('Reading not found');
+    }
     const assignment = await this.prismaService.evaluationGroupReading.create({
       data: {
-        reading_id: createDTO.reading_id,
-        evaluation_group_id: Number(evaluationGroupId),
+        evaluation_group_id: evaluationGroup.id,
+        reading_id: reading.id,
         // due_date: createDTO.due_date, // TODO wait for due_date PR to be merged
         // TODO add created_by column in db, and store `userId` in it
       },
