@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.controller';
 import { PrismaService } from 'src/prisma.service';
 import { TestFactory } from '../testFactory';
+import { NotFoundException } from '@nestjs/common';
 
 const defaultPagination = { page: 0, pageSize: 20 };
 
@@ -23,33 +24,35 @@ describe('EvaluationGroupsController', () => {
   });
 
   describe('getAll', () => {
-    describe('when no ci is passed', () => {
+    describe('when no userId is passed', () => {
       it('throws an error', async () => {
-        await expect(
-          controller.getAll(defaultPagination, null),
-        ).rejects.toEqual(new Error('Must provide a filter'));
+        const errorMessage = await controller
+          .getAll(null, defaultPagination)
+          .catch((e) => e.message);
+        expect(errorMessage).toContain('Unknown arg `id` in where.Teacher.id');
       });
     });
 
-    describe('when ci is passed', () => {
-      const ci = '1234';
-
+    describe('when userId is passed', () => {
       describe('when there are no groups', () => {
         it('returns an empty array', async () => {
+          const testTeacher = await TestFactory.createTeacher({});
           await expect(
-            controller.getAll(defaultPagination, ci),
+            controller.getAll(testTeacher.id, defaultPagination),
           ).resolves.toEqual({ data: [] });
         });
       });
 
       describe('when there are groups', () => {
         it('returns the groups that match the filter, with pagination info', async () => {
-          const testTeacher = await TestFactory.createTeacher({ cedula: ci });
+          const testTeacher = await TestFactory.createTeacher({});
           const testEvaluationGroup = await TestFactory.createEvaluationGroup({
             teacherId: testTeacher.id,
           });
 
-          expect(await controller.getAll(defaultPagination, ci)).toEqual({
+          expect(
+            await controller.getAll(testTeacher.id, defaultPagination),
+          ).toEqual({
             data: [
               {
                 id: testEvaluationGroup.id,
@@ -67,12 +70,20 @@ describe('EvaluationGroupsController', () => {
   });
 
   describe('getOne', () => {
+    it('throws an error when group does not exist', async () => {
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      await expect(controller.getOne(teacher.id, '1')).rejects.toThrow(
+        new NotFoundException('Evaluation group not found'),
+      );
+    });
+
     it('returns a group and its students when it exists', async () => {
       const teacher = await TestFactory.createTeacher({ cedula: '1234' });
       const evaluationGroup = await TestFactory.createEvaluationGroup({
         teacherId: teacher.id,
       });
       const student = await TestFactory.createStudent({});
+      const student2 = await TestFactory.createStudent({});
       await prismaService.student.update({
         where: { id: student.id },
         data: {
@@ -81,7 +92,25 @@ describe('EvaluationGroupsController', () => {
           },
         },
       });
-      expect(await controller.getOne(String(evaluationGroup.id))).toEqual({
+      await prismaService.student.update({
+        where: { id: student2.id },
+        data: {
+          EvaluationGroups: {
+            connect: { id: evaluationGroup.id },
+          },
+        },
+      });
+      const evaluationGroupReading =
+        await TestFactory.createEvaluationGroupReading({
+          evaluationGroupId: evaluationGroup.id,
+        });
+      await TestFactory.createRecording({
+        evaluationGroupReadingId: evaluationGroupReading.id,
+        studentId: student.id,
+      });
+      expect(
+        await controller.getOne(teacher.id, String(evaluationGroup.id)),
+      ).toEqual({
         id: evaluationGroup.id,
         name: evaluationGroup.name,
         school_data: null,
@@ -95,6 +124,17 @@ describe('EvaluationGroupsController', () => {
             last_name: student.last_name,
             cedula: student.cedula,
             email: student.email,
+            assignments_done: 1,
+            assignments_pending: 0,
+          },
+          {
+            id: student2.id,
+            first_name: student2.first_name,
+            last_name: student2.last_name,
+            cedula: student2.cedula,
+            email: student2.email,
+            assignments_done: 0,
+            assignments_pending: 1,
           },
         ],
       });

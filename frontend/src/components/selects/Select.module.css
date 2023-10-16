@@ -24,6 +24,7 @@
 .options div {
   font-size: 14px;
   padding: 12px 16px;
+  min-width: max-content;
 }
 
 .options div:hover {

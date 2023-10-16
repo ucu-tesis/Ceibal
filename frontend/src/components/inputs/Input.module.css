@@ -7,6 +7,13 @@
   font-size: 18px;
 }
 
+.input-date {
+  padding: 6px 8px 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--ceibal-grey);
+  background: var(--ceibal-white);
+}
+
 .input-login::placeholder {
-    color: var(--ceibal-grey-secondary);
+  color: var(--ceibal-grey-secondary);
 }
