@@ -65,7 +65,10 @@ export class EvaluationGroupsController {
           },
         },
         EvaluationGroupReadings: {
-          include: { Recording: true, Reading: true },
+          include: {
+            Recordings: true,
+            Reading: { include: { Section: { include: { Chapter: true } } } },
+          },
         },
       },
     });
@@ -81,7 +84,7 @@ export class EvaluationGroupsController {
 
     evaluationGroup.EvaluationGroupReadings.forEach((reading) => {
       const doneStudentsMap = {};
-      reading.Recording.forEach((recording) => {
+      reading.Recordings.forEach((recording) => {
         doneStudentsMap[recording.student_id] = true;
       });
       students.forEach((student) => {
@@ -105,8 +108,8 @@ export class EvaluationGroupsController {
         evaluation_group_reading_id: r.id,
         reading_id: r.Reading.id,
         reading_title: r.Reading.title,
-        // TODO chapter: r.Reading.chapter, add `chapter` to db schema
-        // TODO section: r.Reading.section, add `section` to db schema
+        chapter_id: r.Reading.Section?.Chapter.id || null,
+        section_id: r.Reading.Section?.id || null,
         // TODO due_date: r.due_date, wait for student-readings-api PR to be merged
       })),
     };

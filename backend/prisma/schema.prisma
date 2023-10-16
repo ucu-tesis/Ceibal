@@ -45,10 +45,31 @@ model EvaluationGroup {
   EvaluationGroupReadings EvaluationGroupReading[]
 }
 
+model Chapter {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  difficulty  Int
+  Sections    Section[]
+}
+
+model Section {
+  id               Int       @id @default(autoincrement())
+  title            String
+  description      String
+  index_in_chapter Int
+  chapter_id       Int
+  Chapter          Chapter   @relation(fields: [chapter_id], references: [id])
+  Readings         Reading[]
+}
+
 model Reading {
   id                      Int                      @id @default(autoincrement())
   title                   String
   content                 String
+  section_id              Int?
+  Section                 Section?                 @relation(fields: [section_id], references: [id])
+  index_in_chapter        Int                      @default(0)
   EvaluationGroupReadings EvaluationGroupReading[]
 }
 
@@ -58,7 +79,7 @@ model EvaluationGroupReading {
   reading_id          Int
   EvaluationGroup     EvaluationGroup @relation(fields: [evaluation_group_id], references: [id])
   evaluation_group_id Int
-  Recording           Recording[]
+  Recordings          Recording[]
 }
 
 model Recording {
