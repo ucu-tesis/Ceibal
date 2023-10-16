@@ -39,7 +39,7 @@ export class StudentsController {
       },
     });
 
-    const totalReadings = await this.prismaService.recording.count({
+    const totalRecordings = await this.prismaService.recording.count({
       where: {
         student_id: user.id,
       },
@@ -54,12 +54,12 @@ export class StudentsController {
           id: r.id,
           date_submitted: r.created_at,
           title: r.EvaluationGroupReading.Reading.title,
-          image: r.EvaluationGroupReading.Reading.imageUrl,
+          image: r.EvaluationGroupReading.Reading.image_url,
           score: newestAnalysis?.score || 0,
           status: newestAnalysis?.status || 'NOT_STARTED',
         };
       }),
-      total: totalReadings,
+      total: totalRecordings,
       page: page,
       page_size: pageSize,
     };
@@ -72,19 +72,21 @@ export class StudentsController {
   ): Promise<PendingReadingsResponse> {
     const user = this.userService.get();
 
-    const readings = await this.prismaService.evaluationGroupReading.findMany({
-      where: {
-        EvaluationGroup: {
-          Students: {
-            some: {
-              id: user.id,
-            },
+    const where = {
+      EvaluationGroup: {
+        Students: {
+          some: {
+            id: user.id,
           },
         },
-        Recording: {
-          none: {},
-        },
       },
+      Recording: {
+        none: {},
+      },
+    };
+
+    const readings = await this.prismaService.evaluationGroupReading.findMany({
+      where: where,
       include: {
         Reading: true,
       },
@@ -97,18 +99,7 @@ export class StudentsController {
 
     const totalReadings = await this.prismaService.evaluationGroupReading.count(
       {
-        where: {
-          EvaluationGroup: {
-            Students: {
-              some: {
-                id: user.id,
-              },
-            },
-          },
-          Recording: {
-            none: {},
-          },
-        },
+        where: where,
       },
     );
 
