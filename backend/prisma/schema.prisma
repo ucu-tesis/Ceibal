@@ -67,7 +67,6 @@ model EvaluationGroupReading {
 model Recording {
   id                          Int                    @id @default(autoincrement())
   recording_url               String
-  evaluation                  Json?
   EvaluationGroupReading      EvaluationGroupReading @relation(fields: [evaluation_group_reading_id], references: [id])
   evaluation_group_reading_id Int
   Student                     Student                @relation(fields: [student_id], references: [id])

@@ -233,29 +233,44 @@ async function addStudentReading(studentId, groupReadingId) {
     data: {
       recording_url:
         'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-      evaluation: {},
       evaluation_group_reading_id: groupReadingId,
       student_id: studentId,
     },
   });
 
+  const analysisRawData = {
+    cantidad_de_repeticiones: randomInt(0, 4),
+    cantidad_de_silencios: randomInt(0, 4),
+    cantidad_palabras_con_error: 4,
+    error_general_allosaurus: 44,
+    error_similitud: 15,
+    fonemas_repetidos: [],
+    palabras_con_errores: ['some', 'text', 'some', 'text'],
+    palabras_con_repeticiones: [],
+    puntaje: randomInt(50, 100),
+    tiempo_errores: [1.38, 2.08, 1.38, 2.08],
+    tiempo_repeticiones: [],
+    velocidad_fonemas: 198,
+    velocidad_palabras: 57,
+  };
+
   await prisma.analysis.create({
     data: {
       recording_id: recording.id,
       status: AnalysisStatus.COMPLETED,
-      repetitions_count: randomInt(0, 4),
-      silences_count: randomInt(0, 4),
-      allosaurus_general_error: 0,
-      similarity_error: 0,
-      repeated_phonemes: [],
-      words_with_errors: [],
-      words_with_repetitions: [],
-      score: randomInt(50, 100),
-      error_timestamps: [],
-      repetition_timestamps: [],
-      phoneme_velocity: randomInt(10, 40),
-      words_velocity: randomInt(10, 40),
-      raw_analysis: {},
+      repetitions_count: analysisRawData.cantidad_de_repeticiones,
+      silences_count: analysisRawData.cantidad_de_silencios,
+      allosaurus_general_error: analysisRawData.error_general_allosaurus,
+      similarity_error: analysisRawData.error_similitud,
+      repeated_phonemes: analysisRawData.fonemas_repetidos,
+      words_with_errors: analysisRawData.palabras_con_errores,
+      words_with_repetitions: analysisRawData.palabras_con_repeticiones,
+      score: analysisRawData.puntaje,
+      error_timestamps: analysisRawData.tiempo_errores,
+      repetition_timestamps: analysisRawData.tiempo_repeticiones,
+      phoneme_velocity: analysisRawData.velocidad_fonemas,
+      words_velocity: analysisRawData.velocidad_palabras,
+      raw_analysis: analysisRawData,
     },
   });
 }

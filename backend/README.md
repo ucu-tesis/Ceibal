@@ -30,11 +30,14 @@ $ npm run start:prod
 [Prisma migrate docs](https://www.prisma.io/docs/concepts/components/prisma-migrate/migrate-development-production)
 
 ```bash
-# generate and run migration 
-$ npx prisma migrate dev --name <migrationName>
+# run existing migrations
+$ npx prisma migrate deploy
 
 # update generated models
 $ npx prisma generate
+
+# generate and run new migration
+$ npx prisma migrate dev --name <migrationName>
 
 # seed db
 $ npx prisma db seed
