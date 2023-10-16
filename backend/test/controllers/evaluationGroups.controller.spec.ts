@@ -76,7 +76,7 @@ describe('EvaluationGroupsController', () => {
       );
     });
 
-    it('returns a group and its students when it exists', async () => {
+    it('returns a group with its students and assignments when it exists', async () => {
       const teacher = await TestFactory.createTeacher({ cedula: '1234' });
       const evaluationGroup = await TestFactory.createEvaluationGroup({
         teacherId: teacher.id,
@@ -151,11 +151,15 @@ describe('EvaluationGroupsController', () => {
             evaluation_group_reading_id: evaluationGroupReading1.id,
             reading_id: associatedReading1.id,
             reading_title: associatedReading1.title,
+            section_id: associatedReading1.section_id,
+            chapter_id: expect.any(Number),
           },
           {
             evaluation_group_reading_id: evaluationGroupReading2.id,
             reading_id: associatedReading2.id,
             reading_title: associatedReading2.title,
+            section_id: associatedReading2.section_id,
+            chapter_id: expect.any(Number),
           },
         ],
       });
