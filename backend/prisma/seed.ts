@@ -3,18 +3,6 @@ import { AnalysisStatus, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function load() {
-  const admin = await prisma.user.upsert({
-    where: { cedula: '99999' },
-    update: {},
-    create: {
-      cedula: '99999',
-      email: 'admin@admin.com',
-      first_name: 'Admin',
-      last_name: 'Admin',
-      password_hash:
-        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
-    },
-  });
   const testTeacher = await prisma.user.upsert({
     where: { cedula: '10000' },
     update: {},
@@ -27,7 +15,7 @@ async function load() {
         create: {
           name: 'group1',
           school_year: 2023,
-          created_by: admin.id,
+          created_by: 1,
         },
       },
       password_hash:
