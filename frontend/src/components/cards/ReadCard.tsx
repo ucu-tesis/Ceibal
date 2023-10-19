@@ -1,23 +1,36 @@
-import React from "react";
-import styles from "./Card.module.css";
-import Star from "../../assets/images/star.svg";
 import Image from "next/image";
+import { forwardRef } from "react";
+import Star from "../../assets/images/star.svg";
+import SuarezReading from "../../assets/images/suarez.svg";
+import styles from "./Card.module.css";
 
 interface ReadCardProps {
   title: string;
-  children: JSX.Element;
-  stars: Number;
+  starsCount: number;
+  image?: string;
 }
 
-const ReadCard: React.FC<ReadCardProps> = ({ title, children, stars }) => {
-  const starArray = Array<JSX.Element>(stars as any).fill(<Image src={Star} alt="star"></Image>);
-  return (
-    <div className={`${styles["read-card"]} col`}>
-      {children}
-      <span>{title}</span>
-      <div className={`${styles.stars} row`}>{starArray.map((element) => element)}</div>
-    </div>
-  );
-};
+// eslint-disable-next-line react/display-name
+const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
+  ({ title, image, starsCount }, ref) => {
+    const stars = Array<JSX.Element>(starsCount).fill(
+      <Image src={Star} alt="star" />
+    );
+    return (
+      <div className={`${styles["read-card"]} col`} ref={ref}>
+        {/* TODO Replace SuarezReading with a default image */}
+        <Image
+          src={image ?? SuarezReading}
+          alt={`Imagen de la lectura '${title}'`}
+          width={200}
+          height={300}
+          priority
+        />
+        <span>{title}</span>
+        <div className={`${styles.stars} row`}>{stars}</div>
+      </div>
+    );
+  }
+);
 
 export default ReadCard;
