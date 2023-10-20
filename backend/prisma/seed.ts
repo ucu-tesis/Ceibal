@@ -1,21 +1,10 @@
 import { AnalysisStatus, PrismaClient } from '@prisma/client';
 import { randomInt } from 'crypto';
+import { fakerES as faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
 async function load() {
-  const admin = await prisma.user.upsert({
-    where: { cedula: '99999' },
-    update: {},
-    create: {
-      cedula: '99999',
-      email: 'admin@admin.com',
-      first_name: 'Admin',
-      last_name: 'Admin',
-      password_hash:
-        '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
-    },
-  });
   const testTeacher = await prisma.user.upsert({
     where: { cedula: '10000' },
     update: {},
@@ -25,11 +14,53 @@ async function load() {
       first_name: 'Alice',
       last_name: 'Wonders',
       GroupsOwned: {
-        create: {
-          name: 'group1',
-          school_year: 2023,
-          created_by: admin.id,
-        },
+        create: [
+          {
+            name: '1ero A',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '1ero B',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '1ero C',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '2do A',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '2do B',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '2do C',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '3ero A',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '3ero B',
+            school_year: 2023,
+            created_by: 1,
+          },
+          {
+            name: '3ero C',
+            school_year: 2023,
+            created_by: 1,
+          },
+        ],
       },
       password_hash:
         '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
@@ -144,6 +175,8 @@ async function load() {
       due_date: new Date('2024-09-10'),
     },
   });
+
+  addStudents(testTeacher);
 }
 
 async function addSSOUsers(testTeacher) {
@@ -273,6 +306,34 @@ async function addStudentReading(studentId, groupReadingId) {
       raw_analysis: analysisRawData,
     },
   });
+}
+
+async function addStudents(teacher) {
+  for (let i = 0; i < 30; i++) {
+    const ci = randomInt(5000000, 6000000).toString();
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const email = faker.internet.email({
+      firstName,
+      lastName,
+    });
+    await prisma.student.upsert({
+      where: { cedula: ci },
+      update: {},
+      create: {
+        cedula: ci,
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        EvaluationGroups: {
+          connect: { id: teacher.GroupsOwned[0].id },
+        },
+        password_hash:
+          '$2y$10$Rc2tFlQEKnsY5j4U5RowkOtetNyFOZPq/rVWDAkAR8pGC4S.SFIMC', // password
+      },
+      include: { EvaluationGroups: true },
+    });
+  }
 }
 
 const main = async () => {

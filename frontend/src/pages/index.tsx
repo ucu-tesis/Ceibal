@@ -9,7 +9,7 @@ const Home: React.FC = () => {
   if (!user) {
     router.replace("/login");
   } else if (user.type === "teacher") {
-    router.replace("/maestro");
+    router.replace("/maestro/grupos");
   } else if (user.type === "student") {
     router.replace("/alumno");
   }

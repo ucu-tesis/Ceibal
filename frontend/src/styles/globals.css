@@ -57,7 +57,7 @@ code {
   text-align: end;
   /* Make sure all divs are equal size so they are properly distributed with
   container's justify-content. */
-  width: 142px;
+  /* width: 142px; */
 }
 
 #header div img {
