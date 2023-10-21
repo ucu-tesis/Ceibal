@@ -1,5 +1,8 @@
 import useFetchCompletedReadings from "@/api/students/hooks/useFetchCompletedReadings";
 import ReadCard from "@/components/cards/ReadCard";
+import ErrorPage from "@/components/errorPage/ErrorPage";
+import LoadingPage from "@/components/loadingPage/LoadingPage";
+import Spinner from "@/components/spinners/Spinner";
 import Head from "next/head";
 import React, { useEffect, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
@@ -9,7 +12,14 @@ const pageSize = 10;
 
 const MiProgreso: React.FC = () => {
   const { ref, inView } = useInView();
-  const { data, fetchNextPage, hasNextPage } = useFetchCompletedReadings({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+    isError,
+  } = useFetchCompletedReadings({
     page: 0,
     pageSize,
   }); // This parameter is just the initial request
@@ -25,6 +35,14 @@ const MiProgreso: React.FC = () => {
       fetchNextPage();
     }
   }, [inView, fetchNextPage, hasNextPage]);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (isError) {
+    return <ErrorPage intendedAction="cargar tus lecturas" />;
+  }
 
   return (
     <>
@@ -49,6 +67,11 @@ const MiProgreso: React.FC = () => {
           )
         )}
       </div>
+      {isFetchingNextPage && (
+        <div className={`${styles["spinner-container"]}`}>
+          <Spinner />
+        </div>
+      )}
       <style jsx global>
         {`
           body {
