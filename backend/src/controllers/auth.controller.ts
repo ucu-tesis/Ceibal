@@ -115,6 +115,6 @@ export class AuthController {
       httpOnly: true,
       maxAge: this.cookieDuration,
     });
-    res.redirect(this.configService.get('FRONTEND_URL') + '/maestro');
+    res.redirect(this.configService.get('FRONTEND_URL') + '/maestro/grupos');
   }
 }
