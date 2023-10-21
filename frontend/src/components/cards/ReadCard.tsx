@@ -13,9 +13,9 @@ interface ReadCardProps {
 // eslint-disable-next-line react/display-name
 const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
   ({ title, image, starsCount }, ref) => {
-    const stars = Array<JSX.Element>(starsCount).fill(
-      <Image src={Star} alt="star" />
-    );
+    const stars = Array.from({ length: starsCount }, (_, index) => (
+      <Image key={`star-${index}`} src={Star} alt="estrella" />
+    ));
     return (
       <div className={`${styles["read-card"]} col`} ref={ref}>
         {/* TODO Replace SuarezReading with a default image */}
