@@ -131,7 +131,7 @@ export class StudentsController {
             },
           },
         },
-        Recording: {
+        Recordings: {
           none: {},
         },
       },
