@@ -110,7 +110,7 @@ export class EvaluationGroupsController {
         reading_title: r.Reading.title,
         chapter_id: r.Reading.Section?.Chapter.id || null,
         section_id: r.Reading.Section?.id || null,
-        // TODO due_date: r.due_date, wait for student-readings-api PR to be merged
+        due_date: r.due_date,
       })),
     };
   }
@@ -140,7 +140,7 @@ export class EvaluationGroupsController {
       data: {
         evaluation_group_id: evaluationGroup.id,
         reading_id: reading.id,
-        // due_date: createDTO.due_date, // TODO wait for due_date PR to be merged
+        due_date: createDTO.due_date,
         // TODO add created_by column in db, and store `userId` in it
       },
     });

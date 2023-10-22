@@ -153,6 +153,7 @@ describe('EvaluationGroupsController', () => {
             reading_title: associatedReading1.title,
             section_id: associatedReading1.section_id,
             chapter_id: expect.any(Number),
+            due_date: evaluationGroupReading1.due_date,
           },
           {
             evaluation_group_reading_id: evaluationGroupReading2.id,
@@ -160,6 +161,7 @@ describe('EvaluationGroupsController', () => {
             reading_title: associatedReading2.title,
             section_id: associatedReading2.section_id,
             chapter_id: expect.any(Number),
+            due_date: evaluationGroupReading2.due_date,
           },
         ],
       });
@@ -187,6 +189,8 @@ describe('EvaluationGroupsController', () => {
         id: expect.any(Number),
         evaluation_group_id: evaluationGroup.id,
         reading_id: reading.id,
+        due_date: new Date(payload.due_date),
+        created_at: expect.any(Date),
       });
     });
 

@@ -102,6 +102,7 @@ export class TestFactory {
   static async createEvaluationGroupReading({
     readingId,
     evaluationGroupId,
+    ...attributes
   }: {
     readingId?: number;
     evaluationGroupId?: number;
@@ -116,6 +117,8 @@ export class TestFactory {
       data: {
         reading_id: readingId,
         evaluation_group_id: evaluationGroupId,
+        due_date: faker.date.future(),
+        ...attributes,
       },
     });
   }
