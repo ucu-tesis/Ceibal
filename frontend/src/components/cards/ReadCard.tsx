@@ -10,7 +10,6 @@ interface ReadCardProps {
   image?: string;
 }
 
-// eslint-disable-next-line react/display-name
 const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
   ({ title, image, starsCount }, ref) => {
     const stars = Array.from({ length: starsCount }, (_, index) => (
@@ -32,5 +31,7 @@ const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
     );
   }
 );
+
+ReadCard.displayName = "ReadCard";
 
 export default ReadCard;
