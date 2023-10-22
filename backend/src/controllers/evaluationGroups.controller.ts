@@ -1,15 +1,25 @@
 import {
+  Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
+  Post,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import { EvaluationGroup } from '@prisma/client';
+import { IsDateString, IsNumber } from 'class-validator';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
+
+class CreateAssignmentDTO {
+  @IsNumber()
+  reading_id: number;
+  @IsDateString()
+  due_date: string;
+}
 
 @Controller('evaluationGroups')
 export class EvaluationGroupsController {
@@ -55,12 +65,15 @@ export class EvaluationGroupsController {
           },
         },
         EvaluationGroupReadings: {
-          include: { Recording: true, Reading: true },
+          include: {
+            Recordings: true,
+            Reading: { include: { Section: { include: { Chapter: true } } } },
+          },
         },
       },
     });
     if (!evaluationGroup) {
-      throw new NotFoundException('Evaluation group not found');
+      throw new UnprocessableEntityException('Evaluation group not found');
     }
 
     const students = evaluationGroup.Students.map((s) => ({
@@ -71,7 +84,7 @@ export class EvaluationGroupsController {
 
     evaluationGroup.EvaluationGroupReadings.forEach((reading) => {
       const doneStudentsMap = {};
-      reading.Recording.forEach((recording) => {
+      reading.Recordings.forEach((recording) => {
         doneStudentsMap[recording.student_id] = true;
       });
       students.forEach((student) => {
@@ -95,10 +108,42 @@ export class EvaluationGroupsController {
         evaluation_group_reading_id: r.id,
         reading_id: r.Reading.id,
         reading_title: r.Reading.title,
-        // TODO chapter: r.Reading.chapter, add `chapter` to db schema
-        // TODO section: r.Reading.section, add `section` to db schema
-        // TODO due_date: r.due_date, wait for student-readings-api PR to be merged
+        chapter_id: r.Reading.Section?.Chapter.id || null,
+        section_id: r.Reading.Section?.id || null,
+        due_date: r.due_date,
       })),
     };
+  }
+
+  @Post('/:evaluationGroupId/assignments')
+  @UseGuards(TeacherGuard)
+  async createAssignment(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Body() createDTO: CreateAssignmentDTO,
+  ) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
+      {
+        where: { id: Number(evaluationGroupId) },
+      },
+    );
+    if (!evaluationGroup || evaluationGroup.teacher_id !== userId) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+    const reading = await this.prismaService.reading.findUnique({
+      where: { id: createDTO.reading_id },
+    });
+    if (!reading) {
+      throw new UnprocessableEntityException('Reading not found');
+    }
+    const assignment = await this.prismaService.evaluationGroupReading.create({
+      data: {
+        evaluation_group_id: evaluationGroup.id,
+        reading_id: reading.id,
+        due_date: createDTO.due_date,
+        // TODO add created_by column in db, and store `userId` in it
+      },
+    });
+    return assignment;
   }
 }
