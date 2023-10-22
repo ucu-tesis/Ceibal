@@ -1,14 +1,29 @@
-import useFetchCompletedReadings from "@/api/students/hooks/useFetchCompletedReadings";
+import { fetchCompletedReadings } from "@/api/students/students";
 import ReadCard from "@/components/cards/ReadCard";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import Spinner from "@/components/spinners/Spinner";
+import { useUser } from "@/providers/UserContext";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import Head from "next/head";
 import React, { useEffect, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import styles from "./miprogreso.module.css";
 
-const pageSize = 10;
+const useFetchCompletedReadings = () => {
+  const { id } = useUser();
+  const pageSize = 10;
+  return useInfiniteQuery({
+    keepPreviousData: true,
+    queryKey: ["student", "completed-readings", id],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchCompletedReadings({ page: pageParam, pageSize }),
+    getNextPageParam: (lastPage, allPages) =>
+      allPages.length * pageSize < lastPage.total
+        ? lastPage.page + 1
+        : undefined,
+  });
+};
 
 const MiProgreso: React.FC = () => {
   const { ref, inView } = useInView();
@@ -19,10 +34,7 @@ const MiProgreso: React.FC = () => {
     isLoading,
     isFetchingNextPage,
     isError,
-  } = useFetchCompletedReadings({
-    page: 0,
-    pageSize,
-  }); // This parameter is just the initial request
+  } = useFetchCompletedReadings();
 
   const readings = useMemo(
     () => (data?.pages ?? []).flatMap(({ Readings }) => Readings),
