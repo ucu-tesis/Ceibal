@@ -59,7 +59,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     if (user?.type === "teacher" && isStudentRoute) {
-      router.replace("/maestro/groupos");
+      router.replace("/maestro/grupos");
     } else if (user?.type === "student" && isTeacherRoute) {
       router.replace("/alumno");
     }
@@ -67,7 +67,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <UserContext.Provider value={value}>
-      {loading || isProtectedRoute && !user ? null : children}
+      {loading || (isProtectedRoute && !user) ? null : children}
     </UserContext.Provider>
   );
 };

@@ -4,3 +4,8 @@
     justify-content: center;
     flex-wrap: wrap;
 }
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+}
