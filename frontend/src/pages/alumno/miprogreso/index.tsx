@@ -26,7 +26,7 @@ const useFetchCompletedReadings = () => {
 };
 
 const MiProgreso: React.FC = () => {
-  const { ref, inView } = useInView();
+  const { ref: lastElementRef, inView: lastElementInView } = useInView();
   const {
     data,
     fetchNextPage,
@@ -43,10 +43,10 @@ const MiProgreso: React.FC = () => {
 
   // Auto fetch when one of the last elements is visible
   useEffect(() => {
-    if (inView && hasNextPage) {
+    if (lastElementInView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, fetchNextPage, hasNextPage]);
+  }, [lastElementInView, fetchNextPage, hasNextPage]);
 
   if (isLoading) {
     return <LoadingPage />;
@@ -66,11 +66,7 @@ const MiProgreso: React.FC = () => {
           // TODO use status and date_submitted
           ({ id, image, score, status, title, date_submitted }, index) => (
             <ReadCard
-              ref={
-                readings.length >= 3 && index === readings.length - 3
-                  ? ref
-                  : undefined
-              }
+              ref={index === readings.length - 1 ? lastElementRef : undefined}
               key={id}
               title={title}
               image={image}
