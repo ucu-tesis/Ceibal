@@ -41,7 +41,6 @@ const MiProgreso: React.FC = () => {
     [data?.pages]
   );
 
-  // Auto fetch when one of the last elements is visible
   useEffect(() => {
     if (lastElementInView && hasNextPage) {
       fetchNextPage();
