@@ -38,7 +38,42 @@ describe('ReadingsController', () => {
     });
 
     it('includes private readings that are created by the given user', async () => {
-      // TODO
+      const teacher1 = await TestFactory.createTeacher({});
+      const teacher2 = await TestFactory.createTeacher({});
+      await TestFactory.createReading({
+        title: 'reading1',
+        created_by: teacher1.id,
+        is_public: true,
+      });
+      await TestFactory.createReading({
+        title: 'reading2',
+        created_by: teacher1.id,
+        is_public: false,
+      });
+      await TestFactory.createReading({
+        title: 'reading3',
+        created_by: teacher2.id,
+        is_public: false,
+      });
+      const result = await controller.getAll(teacher2.id, {
+        page: 0,
+        pageSize: 5,
+      });
+      expect(result).toEqual({
+        Readings: [
+          expect.objectContaining({
+            title: 'reading1',
+            is_public: true,
+          }),
+          expect.objectContaining({
+            title: 'reading3',
+            is_public: false,
+          }),
+        ],
+        page: 0,
+        page_size: 5,
+        total: 2,
+      });
     });
   });
 
@@ -50,6 +85,8 @@ describe('ReadingsController', () => {
       const result = await controller.createReading(teacher.id, {
         title: 'testTitle',
         content: 'someContent',
+        category: 'Beginner',
+        subcategory: 'Adventure',
       });
       const readingsAfter = await prismaService.reading.findMany();
       expect(readingsAfter).toEqual([
@@ -57,9 +94,13 @@ describe('ReadingsController', () => {
           id: result.id,
           title: 'testTitle',
           content: 'someContent',
+          category: 'Beginner',
+          subcategory: 'Adventure',
+          position: 0,
           image_url: null,
-          index_in_chapter: 0,
-          section_id: null,
+          is_public: false,
+          created_at: expect.any(Date),
+          created_by: teacher.id,
         },
       ]);
     });

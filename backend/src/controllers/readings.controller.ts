@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { Reading } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
@@ -11,6 +10,11 @@ class CreateReadingDTO {
   title: string;
   @IsString()
   content: string;
+  @IsString()
+  category: string;
+  @IsString()
+  @IsOptional()
+  subcategory?: string;
   @IsString()
   @IsOptional()
   image_url?: string;
@@ -26,11 +30,15 @@ export class ReadingsController {
     @UserData('id') userId: number, // TODO include readings created by the requesting teacher
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
   ) {
+    const where = {
+      OR: [{ is_public: true }, { created_by: userId }],
+    };
     const readings = await this.prismaService.reading.findMany({
+      where,
       skip: page * pageSize,
       take: pageSize,
     });
-    const totalReadings = await this.prismaService.reading.count();
+    const totalReadings = await this.prismaService.reading.count({ where });
     return {
       Readings: readings,
       page,
@@ -49,9 +57,11 @@ export class ReadingsController {
       data: {
         title: createDTO.title,
         content: createDTO.content,
-        // TODO section
-        // TODO created_by
-        // TODO image_url
+        category: createDTO.category,
+        subcategory: createDTO.subcategory,
+        image_url: createDTO.image_url,
+        created_by: userId,
+        is_public: false,
       },
     });
     return reading;

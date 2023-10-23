@@ -53,47 +53,13 @@ export class TestFactory {
     });
   }
 
-  static async createChapter({ ...attributes }) {
-    return prisma.chapter.create({
-      data: {
-        title: faker.word.noun(),
-        description: faker.lorem.lines(2),
-        difficulty: 1,
-        ...attributes,
-      },
-    });
-  }
-
-  static async createSection({
-    chapterId,
-    ...attributes
-  }: { chapterId?: number } = {}) {
-    if (!chapterId) {
-      chapterId = (await this.createChapter({})).id;
-    }
-    return prisma.section.create({
-      data: {
-        title: faker.word.noun(),
-        description: faker.lorem.lines(2),
-        chapter_id: chapterId,
-        index_in_chapter: 0,
-        ...attributes,
-      },
-    });
-  }
-
-  static async createReading({
-    sectionId,
-    ...attributes
-  }: { sectionId?: number } = {}) {
-    if (!sectionId) {
-      sectionId = (await this.createSection({})).id;
-    }
+  static async createReading({ ...attributes } = {}) {
     return prisma.reading.create({
       data: {
         title: faker.word.noun(),
         content: faker.lorem.lines(2),
-        section_id: sectionId,
+        category: faker.word.noun(),
+        subcategory: faker.word.noun(),
         ...attributes,
       },
     });
