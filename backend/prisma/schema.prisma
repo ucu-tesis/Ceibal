@@ -11,14 +11,15 @@ datasource db {
 }
 
 model User {
-  id            Int               @id @default(autoincrement())
-  cedula        String            @unique
-  email         String
-  first_name    String
-  last_name     String
-  password_hash String?
-  GroupsOwned   EvaluationGroup[] @relation(name: "owned")
-  GroupsCreated EvaluationGroup[] @relation(name: "created")
+  id              Int               @id @default(autoincrement())
+  cedula          String            @unique
+  email           String
+  first_name      String
+  last_name       String
+  password_hash   String?
+  GroupsOwned     EvaluationGroup[] @relation(name: "owned")
+  GroupsCreated   EvaluationGroup[] @relation(name: "created")
+  ReadingsCreated Reading[]         @relation(name: "created")
 }
 
 model Student {
@@ -45,33 +46,19 @@ model EvaluationGroup {
   EvaluationGroupReadings EvaluationGroupReading[]
 }
 
-model Chapter {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String
-  difficulty  Int
-  Sections    Section[]
-}
-
-model Section {
-  id               Int       @id @default(autoincrement())
-  title            String
-  description      String
-  index_in_chapter Int
-  chapter_id       Int
-  Chapter          Chapter   @relation(fields: [chapter_id], references: [id])
-  Readings         Reading[]
-}
-
 model Reading {
   id                      Int                      @id @default(autoincrement())
   title                   String
   content                 String
   image_url               String?
-  section_id              Int?
-  Section                 Section?                 @relation(fields: [section_id], references: [id])
-  index_in_chapter        Int                      @default(0)
+  category                String                   @default("Intermedio")
+  subcategory             String?
+  position                Int                      @default(0)
+  is_public               Boolean                  @default(true)
   EvaluationGroupReadings EvaluationGroupReading[]
+  created_at              DateTime                 @default(now())
+  created_by              Int?
+  Creator                 User?                    @relation(name: "created", fields: [created_by], references: [id])
 }
 
 model EvaluationGroupReading {
