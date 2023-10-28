@@ -10,11 +10,12 @@ export interface Group {
   school_year: number;
   teacher_id: number;
   created_by: number;
-  school_data?: string; // TODO: Define type.
+  school_data?: string; // TODO: Define type
 }
 
 export type GroupStudentsResponse = Group & {
   Students?: Student[];
+  Assignments?: Assignment[];
 };
 
 export interface Student {
@@ -27,7 +28,16 @@ export interface Student {
   assignments_pending?: number;
 }
 
-export const fetchGroupStudents = (groupId: number) =>
+export interface Assignment {
+  evaluation_group_reading_id: number;
+  reading_id: number;
+  reading_title: string;
+  chapter_id?: number;
+  section_id?: number;
+  due_date: string;
+}
+
+export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
     .get<GroupStudentsResponse>(`/evaluationGroups/${groupId}`)
     .then((res) => res.data);

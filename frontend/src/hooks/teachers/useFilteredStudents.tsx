@@ -1,4 +1,4 @@
-import { StudentWithFullName } from "@/api/teachers/hooks/useFetchGroupStudents";
+import { StudentWithFullName } from "@/api/teachers/hooks/useFetchGroupDetails";
 import { useMemo } from "react";
 
 const studentFilter =

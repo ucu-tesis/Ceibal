@@ -1,9 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  GroupStudentsResponse,
-  Student,
-  fetchGroupStudents,
-} from "../teachers";
+import { GroupStudentsResponse, Student, fetchGroupDetails } from "../teachers";
 
 export type StudentWithFullName = Student & {
   fullName: string;
@@ -18,14 +14,23 @@ const addFullName = (student: Student): StudentWithFullName => ({
 
 const select = (group: GroupStudentsResponse) => {
   const students = group.Students?.map(addFullName) ?? [];
-  return { groupName: group.name, students };
+  return {
+    groupName: group.name,
+    students,
+    assignments: (group.Assignments ?? []).map(
+      ({ due_date, ...assignment }) => ({
+        ...assignment,
+        due_date: new Date(due_date),
+      })
+    ),
+  };
 };
 
-const useFetchGroupStudents = (groupId: number) =>
+const useFetchGroupDetails = (groupId: number) =>
   useQuery({
     queryKey: ["teacher", "groups", groupId],
-    queryFn: () => fetchGroupStudents(groupId),
+    queryFn: () => fetchGroupDetails(groupId),
     select,
   });
 
-export default useFetchGroupStudents;
+export default useFetchGroupDetails;
