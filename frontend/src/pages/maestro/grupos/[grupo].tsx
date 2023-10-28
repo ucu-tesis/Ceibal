@@ -1,7 +1,4 @@
-import useFetchGroupDetails, {
-  StudentWithFullName,
-} from "@/api/teachers/hooks/useFetchGroupDetails";
-import { Assignment } from "@/api/teachers/teachers";
+import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import InputDate from "@/components/inputs/InputDate";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
@@ -10,6 +7,8 @@ import ChakraTable, {
   ChakraTableColumn,
 } from "@/components/tables/ChakraTable";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
+import { Assignment } from "@/models/Assignment";
+import { Student } from "@/models/Student";
 import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Breadcrumb,
@@ -74,18 +73,14 @@ const assignmentColumnsModal: ChakraTableColumn[] = [
   { label: "Lectura" },
 ];
 
-const toTableList = (
-  students: StudentWithFullName[],
-  groupId: number,
-  groupName: string
-) =>
+const toTableList = (students: Student[], groupId: number, groupName: string) =>
   students.map(
-    ({ fullName, cedula, email, assignments_done, assignments_pending }) => ({
+    ({ fullName, cedula, email, assignmentsDone, assignmentsPending }) => ({
       fullName,
       cedula,
       email,
-      assignments_done,
-      assignments_pending,
+      assignmentsDone,
+      assignmentsPending,
       link: (
         <Link
           href={{
@@ -99,28 +94,32 @@ const toTableList = (
     })
   );
 
-const toAssignmentTableList = (
-  assignments: (Omit<Assignment, "due_date"> & { due_date: Date })[]
-) =>
-  assignments.map(({ section_id, chapter_id, reading_title, due_date }) => ({
-    section_id,
-    chapter_id,
-    reading_title,
-    due_date: "formatted date",
-    link: (
-      <Link
-        href={{
-          pathname: "",
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+const toAssignmentTableList = (assignments: Assignment[]) =>
+  assignments.map(
+    ({
+      sectionId,
+      chapterId,
+      readingTitle,
+      dueDate,
+      evaluationGroupReadingId,
+    }) => ({
+      sectionId,
+      chapterId,
+      readingTitle,
+      dueDate: "formatted date", // TODO use dayjs
+      link: (
+        <Link
+          href={{
+            pathname: "", // TODO use evaluationGroupReadingId
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
-const toTableListModal = (
-  assignments: (Omit<Assignment, "due_date"> & { due_date: Date })[]
-) =>
+const toTableListModal = (assignments: Assignment[]) =>
   assignments.map((assignment) => ({
     checkbox: <Checkbox />,
     ...assignment,
@@ -151,8 +150,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [chapterOptionModal, setChapterOptionModal] = useState<
     string | undefined
   >(undefined);
-  const { groupName, students, assignments } = data ?? {
-    groupName: "",
+  const {
+    name: groupName,
+    students,
+    assignments,
+  } = data ?? {
+    name: "",
     students: [],
     assignments: [],
   };
@@ -184,17 +187,17 @@ export default function Page({ params }: { params: { grupo: number } }) {
   };
 
   const sectionOptions: Option[] = [
-    ...assignments.map(({ section_id }) => ({
-      label: `${section_id}`,
-      value: `${section_id}`,
+    ...assignments.map(({ sectionId }) => ({
+      label: `${sectionId}`,
+      value: `${sectionId}`,
     })),
     defaultOptionSections,
   ];
 
   const chapterOptions: Option[] = [
-    ...assignments.map(({ chapter_id }) => ({
-      label: `${chapter_id}`,
-      value: `${chapter_id}`,
+    ...assignments.map(({ chapterId }) => ({
+      label: `${chapterId}`,
+      value: `${chapterId}`,
     })),
     defaultOptionChapters,
   ];
@@ -298,11 +301,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={columns}
-                data={toTableList(
-                  filteredStudents ?? [],
-                  Number(groupId),
-                  groupName
-                )}
+                data={toTableList(filteredStudents, Number(groupId), groupName)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>

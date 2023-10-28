@@ -1,34 +1,28 @@
+import { Assignment } from "@/models/Assignment";
+import { Group } from "@/models/Group";
+import { GroupDetails } from "@/models/GroupDetails";
+import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
 
-interface GroupResponse {
-  data: Group[];
+interface GroupsResponse {
+  data: GroupResponse[];
 }
 
-export interface Group {
+interface GroupResponse {
+  created_by: number;
   id: number;
   name: string;
+  school_data?: string; // TODO: Define type
   school_year: number;
   teacher_id: number;
-  created_by: number;
-  school_data?: string; // TODO: Define type
 }
 
-export type GroupStudentsResponse = Group & {
-  Students?: Student[];
-  Assignments?: Assignment[];
-};
-
-export interface Student {
-  id: number;
-  cedula: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  assignments_done?: number;
-  assignments_pending?: number;
+interface GroupDetailsResponse extends GroupResponse {
+  Assignments?: AssignmentResponse[];
+  Students?: StudentResponse[];
 }
 
-export interface Assignment {
+interface AssignmentResponse {
   evaluation_group_reading_id: number;
   reading_id: number;
   reading_title: string;
@@ -37,14 +31,69 @@ export interface Assignment {
   due_date: string;
 }
 
+interface StudentResponse {
+  assignments_done?: number;
+  assignments_pending?: number;
+  cedula: string;
+  email: string;
+  first_name: string;
+  id: number;
+  last_name: string;
+}
+
 export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
-    .get<GroupStudentsResponse>(`/evaluationGroups/${groupId}`)
-    .then((res) => res.data);
+    .get<GroupDetailsResponse>(`/evaluationGroups/${groupId}`)
+    .then(({ data }) => parseGroupDetailsResponse(data));
 
 export const fetchGroups = (teacherCI: number) =>
   axiosInstance
-    .get<GroupResponse>("/evaluationGroups", {
+    .get<GroupsResponse>("/evaluationGroups", {
       params: { ci: teacherCI }, // TODO: Modify when backend changes the CI param.
     })
-    .then((res) => res.data.data);
+    .then(({ data }) => parseGroupsResponse(data));
+
+// Parse methods
+
+const parseGroupsResponse = (res: GroupsResponse): Group[] =>
+  res.data.map(parseGroupResponse);
+
+const parseGroupResponse = (group: GroupResponse): Group => ({
+  createdBy: group.created_by,
+  schoolYear: group.school_year,
+  teacherId: group.teacher_id,
+  schoolData: group.school_data,
+  ...group,
+});
+
+const parseGroupDetailsResponse = (
+  res: GroupDetailsResponse
+): GroupDetails => ({
+  createdBy: res.created_by,
+  schoolYear: res.school_year,
+  schoolData: res.school_data,
+  teacherId: res.teacher_id,
+  assignments: res.Assignments?.map(parseAssignmentResponse) ?? [],
+  students: res.Students?.map(parseStudentResponse) ?? [],
+  ...res,
+});
+
+const parseAssignmentResponse = (
+  assignment: AssignmentResponse
+): Assignment => ({
+  dueDate: new Date(assignment.due_date),
+  evaluationGroupReadingId: assignment.evaluation_group_reading_id,
+  readingId: assignment.reading_id,
+  readingTitle: assignment.reading_title,
+  chapterId: assignment.chapter_id,
+  sectionId: assignment.section_id,
+});
+
+const parseStudentResponse = (student: StudentResponse): Student => ({
+  assignmentsDone: student.assignments_done,
+  assignmentsPending: student.assignments_pending,
+  firstName: student.first_name,
+  fullName: `${student.first_name} ${student.last_name}`,
+  lastName: student.last_name,
+  ...student,
+});

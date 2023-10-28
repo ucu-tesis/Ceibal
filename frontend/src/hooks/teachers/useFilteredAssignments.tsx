@@ -1,20 +1,16 @@
-import { Assignment } from "@/api/teachers/teachers";
+import { Assignment } from "@/models/Assignment";
 import { useMemo } from "react";
 
 const assignmentFilter =
   (query: string, sectionFilter?: string, chapterFilter?: string) =>
   // TODO: Modify to use section and chapter titles instead of ids
-  ({
-    reading_title,
-    section_id,
-    chapter_id,
-  }: Omit<Assignment, "due_date"> & { due_date: Date }) =>
-    reading_title.toLowerCase().includes(query) &&
-    (sectionFilter ? sectionFilter === `${section_id}` : true) &&
-    (chapterFilter ? chapterFilter === `${chapter_id}` : true);
+  ({ readingTitle, sectionId, chapterId }: Assignment) =>
+    readingTitle.toLowerCase().includes(query) &&
+    (sectionFilter ? sectionFilter === `${sectionId}` : true) &&
+    (chapterFilter ? chapterFilter === `${chapterId}` : true);
 
 const useFilteredAssignments = (
-  assignments: (Omit<Assignment, "due_date"> & { due_date: Date })[],
+  assignments: Assignment[],
   query: string,
   section?: string,
   chapter?: string
