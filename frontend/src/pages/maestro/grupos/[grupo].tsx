@@ -120,9 +120,11 @@ const toAssignmentTableList = (assignments: Assignment[]) =>
     })
   );
 
+// TODO update to use fetch readings endpoint
 const toTableListModal = (assignments: Assignment[]) =>
-  assignments.map((assignment) => ({
+  assignments.map(({ dueDate, ...assignment }) => ({
     checkbox: <Checkbox />,
+    dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
     ...assignment,
   }));
 
