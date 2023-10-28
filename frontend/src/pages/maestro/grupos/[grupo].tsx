@@ -42,6 +42,7 @@ import {
   PointElement,
   Title,
 } from "chart.js";
+import dayjs from "dayjs";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -106,7 +107,7 @@ const toAssignmentTableList = (assignments: Assignment[]) =>
       sectionId,
       chapterId,
       readingTitle,
-      dueDate: "formatted date", // TODO use dayjs
+      dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
       link: (
         <Link
           href={{
