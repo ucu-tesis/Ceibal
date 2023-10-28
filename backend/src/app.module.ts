@@ -16,6 +16,7 @@ import { UserService } from './services/user.service';
 import { ForbiddenFilter } from './filters/forbidden.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { StudentsController } from './controllers/students.controller';
+import { ReadingsController } from './controllers/readings.controller';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { StudentsController } from './controllers/students.controller';
   ],
   controllers: [
     AppController,
+    ReadingsController,
     RecordingsController,
     AuthController,
     TeachersController,

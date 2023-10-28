@@ -67,7 +67,7 @@ export class EvaluationGroupsController {
         EvaluationGroupReadings: {
           include: {
             Recordings: true,
-            Reading: { include: { Section: { include: { Chapter: true } } } },
+            Reading: true,
           },
         },
       },
@@ -108,8 +108,8 @@ export class EvaluationGroupsController {
         evaluation_group_reading_id: r.id,
         reading_id: r.Reading.id,
         reading_title: r.Reading.title,
-        chapter_id: r.Reading.Section?.Chapter.id || null,
-        section_id: r.Reading.Section?.id || null,
+        reading_category: r.Reading.category,
+        reading_subcategory: r.Reading.subcategory,
         due_date: r.due_date,
       })),
     };
