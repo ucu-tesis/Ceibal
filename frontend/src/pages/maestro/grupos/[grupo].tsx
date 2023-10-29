@@ -2,8 +2,18 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
-import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, CategoryScale, ChartData } from "chart.js";
-import { Line } from "react-chartjs-2";
+import Image from "next/image";
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Legend,
+  BarElement,
+} from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
 import {
   ChakraProvider,
   Button,
@@ -29,6 +39,9 @@ import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import Select from "@/components/selects/Select";
 import InputDate from "@/components/inputs/InputDate";
+import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
+import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
+import IncompleteTasksIcon from "../../../assets/images/lecturas_atrasadas.svg";
 
 interface Task {
   section: string;
@@ -149,24 +162,46 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const inputRegex = /\w|\d|\-|\s/;
 
-  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale);
+  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, BarElement);
 
-  const dataChart = {
-    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+  const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+
+  const dataLine = {
+    labels: months,
     datasets: [
       {
         id: 1,
-        label: "A",
+        label: "Grupos",
         data: [5, 6, 7, 4, 3, 5],
         backgroundColor: "#B1A5FF",
         borderColor: "#B1A5FF",
       },
       {
         id: 2,
-        label: "B",
+        label: "Promedio",
         data: [3, 2, 1, 4, 7, 3],
         backgroundColor: "#FBE38E",
         borderColor: "#FBE38E",
+      },
+    ],
+  };
+
+  const dataBar = {
+    labels: months,
+    datasets: [
+      {
+        label: "Tareas",
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: "#FED0EEB2",
+        borderColor: "#FED0EEB2",
+        borderWidth: 1,
+      },
+      {
+        label: "Promedio",
+        data: [35, 49, 50, 61, 26, 45, 30],
+        backgroundColor: "#D0E8FFB2",
+        borderColor: "#D0E8FFB2",
+        borderWidth: 1,
       },
     ],
   };
@@ -280,8 +315,26 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <div className={styles.canvas}>
-                <Line data={dataChart}></Line>
+              <h2>Resumen</h2>
+              <div className={styles["stats-box"]}>
+                <div className="col">
+                  <div className="row">
+                    <Image alt="lecturas enviadas" src={SentTasksIcon} />
+                    <span>Enviadas: 25</span>
+                  </div>
+                  <div className="row">
+                    <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+                    <span>Pendientes: 25</span>
+                  </div>
+                  <div className="row">
+                    <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+                    <span>Atrasadas: 25</span>
+                  </div>
+                </div>
+              </div>
+              <div className={`row ${styles.canvas}`}>
+                <Line data={dataLine}></Line>
+                <Bar data={dataBar}></Bar>
               </div>
             </TabPanel>
           </TabPanels>

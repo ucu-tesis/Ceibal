@@ -2,6 +2,11 @@
   padding: 24px;
 }
 
+.container h2 {
+  font-size: 24px;
+  font-weight: 500;
+}
+
 .filters {
   justify-content: left;
   margin-top: 8px;
@@ -85,7 +90,32 @@ td .badge {
 
 .canvas {
   height: 300px;
-  max-width: 802px;
+  width: 90%;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.stats-box {
+  padding: 24px 80px 24px 24px;
+  width: fit-content;
+  border: 1px solid var(--ceibal-black);
+  background: #F5F5F5;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.stats-box div {
+  gap: 24px;
+}
+
+.stats-box > div > div {
+  align-items: center;
+}
+
+.stats-box img {
+  width: 48px;
+  height: auto;
 }
 
 @media (max-width: 500px) {
