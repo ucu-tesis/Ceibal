@@ -83,7 +83,7 @@ const toTableList = (students: StudentWithFullName[], groupId: number, groupName
     link: (
       <Link
         href={{
-          pathname: "/maestro/grupos/[grupo]/resultado/[alumno]",
+          pathname: "/maestro/grupos/[grupo]/[alumno]",
           query: { grupo: groupId, alumno: fullName, groupName },
         }}
       >
@@ -315,9 +315,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <h2>Resumen</h2>
               <div className={styles["stats-box"]}>
-                <div className="col">
+                <div className={`row ${styles["mob-col"]}`}>
                   <div className="row">
                     <Image alt="lecturas enviadas" src={SentTasksIcon} />
                     <span>Enviadas: 25</span>

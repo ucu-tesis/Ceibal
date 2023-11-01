@@ -128,4 +128,7 @@ td .badge {
   .modal-content {
     min-width: auto;
   }
+  .mob-col {
+    flex-direction: column;
+  }
 }
