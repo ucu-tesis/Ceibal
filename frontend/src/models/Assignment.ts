@@ -1,8 +1,8 @@
 export interface Assignment {
-  chapterId?: number;
   dueDate: Date;
   evaluationGroupReadingId: number;
+  readingCategory: string;
   readingId: number;
+  readingSubcategory: string;
   readingTitle: string;
-  sectionId?: number;
 }

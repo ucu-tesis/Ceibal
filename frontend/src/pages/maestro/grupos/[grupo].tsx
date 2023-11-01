@@ -61,16 +61,16 @@ const columns: ChakraTableColumn[] = [
 ];
 
 const assignmentColumns: ChakraTableColumn[] = [
-  { label: "Sección" },
-  { label: "Capítulo" },
+  { label: "Categoría" },
+  { label: "Subcategoría" },
   { label: "Lectura" },
   { label: "Fecha de Entrega" },
 ];
 
 const assignmentColumnsModal: ChakraTableColumn[] = [
   { label: "" },
-  { label: "Sección" },
-  { label: "Capítulo" },
+  { label: "Categoría" },
+  { label: "Subcategoría" },
   { label: "Lectura" },
 ];
 
@@ -98,14 +98,14 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
 const toAssignmentTableList = (assignments: Assignment[]) =>
   assignments.map(
     ({
-      sectionId,
-      chapterId,
+      readingCategory,
+      readingSubcategory,
       readingTitle,
       dueDate,
       evaluationGroupReadingId,
     }) => ({
-      sectionId,
-      chapterId,
+      readingCategory,
+      readingSubcategory,
       readingTitle,
       dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
       link: (
@@ -141,16 +141,16 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
   const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] =
     useState("");
-  const [sectionOption, setSectionOption] = useState<string | undefined>(
+  const [categoryOption, setCategoryOption] = useState<string | undefined>(
     undefined
   );
-  const [sectionOptionModal, setSectionOptionModal] = useState<
+  const [categoryOptionModal, setCategoryOptionModal] = useState<
     string | undefined
   >(undefined);
-  const [chapterOption, setChapterOption] = useState<string | undefined>(
-    undefined
-  );
-  const [chapterOptionModal, setChapterOptionModal] = useState<
+  const [subcategoryOption, setSubcategoryOption] = useState<
+    string | undefined
+  >(undefined);
+  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<
     string | undefined
   >(undefined);
   const {
@@ -166,43 +166,41 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { filteredAssignments } = useFilteredAssignments(
     assignments,
     assignmentSearchQuery,
-    sectionOption,
-    chapterOption
+    categoryOption,
+    subcategoryOption
   );
   const { filteredAssignments: filteredAssignmentsModal } =
     useFilteredAssignments(
       assignments,
       modalAssignmentSearchQuery,
-      sectionOptionModal,
-      chapterOptionModal
+      categoryOptionModal,
+      subcategoryOptionModal
     );
 
-  console.log(`filteredAssignments: ${JSON.stringify(filteredAssignments)}`);
-
-  const defaultOptionSections: Option = {
+  const defaultOptionCategory: Option = {
     label: "Todas",
     value: undefined,
   };
 
-  const defaultOptionChapters: Option = {
-    label: "Todos",
+  const defaultOptionSubcategory: Option = {
+    label: "Todas",
     value: undefined,
   };
 
-  const sectionOptions: Option[] = [
-    ...assignments.map(({ sectionId }) => ({
-      label: `${sectionId}`,
-      value: `${sectionId}`,
+  const readingCategoryOptions: Option[] = [
+    ...assignments.map(({ readingCategory }) => ({
+      label: `${readingCategory}`,
+      value: `${readingCategory}`,
     })),
-    defaultOptionSections,
+    defaultOptionCategory,
   ];
 
-  const chapterOptions: Option[] = [
-    ...assignments.map(({ chapterId }) => ({
-      label: `${chapterId}`,
-      value: `${chapterId}`,
+  const readingSubcategoryOptions: Option[] = [
+    ...assignments.map(({ readingSubcategory }) => ({
+      label: `${readingSubcategory}`,
+      value: `${readingSubcategory}`,
     })),
-    defaultOptionChapters,
+    defaultOptionSubcategory,
   ];
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -328,22 +326,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   </InputRightAddon>
                 </InputGroup>
                 <div className="col">
-                  <label>Sección</label>
+                  <label>Categoría</label>
                   <Select
-                    defaultValue={defaultOptionSections}
-                    options={sectionOptions}
+                    defaultValue={defaultOptionCategory}
+                    options={readingCategoryOptions}
                     onChange={(option) => {
-                      setSectionOption(option.value);
+                      setCategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
                 <div className="col">
-                  <label>Capítulo</label>
+                  <label>Subcategoría</label>
                   <Select
-                    defaultValue={defaultOptionChapters}
-                    options={chapterOptions}
+                    defaultValue={defaultOptionSubcategory}
+                    options={readingSubcategoryOptions}
                     onChange={(option) => {
-                      setChapterOption(option.value);
+                      setSubcategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
@@ -393,22 +391,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 </InputRightAddon>
               </InputGroup>
               <div className="col">
-                <label>Sección</label>
+                <label>Categoría</label>
                 <Select
-                  defaultValue={defaultOptionSections}
-                  options={sectionOptions}
+                  defaultValue={defaultOptionCategory}
+                  options={readingCategoryOptions}
                   onChange={(option) => {
-                    setSectionOptionModal(option.value);
+                    setCategoryOptionModal(option.value);
                   }}
                 ></Select>
               </div>
               <div className="col">
-                <label>Capítulo</label>
+                <label>Subcategoría</label>
                 <Select
-                  defaultValue={defaultOptionChapters}
-                  options={chapterOptions}
+                  defaultValue={defaultOptionSubcategory}
+                  options={readingSubcategoryOptions}
                   onChange={(option) => {
-                    setChapterOptionModal(option.value);
+                    setSubcategoryOptionModal(option.value);
                   }}
                 ></Select>
               </div>

@@ -24,10 +24,10 @@ interface GroupDetailsResponse extends GroupResponse {
 
 interface AssignmentResponse {
   evaluation_group_reading_id: number;
+  reading_category: string;
   reading_id: number;
   reading_title: string;
-  chapter_id?: number;
-  section_id?: number;
+  reading_subcategory?: string;
   due_date: string;
 }
 
@@ -70,12 +70,13 @@ const parseGroupDetailsResponse = (
   res: GroupDetailsResponse
 ): GroupDetails => ({
   createdBy: res.created_by,
+  id: res.id,
+  name: res.name,
   schoolYear: res.school_year,
   schoolData: res.school_data,
   teacherId: res.teacher_id,
   assignments: res.Assignments?.map(parseAssignmentResponse) ?? [],
   students: res.Students?.map(parseStudentResponse) ?? [],
-  ...res,
 });
 
 const parseAssignmentResponse = (
@@ -83,10 +84,10 @@ const parseAssignmentResponse = (
 ): Assignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
+  readingCategory: assignment.reading_category,
   readingId: assignment.reading_id,
+  readingSubcategory: assignment.reading_subcategory ?? "",
   readingTitle: assignment.reading_title,
-  chapterId: assignment.chapter_id,
-  sectionId: assignment.section_id,
 });
 
 const parseStudentResponse = (student: StudentResponse): Student => ({

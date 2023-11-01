@@ -4,20 +4,20 @@ import { useMemo } from "react";
 const assignmentFilter =
   (query: string, sectionFilter?: string, chapterFilter?: string) =>
   // TODO: Modify to use section and chapter titles instead of ids
-  ({ readingTitle, sectionId, chapterId }: Assignment) =>
+  ({ readingTitle, readingCategory, readingSubcategory }: Assignment) =>
     readingTitle.toLowerCase().includes(query) &&
-    (sectionFilter ? sectionFilter === `${sectionId}` : true) &&
-    (chapterFilter ? chapterFilter === `${chapterId}` : true);
+    (sectionFilter ? sectionFilter === `${readingCategory}` : true) &&
+    (chapterFilter ? chapterFilter === `${readingSubcategory}` : true);
 
 const useFilteredAssignments = (
   assignments: Assignment[],
   query: string,
-  section?: string,
-  chapter?: string
+  category?: string,
+  subcategory?: string
 ) => {
   const filteredAssignments = useMemo(
-    () => assignments.filter(assignmentFilter(query, section, chapter)),
-    [assignments, query, section, chapter]
+    () => assignments.filter(assignmentFilter(query, category, subcategory)),
+    [assignments, query, category, subcategory]
   );
   return { filteredAssignments };
 };

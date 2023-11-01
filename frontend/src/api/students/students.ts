@@ -38,9 +38,10 @@ export const fetchCompletedReadings = ({
 const parseCompletedReadingsResponse = (
   res: CompletedReadingsResponse
 ): PaginatedCompletedReadings => ({
+  page: res.page,
   pageSize: res.page_size,
   readings: res.Readings.map(parseReadingResponse),
-  ...res,
+  total: res.total,
 });
 
 const parseReadingResponse = (reading: ReadingResponse): Reading => ({
