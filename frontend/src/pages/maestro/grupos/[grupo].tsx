@@ -6,6 +6,7 @@ import Select from "@/components/selects/Select";
 import ChakraTable, {
   ChakraTableColumn,
 } from "@/components/tables/ChakraTable";
+import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
@@ -128,11 +129,6 @@ const toTableListModal = (assignments: Assignment[]) =>
     ...assignment,
   }));
 
-type Option = {
-  value?: string;
-  label: string;
-};
-
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
@@ -176,32 +172,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
       categoryOptionModal,
       subcategoryOptionModal
     );
-
-  const defaultOptionCategory: Option = {
-    label: "Todas",
-    value: undefined,
-  };
-
-  const defaultOptionSubcategory: Option = {
-    label: "Todas",
-    value: undefined,
-  };
-
-  const readingCategoryOptions: Option[] = [
-    ...assignments.map(({ readingCategory }) => ({
-      label: `${readingCategory}`,
-      value: `${readingCategory}`,
-    })),
-    defaultOptionCategory,
-  ];
-
-  const readingSubcategoryOptions: Option[] = [
-    ...assignments.map(({ readingSubcategory }) => ({
-      label: `${readingSubcategory}`,
-      value: `${readingSubcategory}`,
-    })),
-    defaultOptionSubcategory,
-  ];
+  const {
+    defaultCategoryOption,
+    defaultSubcategoryOption,
+    readingCategoryOptions,
+    readingSubcategoryOptions,
+  } = useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -328,7 +304,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Categoría</label>
                   <Select
-                    defaultValue={defaultOptionCategory}
+                    defaultValue={defaultCategoryOption}
                     options={readingCategoryOptions}
                     onChange={(option) => {
                       setCategoryOption(option.value);
@@ -338,7 +314,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Subcategoría</label>
                   <Select
-                    defaultValue={defaultOptionSubcategory}
+                    defaultValue={defaultSubcategoryOption}
                     options={readingSubcategoryOptions}
                     onChange={(option) => {
                       setSubcategoryOption(option.value);
@@ -393,7 +369,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Categoría</label>
                 <Select
-                  defaultValue={defaultOptionCategory}
+                  defaultValue={defaultCategoryOption}
                   options={readingCategoryOptions}
                   onChange={(option) => {
                     setCategoryOptionModal(option.value);
@@ -403,7 +379,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Subcategoría</label>
                 <Select
-                  defaultValue={defaultOptionSubcategory}
+                  defaultValue={defaultSubcategoryOption}
                   options={readingSubcategoryOptions}
                   onChange={(option) => {
                     setSubcategoryOptionModal(option.value);
