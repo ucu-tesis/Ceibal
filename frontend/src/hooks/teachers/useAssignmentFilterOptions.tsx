@@ -11,41 +11,29 @@ const defaultOption: Option = {
   value: undefined,
 };
 
-const categoryReducer = (
-  categories: string[],
-  { readingCategory }: Assignment
-) =>
-  !readingCategory || categories.includes(readingCategory)
-    ? categories
-    : [...categories, readingCategory];
-
-const subcategoryReducer = (
-  subcategories: string[],
-  { readingSubcategory }: Assignment
-) =>
-  !readingSubcategory || subcategories.includes(readingSubcategory)
-    ? subcategories
-    : [...subcategories, readingSubcategory];
-
 const useAssignmentFilterOptions = (assignments: Assignment[]) => {
   const readingCategoryOptions: Option[] = useMemo(() => {
-    const categories = assignments.reduce(categoryReducer, []);
+    const categories = Array.from(
+      new Set(assignments.map((assignment) => assignment.readingCategory))
+    ).filter((category) => !!category);
     return [
       defaultOption,
       ...categories.map((category) => ({
-        label: `${category}`,
-        value: `${category}`,
+        label: category,
+        value: category,
       })),
     ];
   }, [assignments]);
 
   const readingSubcategoryOptions: Option[] = useMemo(() => {
-    const subcategories = assignments.reduce(subcategoryReducer, []);
+    const subcategories = Array.from(
+      new Set(assignments.map((assignment) => assignment.readingSubcategory))
+    ).filter((subcategory) => !!subcategory);
     return [
       defaultOption,
       ...subcategories.map((subcategory) => ({
-        label: `${subcategory}`,
-        value: `${subcategory}`,
+        label: subcategory,
+        value: subcategory,
       })),
     ];
   }, [assignments]);
