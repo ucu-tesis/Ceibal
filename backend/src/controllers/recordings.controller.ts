@@ -26,6 +26,7 @@ export class RecordingsController {
   // TODO consider moving this to a "student" controller with all other student-facing logic
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(StudentGuard)
   async upload(
     @UserData('id') userId: number,
     @UploadedFile() file: File,

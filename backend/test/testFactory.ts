@@ -53,11 +53,13 @@ export class TestFactory {
     });
   }
 
-  static async createReading({ ...attributes }) {
+  static async createReading({ ...attributes } = {}) {
     return prisma.reading.create({
       data: {
         title: faker.word.noun(),
         content: faker.lorem.lines(2),
+        category: faker.word.noun(),
+        subcategory: faker.word.noun(),
         ...attributes,
       },
     });
@@ -66,6 +68,7 @@ export class TestFactory {
   static async createEvaluationGroupReading({
     readingId,
     evaluationGroupId,
+    ...attributes
   }: {
     readingId?: number;
     evaluationGroupId?: number;
@@ -80,6 +83,8 @@ export class TestFactory {
       data: {
         reading_id: readingId,
         evaluation_group_id: evaluationGroupId,
+        due_date: faker.date.future(),
+        ...attributes,
       },
     });
   }

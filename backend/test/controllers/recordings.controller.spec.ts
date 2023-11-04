@@ -13,7 +13,7 @@ describe('RecordingsController', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let prismaService: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [RecordingsController],
       providers: [ConfigService, FileUploadService, PrismaService],
@@ -57,7 +57,6 @@ describe('RecordingsController', () => {
                 recording1.evaluation_group_reading_id,
               student_id: recording1.student_id,
               recording_url: recording1.recording_url,
-              evaluation: null,
               created_at: expect.any(Date),
             },
           ],
@@ -81,7 +80,6 @@ describe('RecordingsController', () => {
         student_id: recording.student_id,
         recording_url: recording.recording_url,
         Analysis: [analysis],
-        evaluation: null,
         created_at: expect.any(Date),
       });
     });

@@ -15,6 +15,8 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { UserService } from './services/user.service';
 import { ForbiddenFilter } from './filters/forbidden.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { StudentsController } from './controllers/students.controller';
+import { ReadingsController } from './controllers/readings.controller';
 
 @Module({
   imports: [
@@ -30,9 +32,11 @@ import { APP_FILTER } from '@nestjs/core';
   ],
   controllers: [
     AppController,
+    ReadingsController,
     RecordingsController,
     AuthController,
     TeachersController,
+    StudentsController,
     EvaluationGroupsController,
   ],
   providers: [

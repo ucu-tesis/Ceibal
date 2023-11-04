@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -7,6 +7,6 @@ export class TeacherGuard extends AuthGuard('jwt') {
     if (user && user.type === 'teacher') {
       return user;
     }
-    throw err || new Error('You are not a teacher'); // TODO respond with 401 or 403 instead of 500
+    throw err || new UnauthorizedException('You are not a teacher');
   }
 }

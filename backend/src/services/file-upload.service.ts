@@ -8,6 +8,7 @@ import {
 import { diskStorage, File } from 'multer';
 import { PrismaService } from 'src/prisma.service';
 import axios from 'axios';
+import { AnalysisStatus } from '@prisma/client';
 
 @Injectable()
 export class FileUploadService implements MulterOptionsFactory {
@@ -45,63 +46,83 @@ export class FileUploadService implements MulterOptionsFactory {
   ): Promise<{ path: string; data: any }> {
     const bucket = this.configService.get('AWS_BUCKET');
     const filename = `${Date.now()}-${file.originalname}`;
-    const params = {
-      Bucket: bucket,
-      Key: filename,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-
     try {
+      const params = {
+        Bucket: bucket,
+        Key: filename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      const path = `https://${bucket}.s3.${this.configService.get(
-        'AWS_REGION',
-      )}.amazonaws.com/${filename}`;
-
-      const evaluationGroupReading =
-        await this.prismaService.evaluationGroupReading.findFirst();
-
-      const formData = new FormData();
-      formData.append('text', 'some text'); // TODO set proper text
-      formData.append('file', new Blob([file.buffer]), file.originalname);
-
-      // TODO add typing to `data`
-      let data = null;
-      try {
-        const response = await axios.post(
-          `${this.configService.get('AUDIOLIB_URL')}/process_audio`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-        data = response.data;
-      } catch (error) {
-        console.log('Unable to process audio');
-        console.error(error.message);
-        console.error(error?.response?.data); // TODO log axios error properly
-      }
-
-      // TODO add created_at to recording
-      await this.prismaService.recording.create({
-        data: {
-          recording_url: path,
-          student_id: studentId,
-          evaluation_group_reading_id: evaluationGroupReading.id,
-          evaluation: data,
-        },
-      });
-
-      return {
-        path,
-        data,
-      };
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error uploading file to S3');
     }
+    const path = `https://${bucket}.s3.${this.configService.get(
+      'AWS_REGION',
+    )}.amazonaws.com/${filename}`;
+
+    const evaluationGroupReading =
+      await this.prismaService.evaluationGroupReading.findFirst();
+
+    const formData = new FormData();
+    formData.append('text', 'some text'); // TODO set proper text
+    formData.append('file', new Blob([file.buffer]), file.originalname);
+
+    // TODO add typing to `data`
+    let data = null;
+    try {
+      const response = await axios.post(
+        `${this.configService.get('AUDIOLIB_URL')}/process_audio`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      data = response.data;
+    } catch (error) {
+      console.log('Unable to process audio');
+      console.error(error.message);
+      console.error(error?.response?.data); // TODO log axios error properly
+    }
+
+    // TODO add created_at to recording
+    const recording = await this.prismaService.recording.create({
+      data: {
+        recording_url: path,
+        student_id: studentId,
+        evaluation_group_reading_id: evaluationGroupReading.id,
+      },
+    });
+    if (data) {
+      const stats = data.indicadores;
+      await this.prismaService.analysis.create({
+        data: {
+          status: AnalysisStatus.COMPLETED,
+          repetitions_count: stats.cantidad_de_repeticiones,
+          silences_count: stats.cantidad_de_silencios,
+          allosaurus_general_error: stats.error_general_allosaurus,
+          similarity_error: stats.error_similitud,
+          repeated_phonemes: stats.fonemas_repetidos,
+          words_with_errors: stats.palabras_con_errores,
+          words_with_repetitions: stats.palabras_con_repeticiones,
+          score: stats.puntaje,
+          error_timestamps: stats.tiempo_errores,
+          repetition_timestamps: stats.tiempo_repeticiones,
+          phoneme_velocity: Number(stats.velocidad_fonemas) || 0,
+          words_velocity: Number(stats.velocidad_palabras) || 0,
+          raw_analysis: data,
+          recording_id: recording.id,
+        },
+      });
+    }
+
+    return {
+      path,
+      data,
+    };
   }
 }
