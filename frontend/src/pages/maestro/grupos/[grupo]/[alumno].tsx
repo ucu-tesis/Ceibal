@@ -173,8 +173,9 @@ export default function Page({ params }: { params: Params }) {
       link: (
         <Link
           href={{
-            pathname: "#",
-          }}
+          pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
+          query: { grupo: group, groupName: group, alumno: student, evaluacion: 1 },
+        }}
         >
           Ver detalles
         </Link>
