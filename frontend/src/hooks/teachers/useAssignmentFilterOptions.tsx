@@ -6,6 +6,11 @@ type Option = {
   label: string;
 };
 
+const defaultOption: Option = {
+  label: "Todas",
+  value: undefined,
+};
+
 const categoryReducer = (
   categories: string[],
   { readingCategory }: Assignment
@@ -23,47 +28,30 @@ const subcategoryReducer = (
     : [...subcategories, readingSubcategory];
 
 const useAssignmentFilterOptions = (assignments: Assignment[]) => {
-  const defaultCategoryOption: Option = useMemo(
-    () => ({
-      label: "Todas",
-      value: undefined,
-    }),
-    []
-  );
-
-  const defaultSubcategoryOption: Option = useMemo(
-    () => ({
-      label: "Todas",
-      value: undefined,
-    }),
-    []
-  );
-
   const readingCategoryOptions: Option[] = useMemo(() => {
     const categories = assignments.reduce(categoryReducer, []);
     return [
-      defaultCategoryOption,
+      defaultOption,
       ...categories.map((category) => ({
         label: `${category}`,
         value: `${category}`,
       })),
     ];
-  }, [assignments, defaultCategoryOption]);
+  }, [assignments]);
 
   const readingSubcategoryOptions: Option[] = useMemo(() => {
     const subcategories = assignments.reduce(subcategoryReducer, []);
     return [
-      defaultSubcategoryOption,
+      defaultOption,
       ...subcategories.map((subcategory) => ({
         label: `${subcategory}`,
         value: `${subcategory}`,
       })),
     ];
-  }, [assignments, defaultSubcategoryOption]);
+  }, [assignments]);
 
   return {
-    defaultCategoryOption,
-    defaultSubcategoryOption,
+    defaultOption,
     readingCategoryOptions,
     readingSubcategoryOptions,
   };

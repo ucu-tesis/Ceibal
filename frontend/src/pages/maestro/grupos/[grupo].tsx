@@ -172,12 +172,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
       categoryOptionModal,
       subcategoryOptionModal
     );
-  const {
-    defaultCategoryOption,
-    defaultSubcategoryOption,
-    readingCategoryOptions,
-    readingSubcategoryOptions,
-  } = useAssignmentFilterOptions(assignments);
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
+    useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -304,7 +300,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Categoría</label>
                   <Select
-                    defaultValue={defaultCategoryOption}
+                    defaultValue={defaultOption}
                     options={readingCategoryOptions}
                     onChange={(option) => {
                       setCategoryOption(option.value);
@@ -314,7 +310,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Subcategoría</label>
                   <Select
-                    defaultValue={defaultSubcategoryOption}
+                    defaultValue={defaultOption}
                     options={readingSubcategoryOptions}
                     onChange={(option) => {
                       setSubcategoryOption(option.value);
@@ -369,7 +365,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Categoría</label>
                 <Select
-                  defaultValue={defaultCategoryOption}
+                  defaultValue={defaultOption}
                   options={readingCategoryOptions}
                   onChange={(option) => {
                     setCategoryOptionModal(option.value);
@@ -379,7 +375,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Subcategoría</label>
                 <Select
-                  defaultValue={defaultSubcategoryOption}
+                  defaultValue={defaultOption}
                   options={readingSubcategoryOptions}
                   onChange={(option) => {
                     setSubcategoryOptionModal(option.value);
