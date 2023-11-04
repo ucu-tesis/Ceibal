@@ -39,6 +39,7 @@ import LoadingPage from "@/components/loadingPage/LoadingPage";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import Select from "@/components/selects/Select";
 import InputDate from "@/components/inputs/InputDate";
+import DatePicker from "react-datepicker";
 import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../assets/images/lecturas_atrasadas.svg";
@@ -137,6 +138,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
     sectionOptionModal,
     chapterOptionModal
   );
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const onChange = (dates: any) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   const defaultOptionSections: Option = {
     label: "Todas",
@@ -315,20 +324,32 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <div className={styles["stats-box"]}>
-                <div className={`row ${styles["mob-col"]}`}>
-                  <div className="row">
-                    <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                    <span>Enviadas: 25</span>
+              <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
+                <div className={styles["stats-box"]}>
+                  <div className={`row ${styles["mob-col"]}`}>
+                    <div className="row">
+                      <Image alt="lecturas enviadas" src={SentTasksIcon} />
+                      <span>Enviadas: 25</span>
+                    </div>
+                    <div className="row">
+                      <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+                      <span>Pendientes: 25</span>
+                    </div>
+                    <div className="row">
+                      <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+                      <span>Atrasadas: 25</span>
+                    </div>
                   </div>
-                  <div className="row">
-                    <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                    <span>Pendientes: 25</span>
-                  </div>
-                  <div className="row">
-                    <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                    <span>Atrasadas: 25</span>
-                  </div>
+                </div>
+                <div>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={onChange}
+                    startDate={startDate}
+                    endDate={endDate}
+                    selectsRange
+                    inline
+                  />
                 </div>
               </div>
               <div className={`row ${styles.canvas}`}>

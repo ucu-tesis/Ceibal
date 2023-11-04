@@ -19,13 +19,15 @@ import {
   Chart as ChartJS,
   LineElement,
   PointElement,
+  RadarController,
+  RadialLinearScale,
   LinearScale,
   Title,
   CategoryScale,
   Legend,
   BarElement,
 } from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+import { Line, Bar, Radar } from "react-chartjs-2";
 
 interface Params {
   alumno: string;
@@ -44,23 +46,7 @@ type Option = {
   label: string;
 };
 
-const columns: ChakraTableColumn[] = [
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Correo" },
-  { label: "Tareas Realizadas" },
-  { label: "Tareas Pendientes" },
-  { label: "", reactKey: "link", width: "20%" },
-];
-
 const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
-
-const taskColumnsModal: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Sección" },
-  { label: "Capítulo" },
-  { label: "Lectura" },
-];
 
 const taskList: Task[] = [
   { section: "6", chapter: "4", reading: "Coco Bandini" },
@@ -81,9 +67,20 @@ export default function Page({ params }: { params: Params }) {
     setEndDate(end);
   };
 
-  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, BarElement);
+  ChartJS.register(
+    LineElement,
+    PointElement,
+    LinearScale,
+    Title,
+    CategoryScale,
+    Legend,
+    BarElement,
+    RadarController,
+    RadialLinearScale
+  );
 
   const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+  const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
 
   const dataLine = {
     labels: months,
@@ -125,6 +122,23 @@ export default function Page({ params }: { params: Params }) {
     ],
   };
 
+  const dataRadar = {
+    labels: metrics,
+    datasets: [
+      {
+        label: "Puntiación",
+        data: [65, 59, 90, 81, 56, 55, 40],
+        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgb(255, 99, 132)",
+        pointBackgroundColor: "rgb(255, 99, 132)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
+      },
+    ],
+  };
+
   const inputRegex = /\w|\d|\-|\s/;
 
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
@@ -154,18 +168,18 @@ export default function Page({ params }: { params: Params }) {
   ];
 
   const toTableListTask = (tasks: Task[]) =>
-  tasks.map((task) => ({
-    ...task,
-    link: (
-      <Link
-        href={{
-          pathname: "#",
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+    tasks.map((task) => ({
+      ...task,
+      link: (
+        <Link
+          href={{
+            pathname: "#",
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    }));
 
   return (
     <ChakraProvider>
@@ -221,8 +235,8 @@ export default function Page({ params }: { params: Params }) {
           </div>
         </div>
         <div className={`row ${styles.canvas}`}>
-          <Line data={dataLine}></Line>
-          <Bar data={dataBar}></Bar>
+          <Line data={dataLine} width={400}></Line>
+          <Radar data={dataRadar}></Radar>
         </div>
         <h2 tabIndex={0}>Tareas</h2>
         <div className={`${styles.filters} row`}>
