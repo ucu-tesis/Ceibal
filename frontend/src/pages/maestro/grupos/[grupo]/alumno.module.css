@@ -57,11 +57,46 @@
   height: auto;
 }
 
-@media (max-width: 500px) {
+.canvas {
+  height: 300px;
+  width: 90%;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.filters {
+  justify-content: left;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  align-items: end;
+  gap: 40px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.filters label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+@media (max-width: 1200px) {
+  .tablet-col {
+    flex-direction: column;
+  }
+  .canvas {
+    height: auto;
+  }
+}
+
+@media (max-width: 660px) {
   .container {
     padding: 8px;
   }
   .space {
     margin-right: 5%;
+  }
+  .mob-col {
+    flex-direction: column;
   }
 }

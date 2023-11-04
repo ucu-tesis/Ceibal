@@ -1,24 +1,72 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Image from "next/image";
 import { ChakraProvider } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
+import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
+import Select from "@/components/selects/Select";
+import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import ProgressBar from "@/components/progress/ProgressBar";
 import styles from "./alumno.module.css";
+import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
 import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
 import DatePicker from "react-datepicker";
-
-import InputDate from "@/components/inputs/InputDate";
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Legend,
+  BarElement,
+} from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
 
 interface Params {
   alumno: string;
   grupo: number;
   groupName: string;
 }
+
+interface Task {
+  section: string;
+  chapter: string;
+  reading: string;
+}
+
+type Option = {
+  value?: string;
+  label: string;
+};
+
+const columns: ChakraTableColumn[] = [
+  { label: "Nombre" },
+  { label: "Documento" },
+  { label: "Correo" },
+  { label: "Tareas Realizadas" },
+  { label: "Tareas Pendientes" },
+  { label: "", reactKey: "link", width: "20%" },
+];
+
+const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
+
+const taskColumnsModal: ChakraTableColumn[] = [
+  { label: "" },
+  { label: "Sección" },
+  { label: "Capítulo" },
+  { label: "Lectura" },
+];
+
+const taskList: Task[] = [
+  { section: "6", chapter: "4", reading: "Coco Bandini" },
+  { section: "5", chapter: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
+  { section: "2", chapter: "8", reading: "Diogenes" },
+];
 
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
@@ -32,6 +80,92 @@ export default function Page({ params }: { params: Params }) {
     setStartDate(start);
     setEndDate(end);
   };
+
+  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, BarElement);
+
+  const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+
+  const dataLine = {
+    labels: months,
+    datasets: [
+      {
+        id: 1,
+        label: "Grupos",
+        data: [5, 6, 7, 4, 3, 5],
+        backgroundColor: "#B1A5FF",
+        borderColor: "#B1A5FF",
+      },
+      {
+        id: 2,
+        label: "Promedio",
+        data: [3, 2, 1, 4, 7, 3],
+        backgroundColor: "#FBE38E",
+        borderColor: "#FBE38E",
+      },
+    ],
+  };
+
+  const dataBar = {
+    labels: months,
+    datasets: [
+      {
+        label: "Tareas",
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: "#FED0EEB2",
+        borderColor: "#FED0EEB2",
+        borderWidth: 1,
+      },
+      {
+        label: "Promedio",
+        data: [35, 49, 50, 61, 26, 45, 30],
+        backgroundColor: "#D0E8FFB2",
+        borderColor: "#D0E8FFB2",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const inputRegex = /\w|\d|\-|\s/;
+
+  const [taskSearchQuery, setTaskSearchQuery] = useState("");
+  const [sectionOption, setSectionOption] = useState<string | undefined>(undefined);
+  const [chapterOption, setChapterOption] = useState<string | undefined>(undefined);
+
+  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption, chapterOption);
+
+  const defaultOptionSections: Option = {
+    label: "Todas",
+    value: undefined,
+  };
+
+  const defaultOptionChapters: Option = {
+    label: "Todos",
+    value: undefined,
+  };
+
+  const sectionOptions: Option[] = [
+    ...taskList.map(({ section }) => ({ label: section, value: section })),
+    defaultOptionSections,
+  ];
+
+  const chapterOptions: Option[] = [
+    ...taskList.map(({ chapter }) => ({ label: chapter, value: chapter })),
+    defaultOptionChapters,
+  ];
+
+  const toTableListTask = (tasks: Task[]) =>
+  tasks.map((task) => ({
+    ...task,
+    link: (
+      <Link
+        href={{
+          pathname: "#",
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
   return (
     <ChakraProvider>
@@ -57,9 +191,9 @@ export default function Page({ params }: { params: Params }) {
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>{student}</h1>
-        <div className={`row ${styles.space}`}>
+        <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={styles["stats-box"]}>
-            <div className="row">
+            <div className={`row ${styles["mob-col"]}`}>
               <ProgressBar value="92" variant="small"></ProgressBar>
               <div className="row">
                 <Image alt="lecturas enviadas" src={SentTasksIcon} />
@@ -86,12 +220,52 @@ export default function Page({ params }: { params: Params }) {
             />
           </div>
         </div>
-        <h2 tabIndex={0}>Métricas</h2>
-        <div className={`col ${styles.stats} ${styles.border}`}>
-          <h5 tabIndex={0}>Cantidad Pausas: 4</h5>
-          <h5 tabIndex={0}>Cantidad Repeticiones 4</h5>
-          <h5 tabIndex={0}>Velocidad de lectura : 120 palabras/minuto</h5>
+        <div className={`row ${styles.canvas}`}>
+          <Line data={dataLine}></Line>
+          <Bar data={dataBar}></Bar>
         </div>
+        <h2 tabIndex={0}>Tareas</h2>
+        <div className={`${styles.filters} row`}>
+          <InputGroup>
+            <Input
+              width="auto"
+              onKeyDown={(e) => {
+                if (!e.key.match(inputRegex)) {
+                  e.preventDefault();
+                }
+              }}
+              onChange={({ target: { value } }) => {
+                setTaskSearchQuery(value.toLowerCase());
+              }}
+              maxLength={30}
+              placeholder="Lectura"
+            />
+            <InputRightAddon>
+              <SearchIcon />
+            </InputRightAddon>
+          </InputGroup>
+          <div className="col">
+            <label>Sección</label>
+            <Select
+              defaultValue={defaultOptionSections}
+              options={sectionOptions}
+              onChange={(option) => {
+                setSectionOption(option.value);
+              }}
+            ></Select>
+          </div>
+          <div className="col">
+            <label>Capítulo</label>
+            <Select
+              defaultValue={defaultOptionChapters}
+              options={chapterOptions}
+              onChange={(option) => {
+                setChapterOption(option.value);
+              }}
+            ></Select>
+          </div>
+        </div>
+        <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
       </div>
     </ChakraProvider>
   );
