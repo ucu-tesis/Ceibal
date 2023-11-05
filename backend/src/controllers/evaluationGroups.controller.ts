@@ -146,4 +146,118 @@ export class EvaluationGroupsController {
     });
     return assignment;
   }
+
+  @Get('/:evaluationGroupId/students/:studentId')
+  @UseGuards(TeacherGuard)
+  async getStudent(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Param('studentId') studentId: string,
+  ) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
+      where: {
+        id: Number(evaluationGroupId),
+        teacher_id: userId,
+      },
+    });
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+
+    const student = await this.prismaService.student.findFirst({
+      where: {
+        id: Number(studentId),
+        EvaluationGroups: {
+          some: {
+            id: evaluationGroup.id,
+          },
+        },
+      },
+    });
+    if (!student) {
+      throw new UnprocessableEntityException('Student not found');
+    }
+
+    const completedAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          Recordings: {
+            some: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const pendingAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            gt: new Date(),
+          },
+          Recordings: {
+            none: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const delayedAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            lt: new Date(),
+          },
+          Recordings: {
+            none: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const assignments =
+      await this.prismaService.evaluationGroupReading.findMany({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+        },
+        include: {
+          Reading: true,
+          Recordings: {
+            where: {
+              student_id: student.id,
+            },
+            include: {
+              Analysis: true,
+            },
+          },
+        },
+      });
+
+    return {
+      assignments_completed: completedAssignmentsCount,
+      assignments_pending: pendingAssignmentsCount,
+      assignments_delayed: delayedAssignmentsCount,
+      Assignments: assignments.map((a) => {
+        return {
+          id: a.id,
+          reading_category: a.Reading.category,
+          reading_subcategory: a.Reading.subcategory,
+          reading_id: a.Reading.id,
+          reading_title: a.Reading.title,
+          due_date: a.due_date,
+          status:
+            a.Recordings.length > 0
+              ? 'completed'
+              : a.due_date < new Date()
+              ? 'delayed'
+              : 'pending',
+        };
+      }),
+    };
+  }
 }
