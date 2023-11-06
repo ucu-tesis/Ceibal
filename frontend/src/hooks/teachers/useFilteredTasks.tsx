@@ -2,14 +2,14 @@ import { useMemo } from "react";
 
 // TODO integrate with backend API
 interface Task {
-  section: string;
-  chapter: string;
+  category: string;
+  subcategory: string;
   reading: string;
 }
 
 const taskFilter =
   (query: string, sectionFilter?: string, chapterFilter?: string) =>
-  ({ reading, section, chapter }: Task) =>
+  ({ reading, category: section, subcategory: chapter }: Task) =>
     reading.toLowerCase().includes(query) &&
     (sectionFilter ? sectionFilter === section : true) &&
     (chapterFilter ? chapterFilter === chapter : true);

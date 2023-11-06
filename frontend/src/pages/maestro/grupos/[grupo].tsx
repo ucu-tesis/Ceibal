@@ -3,16 +3,6 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  Title,
-  CategoryScale,
-  Legend,
-  BarElement,
-} from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
 import {
   ChakraProvider,
@@ -43,10 +33,11 @@ import DatePicker from "react-datepicker";
 import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../assets/images/lecturas_atrasadas.svg";
+import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 
 interface Task {
-  section: string;
-  chapter: string;
+  category: string;
+  subcategory: string;
   reading: string;
 }
 
@@ -59,19 +50,19 @@ const columns: ChakraTableColumn[] = [
   { label: "", reactKey: "link", width: "20%" },
 ];
 
-const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
+const taskColumns: ChakraTableColumn[] = [{ label: "Categoría" }, { label: "Subcategoría" }, { label: "Lectura" }];
 
 const taskColumnsModal: ChakraTableColumn[] = [
   { label: "" },
-  { label: "Sección" },
-  { label: "Capítulo" },
+  { label: "Categoría" },
+  { label: "Subcategoría" },
   { label: "Lectura" },
 ];
 
 const taskList: Task[] = [
-  { section: "6", chapter: "4", reading: "Coco Bandini" },
-  { section: "5", chapter: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
-  { section: "2", chapter: "8", reading: "Diogenes" },
+  { category: "6", subcategory: "4", reading: "Coco Bandini" },
+  { category: "5", subcategory: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
+  { category: "2", subcategory: "8", reading: "Diogenes" },
 ];
 
 const toTableList = (students: StudentWithFullName[], groupId: number, groupName: string) =>
@@ -118,6 +109,60 @@ type Option = {
   label: string;
 };
 
+const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+
+const dataLine = {
+  labels: months,
+  datasets: [
+    {
+      id: 1,
+      label: "Grupos",
+      data: [5, 6, 7, 4, 3, 5],
+      backgroundColor: "#B1A5FF",
+      borderColor: "#B1A5FF",
+    },
+    {
+      id: 2,
+      label: "Promedio",
+      data: [3, 2, 1, 4, 7, 3],
+      backgroundColor: "#FBE38E",
+      borderColor: "#FBE38E",
+    },
+  ],
+};
+
+const dataBar = {
+  labels: months,
+  datasets: [
+    {
+      label: "Tareas",
+      data: [65, 59, 80, 81, 56, 55, 40],
+      backgroundColor: "#FED0EEB2",
+      borderColor: "#FED0EEB2",
+      borderWidth: 1,
+    },
+    {
+      label: "Promedio",
+      data: [35, 49, 50, 61, 26, 45, 30],
+      backgroundColor: "#D0E8FFB2",
+      borderColor: "#D0E8FFB2",
+      borderWidth: 1,
+    },
+  ],
+};
+
+const defaultOptionCategory: Option = {
+  label: "Todas",
+  value: undefined,
+};
+
+const defaultOptionSubcategory: Option = {
+  label: "Todas",
+  value: undefined,
+};
+
+const inputRegex = /\w|\d|\-|\s/;
+
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
@@ -125,18 +170,18 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
   const [modalTaskSearchQuery, setModalTaskSearchQuery] = useState("");
-  const [sectionOption, setSectionOption] = useState<string | undefined>(undefined);
-  const [sectionOptionModal, setSectionOptionModal] = useState<string | undefined>(undefined);
-  const [chapterOption, setChapterOption] = useState<string | undefined>(undefined);
-  const [chapterOptionModal, setChapterOptionModal] = useState<string | undefined>(undefined);
+  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
+  const [categoryOptionModal, setCategoryOptionModal] = useState<string | undefined>(undefined);
+  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
+  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
   const { groupName, students } = data ?? { groupName: "", students: [] };
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
-  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption, chapterOption);
+  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, categoryOption, subcategoryOption);
   const { filteredTasks: filteredTasksModal } = useFilteredTasks(
     taskList,
     modalTaskSearchQuery,
-    sectionOptionModal,
-    chapterOptionModal
+    categoryOptionModal,
+    subcategoryOptionModal
   );
 
   const [startDate, setStartDate] = useState(new Date());
@@ -147,73 +192,19 @@ export default function Page({ params }: { params: { grupo: number } }) {
     setEndDate(end);
   };
 
-  const defaultOptionSections: Option = {
-    label: "Todas",
-    value: undefined,
-  };
-
-  const defaultOptionChapters: Option = {
-    label: "Todos",
-    value: undefined,
-  };
-
-  const sectionOptions: Option[] = [
-    ...taskList.map(({ section }) => ({ label: section, value: section })),
-    defaultOptionSections,
+  const categoryOptions: Option[] = [
+    ...taskList.map(({ category }) => ({ label: category, value: category })),
+    defaultOptionCategory,
   ];
 
-  const chapterOptions: Option[] = [
-    ...taskList.map(({ chapter }) => ({ label: chapter, value: chapter })),
-    defaultOptionChapters,
+  const subcategoryOptions: Option[] = [
+    ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
+    defaultOptionSubcategory,
   ];
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const inputRegex = /\w|\d|\-|\s/;
-
-  ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, BarElement);
-
-  const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
-
-  const dataLine = {
-    labels: months,
-    datasets: [
-      {
-        id: 1,
-        label: "Grupos",
-        data: [5, 6, 7, 4, 3, 5],
-        backgroundColor: "#B1A5FF",
-        borderColor: "#B1A5FF",
-      },
-      {
-        id: 2,
-        label: "Promedio",
-        data: [3, 2, 1, 4, 7, 3],
-        backgroundColor: "#FBE38E",
-        borderColor: "#FBE38E",
-      },
-    ],
-  };
-
-  const dataBar = {
-    labels: months,
-    datasets: [
-      {
-        label: "Tareas",
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: "#FED0EEB2",
-        borderColor: "#FED0EEB2",
-        borderWidth: 1,
-      },
-      {
-        label: "Promedio",
-        data: [35, 49, 50, 61, 26, 45, 30],
-        backgroundColor: "#D0E8FFB2",
-        borderColor: "#D0E8FFB2",
-        borderWidth: 1,
-      },
-    ],
-  };
+  useChartJSInitializer();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -301,22 +292,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   </InputRightAddon>
                 </InputGroup>
                 <div className="col">
-                  <label>Sección</label>
+                  <label>Categorías</label>
                   <Select
-                    defaultValue={defaultOptionSections}
-                    options={sectionOptions}
+                    defaultValue={defaultOptionCategory}
+                    options={categoryOptions}
                     onChange={(option) => {
-                      setSectionOption(option.value);
+                      setCategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
                 <div className="col">
-                  <label>Capítulo</label>
+                  <label>Subcategorías</label>
                   <Select
-                    defaultValue={defaultOptionChapters}
-                    options={chapterOptions}
+                    defaultValue={defaultOptionSubcategory}
+                    options={subcategoryOptions}
                     onChange={(option) => {
-                      setChapterOption(option.value);
+                      setSubcategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
@@ -392,22 +383,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 </InputRightAddon>
               </InputGroup>
               <div className="col">
-                <label>Sección</label>
+                <label>Categorías</label>
                 <Select
-                  defaultValue={defaultOptionSections}
-                  options={sectionOptions}
+                  defaultValue={defaultOptionCategory}
+                  options={categoryOptions}
                   onChange={(option) => {
-                    setSectionOptionModal(option.value);
+                    setCategoryOptionModal(option.value);
                   }}
                 ></Select>
               </div>
               <div className="col">
-                <label>Capítulo</label>
+                <label>Subcategorías</label>
                 <Select
-                  defaultValue={defaultOptionChapters}
-                  options={chapterOptions}
+                  defaultValue={defaultOptionSubcategory}
+                  options={subcategoryOptions}
                   onChange={(option) => {
-                    setChapterOptionModal(option.value);
+                    setSubcategoryOptionModal(option.value);
                   }}
                 ></Select>
               </div>

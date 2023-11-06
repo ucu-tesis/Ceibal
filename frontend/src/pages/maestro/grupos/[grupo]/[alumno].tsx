@@ -15,19 +15,8 @@ import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
 import DatePicker from "react-datepicker";
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  RadarController,
-  RadialLinearScale,
-  LinearScale,
-  Title,
-  CategoryScale,
-  Legend,
-  BarElement,
-} from "chart.js";
 import { Line, Bar, Radar } from "react-chartjs-2";
+import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 
 interface Params {
   alumno: string;
@@ -36,8 +25,8 @@ interface Params {
 }
 
 interface Task {
-  section: string;
-  chapter: string;
+  category: string;
+  subcategory: string;
   reading: string;
 }
 
@@ -48,10 +37,62 @@ type Option = {
 
 const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
 
+const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
+
+const dataLine = {
+  labels: months,
+  datasets: [
+    {
+      id: 1,
+      label: "Grupos",
+      data: [5, 6, 7, 4, 3, 5],
+      backgroundColor: "#B1A5FF",
+      borderColor: "#B1A5FF",
+    },
+    {
+      id: 2,
+      label: "Promedio",
+      data: [3, 2, 1, 4, 7, 3],
+      backgroundColor: "#FBE38E",
+      borderColor: "#FBE38E",
+    },
+  ],
+};
+
+const dataRadar = {
+  labels: metrics,
+  datasets: [
+    {
+      label: "Puntuación",
+      data: [65, 59, 90, 81, 56, 55, 40],
+      fill: true,
+      backgroundColor: "rgba(255, 99, 132, 0.2)",
+      borderColor: "rgb(255, 99, 132)",
+      pointBackgroundColor: "rgb(255, 99, 132)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgb(255, 99, 132)",
+    },
+  ],
+};
+
+const inputRegex = /\w|\d|\-|\s/;
+
+const defaultOptionCategory: Option = {
+  label: "Todas",
+  value: undefined,
+};
+
+const defaultOptionSubcategory: Option = {
+  label: "Todas",
+  value: undefined,
+};
+
 const taskList: Task[] = [
-  { section: "6", chapter: "4", reading: "Coco Bandini" },
-  { section: "5", chapter: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
-  { section: "2", chapter: "8", reading: "Diogenes" },
+  { category: "6", subcategory: "4", reading: "Coco Bandini" },
+  { category: "5", subcategory: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
+  { category: "2", subcategory: "8", reading: "Diogenes" },
 ];
 
 export default function Page({ params }: { params: Params }) {
@@ -67,104 +108,22 @@ export default function Page({ params }: { params: Params }) {
     setEndDate(end);
   };
 
-  ChartJS.register(
-    LineElement,
-    PointElement,
-    LinearScale,
-    Title,
-    CategoryScale,
-    Legend,
-    BarElement,
-    RadarController,
-    RadialLinearScale
-  );
-
-  const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
-  const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
-
-  const dataLine = {
-    labels: months,
-    datasets: [
-      {
-        id: 1,
-        label: "Grupos",
-        data: [5, 6, 7, 4, 3, 5],
-        backgroundColor: "#B1A5FF",
-        borderColor: "#B1A5FF",
-      },
-      {
-        id: 2,
-        label: "Promedio",
-        data: [3, 2, 1, 4, 7, 3],
-        backgroundColor: "#FBE38E",
-        borderColor: "#FBE38E",
-      },
-    ],
-  };
-
-  const dataBar = {
-    labels: months,
-    datasets: [
-      {
-        label: "Tareas",
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: "#FED0EEB2",
-        borderColor: "#FED0EEB2",
-        borderWidth: 1,
-      },
-      {
-        label: "Promedio",
-        data: [35, 49, 50, 61, 26, 45, 30],
-        backgroundColor: "#D0E8FFB2",
-        borderColor: "#D0E8FFB2",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const dataRadar = {
-    labels: metrics,
-    datasets: [
-      {
-        label: "Puntiación",
-        data: [65, 59, 90, 81, 56, 55, 40],
-        fill: true,
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgb(255, 99, 132)",
-        pointBackgroundColor: "rgb(255, 99, 132)",
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgb(255, 99, 132)",
-      },
-    ],
-  };
-
-  const inputRegex = /\w|\d|\-|\s/;
+  useChartJSInitializer();
 
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
-  const [sectionOption, setSectionOption] = useState<string | undefined>(undefined);
-  const [chapterOption, setChapterOption] = useState<string | undefined>(undefined);
+  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
+  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
 
-  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, sectionOption, chapterOption);
+  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, categoryOption, subcategoryOption);
 
-  const defaultOptionSections: Option = {
-    label: "Todas",
-    value: undefined,
-  };
-
-  const defaultOptionChapters: Option = {
-    label: "Todos",
-    value: undefined,
-  };
-
-  const sectionOptions: Option[] = [
-    ...taskList.map(({ section }) => ({ label: section, value: section })),
-    defaultOptionSections,
+  const categoryOptions: Option[] = [
+    ...taskList.map(({ category }) => ({ label: category, value: category })),
+    defaultOptionCategory,
   ];
 
-  const chapterOptions: Option[] = [
-    ...taskList.map(({ chapter }) => ({ label: chapter, value: chapter })),
-    defaultOptionChapters,
+  const subcategoryOptions: Option[] = [
+    ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
+    defaultOptionSubcategory,
   ];
 
   const toTableListTask = (tasks: Task[]) =>
@@ -173,9 +132,9 @@ export default function Page({ params }: { params: Params }) {
       link: (
         <Link
           href={{
-          pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-          query: { grupo: group, groupName: group, alumno: student, evaluacion: 1 },
-        }}
+            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
+            query: { grupo: group, groupName: group, alumno: student, evaluacion: 1 },
+          }}
         >
           Ver detalles
         </Link>
@@ -260,22 +219,22 @@ export default function Page({ params }: { params: Params }) {
             </InputRightAddon>
           </InputGroup>
           <div className="col">
-            <label>Sección</label>
+            <label>Categorías</label>
             <Select
-              defaultValue={defaultOptionSections}
-              options={sectionOptions}
+              defaultValue={defaultOptionCategory}
+              options={categoryOptions}
               onChange={(option) => {
-                setSectionOption(option.value);
+                setCategoryOption(option.value);
               }}
             ></Select>
           </div>
           <div className="col">
-            <label>Capítulo</label>
+            <label>Subcategorías</label>
             <Select
-              defaultValue={defaultOptionChapters}
-              options={chapterOptions}
+              defaultValue={defaultOptionSubcategory}
+              options={subcategoryOptions}
               onChange={(option) => {
-                setChapterOption(option.value);
+                setSubcategoryOption(option.value);
               }}
             ></Select>
           </div>
