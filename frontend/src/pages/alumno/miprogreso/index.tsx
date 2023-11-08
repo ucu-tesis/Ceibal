@@ -37,7 +37,7 @@ const MiProgreso: React.FC = () => {
   } = useFetchCompletedReadings();
 
   const readings = useMemo(
-    () => (data?.pages ?? []).flatMap(({ Readings }) => Readings),
+    () => (data?.pages ?? []).flatMap(({ readings }) => readings),
     [data?.pages]
   );
 
@@ -63,7 +63,7 @@ const MiProgreso: React.FC = () => {
       <div className={`${styles.container} row`}>
         {readings.map(
           // TODO use status and date_submitted
-          ({ id, image, score, status, title, date_submitted }, index) => (
+          ({ id, image, score, status, title, dateSubmitted }, index) => (
             <ReadCard
               ref={index === readings.length - 1 ? lastElementRef : undefined}
               key={id}

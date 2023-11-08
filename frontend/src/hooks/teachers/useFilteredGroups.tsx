@@ -1,10 +1,10 @@
-import { Group } from "@/api/teachers/teachers";
+import { Group } from "@/models/Group";
 import { useMemo } from "react";
 
 const groupFilter =
   (query: string) =>
-  ({ school_year }: Group) =>
-    `${school_year}` === query;
+  ({ schoolYear }: Group) =>
+    `${schoolYear}` === query;
 
 const useFilteredGroups = (groups: Group[], query: string | undefined) => {
   const filteredGroups = useMemo(

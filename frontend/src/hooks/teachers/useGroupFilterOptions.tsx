@@ -1,4 +1,4 @@
-import { Group } from "@/api/teachers/teachers";
+import { Group } from "@/models/Group";
 import { useMemo } from "react";
 
 const defaultOption = {
@@ -6,22 +6,20 @@ const defaultOption = {
   value: undefined,
 };
 
-const reducer = (school_years: number[], { school_year }: Group) =>
-  school_years.includes(school_year)
-    ? school_years
-    : [...school_years, school_year];
+const reducer = (schoolYears: number[], { schoolYear }: Group) =>
+  schoolYears.includes(schoolYear) ? schoolYears : [...schoolYears, schoolYear];
 
 const useGroupFilterOptions = (groups: Group[]) => {
-  const school_years = useMemo(() => groups.reduce(reducer, []), [groups]);
+  const schoolYears = useMemo(() => groups.reduce(reducer, []), [groups]);
   const filterOptions = useMemo(
     () => [
       defaultOption,
-      ...school_years.map((year) => ({
+      ...schoolYears.map((year) => ({
         label: `${year}`,
         value: `${year}`,
       })),
     ],
-    [school_years]
+    [schoolYears]
   );
   return { filterOptions };
 };
