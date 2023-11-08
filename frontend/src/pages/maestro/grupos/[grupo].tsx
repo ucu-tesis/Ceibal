@@ -151,12 +151,7 @@ const dataBar = {
   ],
 };
 
-const defaultOptionCategory: Option = {
-  label: "Todas",
-  value: undefined,
-};
-
-const defaultOptionSubcategory: Option = {
+const defaultOption: Option = {
   label: "Todas",
   value: undefined,
 };
@@ -194,12 +189,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const categoryOptions: Option[] = [
     ...taskList.map(({ category }) => ({ label: category, value: category })),
-    defaultOptionCategory,
+    defaultOption,
   ];
 
   const subcategoryOptions: Option[] = [
     ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
-    defaultOptionSubcategory,
+    defaultOption,
   ];
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -294,7 +289,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Categorías</label>
                   <Select
-                    defaultValue={defaultOptionCategory}
+                    defaultValue={defaultOption}
                     options={categoryOptions}
                     onChange={(option) => {
                       setCategoryOption(option.value);
@@ -304,7 +299,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 <div className="col">
                   <label>Subcategorías</label>
                   <Select
-                    defaultValue={defaultOptionSubcategory}
+                    defaultValue={defaultOption}
                     options={subcategoryOptions}
                     onChange={(option) => {
                       setSubcategoryOption(option.value);
@@ -385,7 +380,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Categorías</label>
                 <Select
-                  defaultValue={defaultOptionCategory}
+                  defaultValue={defaultOption}
                   options={categoryOptions}
                   onChange={(option) => {
                     setCategoryOptionModal(option.value);
@@ -395,7 +390,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               <div className="col">
                 <label>Subcategorías</label>
                 <Select
-                  defaultValue={defaultOptionSubcategory}
+                  defaultValue={defaultOption}
                   options={subcategoryOptions}
                   onChange={(option) => {
                     setSubcategoryOptionModal(option.value);

@@ -79,12 +79,7 @@ const dataRadar = {
 
 const inputRegex = /\w|\d|\-|\s/;
 
-const defaultOptionCategory: Option = {
-  label: "Todas",
-  value: undefined,
-};
-
-const defaultOptionSubcategory: Option = {
+const defaultOption: Option = {
   label: "Todas",
   value: undefined,
 };
@@ -118,12 +113,12 @@ export default function Page({ params }: { params: Params }) {
 
   const categoryOptions: Option[] = [
     ...taskList.map(({ category }) => ({ label: category, value: category })),
-    defaultOptionCategory,
+    defaultOption,
   ];
 
   const subcategoryOptions: Option[] = [
     ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
-    defaultOptionSubcategory,
+    defaultOption,
   ];
 
   const toTableListTask = (tasks: Task[]) =>
@@ -221,7 +216,7 @@ export default function Page({ params }: { params: Params }) {
           <div className="col">
             <label>Categorías</label>
             <Select
-              defaultValue={defaultOptionCategory}
+              defaultValue={defaultOption}
               options={categoryOptions}
               onChange={(option) => {
                 setCategoryOption(option.value);
@@ -231,7 +226,7 @@ export default function Page({ params }: { params: Params }) {
           <div className="col">
             <label>Subcategorías</label>
             <Select
-              defaultValue={defaultOptionSubcategory}
+              defaultValue={defaultOption}
               options={subcategoryOptions}
               onChange={(option) => {
                 setSubcategoryOption(option.value);
