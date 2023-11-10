@@ -1,3 +1,5 @@
+import { PaginatedCompletedReadings } from "@/models/CompletedReadings";
+import { Reading, ReadingStatus } from "@/models/Reading";
 import axiosInstance from "../axiosInstance";
 
 export interface CompletedReadingsRequest {
@@ -5,22 +7,20 @@ export interface CompletedReadingsRequest {
   pageSize: number;
 }
 
-export type ReadingStatus = "PENDING" | "WORKING" | "COMPLETED" | "FAILED";
-
 interface ReadingResponse {
-  id: number;
   date_submitted: string;
-  title: string;
+  id: number;
   image: string;
   score: number;
   status: ReadingStatus;
+  title: string;
 }
 
-export interface CompletedReadingsResponse {
-  total: number;
+interface CompletedReadingsResponse {
   page: number;
   page_size: number;
   Readings: ReadingResponse[];
+  total: number;
 }
 
 export const fetchCompletedReadings = ({
@@ -31,4 +31,20 @@ export const fetchCompletedReadings = ({
     .get<CompletedReadingsResponse>(`/students/readings/completed`, {
       params: { page, pageSize },
     })
-    .then((res) => res.data);
+    .then(({ data }) => parseCompletedReadingsResponse(data));
+
+// Parse methods
+
+const parseCompletedReadingsResponse = (
+  res: CompletedReadingsResponse
+): PaginatedCompletedReadings => ({
+  page: res.page,
+  pageSize: res.page_size,
+  readings: res.Readings.map(parseReadingResponse),
+  total: res.total,
+});
+
+const parseReadingResponse = (reading: ReadingResponse): Reading => ({
+  dateSubmitted: reading.date_submitted,
+  ...reading,
+});

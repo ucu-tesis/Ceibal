@@ -4,25 +4,57 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { Line, Bar } from "react-chartjs-2";
+import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
+import ErrorPage from "@/components/errorPage/ErrorPage";
+import InputDate from "@/components/inputs/InputDate";
+import LoadingPage from "@/components/loadingPage/LoadingPage";
+import Select from "@/components/selects/Select";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
+import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
+import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
+import { Assignment } from "@/models/Assignment";
+import { Student } from "@/models/Student";
+import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
-  ChakraProvider,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
+  ChakraProvider,
+  Checkbox,
+  Input,
+  InputGroup,
+  InputRightAddon,
   Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   useDisclosure,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
-  Checkbox,
-  ModalFooter,
 } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import styles from "./grupos.module.css";
-import useFetchGroupStudents, { StudentWithFullName } from "@/api/teachers/hooks/useFetchGroupStudents";
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+} from "chart.js";
+import dayjs from "dayjs";
+import Head from "next/head";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Line } from "react-chartjs-2";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
@@ -40,6 +72,7 @@ interface Task {
   subcategory: string;
   reading: string;
 }
+import styles from "./grupos.module.css";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -51,8 +84,14 @@ const columns: ChakraTableColumn[] = [
 ];
 
 const taskColumns: ChakraTableColumn[] = [{ label: "Categoría" }, { label: "Subcategoría" }, { label: "Lectura" }];
+const assignmentColumns: ChakraTableColumn[] = [
+  { label: "Categoría" },
+  { label: "Subcategoría" },
+  { label: "Lectura" },
+  { label: "Fecha de Entrega" },
+];
 
-const taskColumnsModal: ChakraTableColumn[] = [
+const assignmentColumnsModal: ChakraTableColumn[] = [
   { label: "" },
   { label: "Categoría" },
   { label: "Subcategoría" },
@@ -84,24 +123,37 @@ const toTableList = (students: StudentWithFullName[], groupId: number, groupName
     ),
   }));
 
-const toTableListTask = (tasks: Task[]) =>
-  tasks.map((task) => ({
-    ...task,
-    link: (
-      <Link
-        href={{
-          pathname: "#",
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+const toAssignmentTableList = (assignments: Assignment[]) =>
+  assignments.map(
+    ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate,
+      evaluationGroupReadingId,
+    }) => ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
+      link: (
+        <Link
+          href={{
+            pathname: "", // TODO use evaluationGroupReadingId
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
-const toTableListModal = (tasks: Task[]) =>
-  tasks.map((task) => ({
+// TODO update to use fetch readings endpoint
+const toTableListModal = (assignments: Assignment[]) =>
+  assignments.map(({ dueDate, ...assignment }) => ({
     checkbox: <Checkbox />,
-    ...task,
+    dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
+    ...assignment,
   }));
 
 type Option = {
@@ -161,7 +213,7 @@ const inputRegex = /\w|\d|\-|\s/;
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
-  const { data, isLoading, isError } = useFetchGroupStudents(Number(groupId));
+  const { data, isLoading, isError } = useFetchGroupDetails(Number(groupId));
   const [searchQuery, setSearchQuery] = useState("");
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
   const [modalTaskSearchQuery, setModalTaskSearchQuery] = useState("");
@@ -200,6 +252,78 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   useChartJSInitializer();
+  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
+  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] =
+    useState("");
+  const [categoryOption, setCategoryOption] = useState<string | undefined>(
+    undefined
+  );
+  const [categoryOptionModal, setCategoryOptionModal] = useState<
+    string | undefined
+  >(undefined);
+  const [subcategoryOption, setSubcategoryOption] = useState<
+    string | undefined
+  >(undefined);
+  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<
+    string | undefined
+  >(undefined);
+  const {
+    name: groupName,
+    students,
+    assignments,
+  } = data ?? {
+    name: "",
+    students: [],
+    assignments: [],
+  };
+  const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
+  const { filteredAssignments } = useFilteredAssignments(
+    assignments,
+    assignmentSearchQuery,
+    categoryOption,
+    subcategoryOption
+  );
+  const { filteredAssignments: filteredAssignmentsModal } =
+    useFilteredAssignments(
+      assignments,
+      modalAssignmentSearchQuery,
+      categoryOptionModal,
+      subcategoryOptionModal
+    );
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
+    useAssignmentFilterOptions(assignments);
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const inputRegex = /\w|\d|\-|\s/;
+
+  ChartJS.register(
+    LineElement,
+    PointElement,
+    LinearScale,
+    Title,
+    CategoryScale
+  );
+
+  const dataChart = {
+    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+    datasets: [
+      {
+        id: 1,
+        label: "A",
+        data: [5, 6, 7, 4, 3, 5],
+        backgroundColor: "#B1A5FF",
+        borderColor: "#B1A5FF",
+      },
+      {
+        id: 2,
+        label: "B",
+        data: [3, 2, 1, 4, 7, 3],
+        backgroundColor: "#FBE38E",
+        borderColor: "#FBE38E",
+      },
+    ],
+  };
 
   if (isLoading) {
     return <LoadingPage />;
@@ -229,7 +353,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
-          <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
+          <Button
+            onClick={onOpen}
+            leftIcon={<AddIcon />}
+            className={styles.primary}
+            variant="solid"
+          >
             Agregar tareas
           </Button>
         </div>
@@ -263,7 +392,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={columns}
-                data={toTableList(filteredStudents ?? [], Number(groupId), groupName)}
+                data={toTableList(filteredStudents, Number(groupId), groupName)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -277,7 +406,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       }
                     }}
                     onChange={({ target: { value } }) => {
-                      setTaskSearchQuery(value.toLowerCase());
+                      setAssignmentSearchQuery(value.toLowerCase());
                     }}
                     maxLength={30}
                     placeholder="Lectura"
@@ -287,27 +416,30 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   </InputRightAddon>
                 </InputGroup>
                 <div className="col">
-                  <label>Categorías</label>
+                  <label>Categoría</label>
                   <Select
                     defaultValue={defaultOption}
-                    options={categoryOptions}
+                    options={readingCategoryOptions}
                     onChange={(option) => {
                       setCategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
                 <div className="col">
-                  <label>Subcategorías</label>
+                  <label>Subcategoría</label>
                   <Select
                     defaultValue={defaultOption}
-                    options={subcategoryOptions}
+                    options={readingSubcategoryOptions}
                     onChange={(option) => {
                       setSubcategoryOption(option.value);
                     }}
                   ></Select>
                 </div>
               </div>
-              <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
+              <ChakraTable
+                columns={assignmentColumns}
+                data={toAssignmentTableList(filteredAssignments)}
+              ></ChakraTable>
             </TabPanel>
             <TabPanel>
               <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
@@ -368,7 +500,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     }
                   }}
                   onChange={({ target: { value } }) => {
-                    setModalTaskSearchQuery(value.toLowerCase());
+                    setModalAssignmentSearchQuery(value.toLowerCase());
                   }}
                   maxLength={30}
                   placeholder="Lectura"
@@ -378,20 +510,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 </InputRightAddon>
               </InputGroup>
               <div className="col">
-                <label>Categorías</label>
+                <label>Categoría</label>
                 <Select
                   defaultValue={defaultOption}
-                  options={categoryOptions}
+                  options={readingCategoryOptions}
                   onChange={(option) => {
                     setCategoryOptionModal(option.value);
                   }}
                 ></Select>
               </div>
               <div className="col">
-                <label>Subcategorías</label>
+                <label>Subcategoría</label>
                 <Select
                   defaultValue={defaultOption}
-                  options={subcategoryOptions}
+                  options={readingSubcategoryOptions}
                   onChange={(option) => {
                     setSubcategoryOptionModal(option.value);
                   }}
@@ -400,12 +532,16 @@ export default function Page({ params }: { params: { grupo: number } }) {
             </div>
             <ChakraTable
               variant="simple"
-              columns={taskColumnsModal}
-              data={toTableListModal(filteredTasksModal)}
+              columns={assignmentColumnsModal}
+              data={toTableListModal(filteredAssignmentsModal)}
             ></ChakraTable>
           </ModalBody>
           <ModalFooter className={styles["flex-center"]}>
-            <Button onClick={onClose} className={styles.primary} variant="solid">
+            <Button
+              onClick={onClose}
+              className={styles.primary}
+              variant="solid"
+            >
               Crear tarea
             </Button>
           </ModalFooter>
