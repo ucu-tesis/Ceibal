@@ -3,12 +3,13 @@ import styles from "./Progress.module.css";
 
 interface ProgressBarProps {
   value: string;
+  variant?: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ value, variant = "" }) => {
   return (
     <div
-      className={`${styles["progress-bar"]} col`}
+      className={`${styles["progress-bar"]} ${styles[variant] ?? ""} col`}
       style={{
         background: `radial-gradient(closest-side, #346608 79%, transparent 80% 100%),
     conic-gradient(#4C950C ${value}%, white 0)`,

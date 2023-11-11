@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import MainHeader from "@/components/headers/MainHeader";
+import "react-datepicker/dist/react-datepicker.css";
 import { UserProvider } from "@/providers/UserContext";
 import { useRouter } from "next/router";
 

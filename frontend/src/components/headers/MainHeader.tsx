@@ -29,7 +29,7 @@ const MainHeader: React.FC = () => {
           disabled={homeIconDisabled}
         />
       )}
-      <div>
+      <div className="row">
         <span className="name">{user?.firstName}</span>
         <Link href={backendUrl + '/auth/logout'} className="log-out-link">Salir</Link>
       </div>
