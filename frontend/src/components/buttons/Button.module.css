@@ -147,6 +147,11 @@
   transform: scale(0.75);
 }
 
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 500px) {
   .card-button {
     border-radius: 8px;

@@ -1,13 +1,13 @@
-import React, { useRef, useState, useEffect, SetStateAction } from "react";
-import PrimaryButton from "./buttons/PrimaryButton";
+import localFont from "next/font/local";
+import Image from "next/image";
+import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import PauseIcon from "../assets/images/pause_icon.svg";
+import PlayIcon from "../assets/images/play_icon.svg";
+import RecordAgainIcon from "../assets/images/record_again_icon.svg";
 import RecordIcon from "../assets/images/record_icon.svg";
 import StopIcon from "../assets/images/stop_icon.svg";
-import Image from "next/image";
-import localFont from "next/font/local";
+import PrimaryButton from "./buttons/PrimaryButton";
 import SecondaryButton from "./buttons/SecondaryButton";
-import RecordAgainIcon from "../assets/images/record_again_icon.svg";
-import PlayIcon from "../assets/images/play_icon.svg";
-import PauseIcon from "../assets/images/pause_icon.svg";
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
@@ -42,12 +42,20 @@ const Recorder: React.FC<RecorderProps> = ({
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
   const audioContext = useRef<AudioContext | null>(null);
+  const [stopButtonDisabled, setStopButtonDisabled] = useState(false);
 
   useEffect(() => {
     if (newRecord) {
       setArrayBuffer(null);
     }
   }, [newRecord]);
+
+  const disableStopButtonTemporarily = () => {
+    setStopButtonDisabled(true);
+    setTimeout(() => {
+      setStopButtonDisabled(false);
+    }, 10000);
+  };
 
   const stopAudioPlayback = () => {
     if (bufferSource && playing) {
@@ -60,6 +68,7 @@ const Recorder: React.FC<RecorderProps> = ({
     try {
       stopAudioPlayback();
       onRecording();
+      disableStopButtonTemporarily();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
@@ -153,6 +162,7 @@ const Recorder: React.FC<RecorderProps> = ({
           id="primary-button"
           onClick={recording ? stopRecording : startRecording}
           variant={(recording ? "pink" : "") as keyof Object}
+          disabled={stopButtonDisabled}
         >
           {recording ? (
             <>
