@@ -111,6 +111,8 @@ export class EvaluationGroupsController {
         reading_category: r.Reading.category,
         reading_subcategory: r.Reading.subcategory,
         due_date: r.due_date,
+        done: r.Recordings.length,
+        pending: students.length - r.Recordings.length,
       })),
     };
   }
