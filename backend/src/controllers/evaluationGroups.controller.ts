@@ -178,7 +178,7 @@ export class EvaluationGroupsController {
       throw new UnprocessableEntityException('Student not found');
     }
 
-    const completedAssignmentsCount =
+    const doneAssignmentsCount =
       await this.prismaService.evaluationGroupReading.count({
         where: {
           evaluation_group_id: evaluationGroup.id,
@@ -220,23 +220,6 @@ export class EvaluationGroupsController {
         },
       });
 
-    const avgScore = await this.prismaService.recording.aggregate({
-      where: {
-        EvaluationGroupReading: {
-          evaluation_group_id: evaluationGroup.id,
-        },
-        student_id: student.id,
-          EvaluationGroupReading: {
-            evaluation_group_id: evaluationGroup.id,
-          },
-          student_id: student.id,
-        },
-      },
-      avg: {
-        score: true,
-      },
-    });
-
     const assignments =
       await this.prismaService.evaluationGroupReading.findMany({
         where: {
@@ -255,11 +238,42 @@ export class EvaluationGroupsController {
         },
       });
 
+    const averageScore = await this.prismaService.analysis.aggregate({
+      _avg: {
+        score: true,
+      },
+      where: {
+        Recording: {
+          student_id: student.id,
+        },
+      },
+    });
+
+    // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
+    const monthlyAverages = await this.prismaService.$queryRaw`
+      SELECT
+        DATE_TRUNC('month', a.created_at) as month,
+        AVG(a.score) FILTER (WHERE r.student_id = ${student.id}) as student_avg_score,
+        AVG(a.score) as group_avg_score
+      FROM "Analysis" a
+      JOIN "Recording" r ON a.recording_id = r.id
+      JOIN "Student" s ON r.student_id = s.id
+      JOIN "EvaluationGroupReading" egr ON r.evaluation_group_reading_id = egr.id
+      JOIN "EvaluationGroup" eg ON egr.evaluation_group_id = eg.id
+      WHERE eg.id = ${evaluationGroup.id}
+      GROUP BY DATE_TRUNC('month', a.created_at)
+      ORDER BY month;
+    `;
+
     return {
-      assignments_completed: completedAssignmentsCount,
+      assignments_done: doneAssignmentsCount,
       assignments_pending: pendingAssignmentsCount,
       assignments_delayed: delayedAssignmentsCount,
+      average_score: averageScore._avg.score || 0,
       Assignments: assignments.map((a) => {
+        const lastRecording = a.Recordings.length
+          ? a.Recordings[a.Recordings.length - 1]
+          : null;
         return {
           id: a.id,
           reading_category: a.Reading.category,
@@ -267,14 +281,15 @@ export class EvaluationGroupsController {
           reading_id: a.Reading.id,
           reading_title: a.Reading.title,
           due_date: a.due_date,
-          status:
-            a.Recordings.length > 0
-              ? 'completed'
-              : a.due_date < new Date()
-              ? 'delayed'
-              : 'pending',
+          score: lastRecording ? lastRecording.Analysis.length : 0,
+          status: lastRecording
+            ? 'completed'
+            : a.due_date < new Date()
+            ? 'delayed'
+            : 'pending',
         };
       }),
+      monthly_averages: monthlyAverages,
     };
   }
 }
