@@ -220,6 +220,23 @@ export class EvaluationGroupsController {
         },
       });
 
+    const avgScore = await this.prismaService.recording.aggregate({
+      where: {
+        EvaluationGroupReading: {
+          evaluation_group_id: evaluationGroup.id,
+        },
+        student_id: student.id,
+          EvaluationGroupReading: {
+            evaluation_group_id: evaluationGroup.id,
+          },
+          student_id: student.id,
+        },
+      },
+      avg: {
+        score: true,
+      },
+    });
+
     const assignments =
       await this.prismaService.evaluationGroupReading.findMany({
         where: {
