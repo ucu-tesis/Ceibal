@@ -3,7 +3,6 @@ import { useMemo } from "react";
 
 const assignmentFilter =
   (query: string, sectionFilter?: string, chapterFilter?: string) =>
-  // TODO: Modify to use section and chapter titles instead of ids
   ({ readingTitle, readingCategory, readingSubcategory }: Assignment) =>
     readingTitle.toLowerCase().includes(query) &&
     (sectionFilter ? sectionFilter === `${readingCategory}` : true) &&
