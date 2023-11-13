@@ -98,7 +98,7 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
     ),
   }));
 
-const toAssignmentTableList = (assignments: Assignment[]) =>
+const toAssignmentTableList = (assignments: Assignment[], groupId: number) =>
   assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
     readingCategory,
     readingSubcategory,
@@ -107,7 +107,8 @@ const toAssignmentTableList = (assignments: Assignment[]) =>
     link: (
       <Link
         href={{
-          pathname: "", // TODO use evaluationGroupReadingId
+          pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+          query: {grupo: groupId, tarea: readingTitle}
         }}
       >
         Ver detalles
@@ -356,7 +357,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   ></Select>
                 </div>
               </div>
-              <ChakraTable columns={assignmentColumns} data={toAssignmentTableList(filteredAssignments)}></ChakraTable>
+              <ChakraTable columns={assignmentColumns} data={toAssignmentTableList(filteredAssignments, Number(groupId))}></ChakraTable>
             </TabPanel>
             <TabPanel>
               <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
