@@ -16,7 +16,6 @@
 
 .space {
   justify-content: space-between;
-  margin-right: 15%;
   margin-bottom: 64px;
 }
 
@@ -58,8 +57,8 @@
 }
 
 .canvas {
-  height: 300px;
-  width: 90%;
+  height: 400px;
+  width: 85%;
   gap: 64px;
   flex-wrap: wrap;
 }
@@ -83,7 +82,7 @@
 @media (max-width: 1200px) {
   .tablet-col {
     flex-direction: column;
-    align-items: center;
+    align-items: self-start;
   }
   .canvas {
     height: auto;

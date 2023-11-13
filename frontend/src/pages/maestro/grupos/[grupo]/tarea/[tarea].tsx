@@ -9,13 +9,12 @@ import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable"
 import Select from "@/components/selects/Select";
 import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import ProgressBar from "@/components/progress/ProgressBar";
-import styles from "./alumno.module.css";
+import styles from "./tarea.module.css";
 import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
 import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
-import DatePicker from "react-datepicker";
-import { Line, Bar, Radar } from "react-chartjs-2";
+import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 
 interface Params {
@@ -77,6 +76,24 @@ const dataRadar = {
   ],
 };
 
+const dataPie = {
+  labels: [
+    'Red',
+    'Blue',
+    'Yellow'
+  ],
+  datasets: [{
+    label: 'My First Dataset',
+    data: [300, 50, 100],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)'
+    ],
+    hoverOffset: 4
+  }]
+};
+
 const inputRegex = /\w|\d|\-|\s/;
 
 const defaultOption: Option = {
@@ -92,16 +109,10 @@ const taskList: Task[] = [
 
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
-  const student = router.query.alumno;
+  const assignment = router.query.tarea;
+  const readingCategory = router.query.readingCategory;
+  const readingSubcategory = router.query.readingSubCategory;
   const group = router.query.groupName;
-
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const onChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
 
   useChartJSInitializer();
 
@@ -127,8 +138,7 @@ export default function Page({ params }: { params: Params }) {
       link: (
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: { grupo: group, groupName: group, alumno: student, evaluacion: 1 },
+            pathname: "",
           }}
         >
           Ver detalles
@@ -139,7 +149,7 @@ export default function Page({ params }: { params: Params }) {
   return (
     <ChakraProvider>
       <Head>
-        <title>Resultado Evaluación</title>
+        <title>Resultado Tarea</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
@@ -156,11 +166,17 @@ export default function Page({ params }: { params: Params }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{student}</BreadcrumbLink>
+            <BreadcrumbLink href="#">{assignment}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>{student}</h1>
+        <h1 tabIndex={0}>Resultado de evaluación</h1>
+
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
+          <div className={`col ${styles.stats}`}>
+            <h5 tabIndex={0}>Lectura: {assignment}</h5>
+            <h5 tabIndex={0}>Categoría: {readingCategory}</h5>
+            <h5 tabIndex={0}>Subcategoría: {readingSubcategory}</h5>
+          </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
               <ProgressBar value="92" variant="small"></ProgressBar>
@@ -178,22 +194,12 @@ export default function Page({ params }: { params: Params }) {
               </div>
             </div>
           </div>
-          <div>
-            <DatePicker
-              selected={startDate}
-              onChange={onChange}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              inline
-            />
-          </div>
         </div>
-        <div className={`row ${styles.canvas}`}>
-          <Line data={dataLine} width={400}></Line>
-          <Radar data={dataRadar}></Radar>
+        <div className={`row ${styles.canvas} ${styles.space}`}>
+          <Radar width={600} data={dataRadar}></Radar>
+          <Pie width={600} data={dataPie}></Pie>
         </div>
-        <h2 tabIndex={0}>Tareas</h2>
+        <h2 tabIndex={0}>Alumnos</h2>
         <div className={`${styles.filters} row`}>
           <InputGroup>
             <Input
@@ -214,22 +220,12 @@ export default function Page({ params }: { params: Params }) {
             </InputRightAddon>
           </InputGroup>
           <div className="col">
-            <label>Categorías</label>
+            <label>Estado</label>
             <Select
               defaultValue={defaultOption}
               options={categoryOptions}
               onChange={(option) => {
                 setCategoryOption(option.value);
-              }}
-            ></Select>
-          </div>
-          <div className="col">
-            <label>Subcategorías</label>
-            <Select
-              defaultValue={defaultOption}
-              options={subcategoryOptions}
-              onChange={(option) => {
-                setSubcategoryOption(option.value);
               }}
             ></Select>
           </div>
