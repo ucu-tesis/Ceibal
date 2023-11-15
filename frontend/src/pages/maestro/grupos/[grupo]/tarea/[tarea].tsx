@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -7,15 +7,16 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import Select from "@/components/selects/Select";
-import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import ProgressBar from "@/components/progress/ProgressBar";
 import styles from "./tarea.module.css";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
+import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
 import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
+import { Reading } from "@/models/Reading";
+import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 
 interface Params {
   alumno: string;
@@ -23,26 +24,12 @@ interface Params {
   groupName: string;
 }
 
-interface Task {
-  category: string;
-  subcategory: string;
-  reading: string;
-}
-
-interface Evaluation {
-  studentName: string;
-  studentId: string;
-  email: string;
-  status: string;
-  dueDate: string;
-}
-
 type Option = {
   value?: string;
   label: string;
 };
 
-const evaluationColumns: ChakraTableColumn[] = [
+const readingColumns: ChakraTableColumn[] = [
   { label: "Nombre" },
   { label: "Documento" },
   { label: "Mail" },
@@ -70,64 +57,52 @@ const dataRadar = {
 };
 
 const dataPie = {
-  labels: [
-    'Red',
-    'Blue',
-    'Yellow'
+  labels: ["Pepe", "Tortuga", "Dormido"],
+  datasets: [
+    {
+      label: "My First Dataset",
+      data: [300, 50, 100],
+      backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
+      hoverOffset: 4,
+    },
   ],
-  datasets: [{
-    label: 'My First Dataset',
-    data: [300, 50, 100],
-    backgroundColor: [
-      'rgb(255, 99, 132)',
-      'rgb(54, 162, 235)',
-      'rgb(255, 205, 86)'
-    ],
-    hoverOffset: 4
-  }]
 };
 
 const inputRegex = /\w|\d|\-|\s/;
 
 const defaultOption: Option = {
-  label: "Todas",
+  label: "Todos",
   value: undefined,
 };
 
-const taskList: Task[] = [
-  { category: "6", subcategory: "4", reading: "Coco Bandini" },
-  { category: "5", subcategory: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
-  { category: "2", subcategory: "8", reading: "Diogenes" },
-];
-
-const evaluationList: Evaluation[] = [
+const readingList: Reading[] = [
   {
     studentName: "Ana García",
     studentId: "4866987-2",
     email: "agarcia@gmail.com",
     status: "Procesando",
-    dueDate: new Date().toISOString(),
+    dateSubmitted: new Date().toISOString(),
   },
   {
     studentName: "Pedro López",
     studentId: "4866987-2",
     email: "plopez@gmail.com",
     status: "Enviado",
-    dueDate: new Date().toISOString(),
+    dateSubmitted: new Date().toISOString(),
   },
   {
     studentName: "Luis Torres",
     studentId: "4866987-2",
     email: "ltorres@gmail.com",
     status: "Pendiente",
-    dueDate: new Date().toISOString(),
+    dateSubmitted: new Date().toISOString(),
   },
   {
     studentName: "Javier Alaves",
     studentId: "4866987-2",
     email: "jalaves@gmail.com",
     status: "Pendiente",
-    dueDate: new Date().toISOString(),
+    dateSubmitted: new Date().toISOString(),
   },
 ];
 
@@ -140,25 +115,26 @@ export default function Page({ params }: { params: Params }) {
 
   useChartJSInitializer();
 
-  const [taskSearchQuery, setTaskSearchQuery] = useState("");
-  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
-  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
+  const [readingSearchQuery, setReadingSearchQuery] = useState("");
+  const [statusOption, setStatusOption] = useState<string | undefined>(undefined);
 
-  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, categoryOption, subcategoryOption);
+  const { filteredReadings } = useFilteredEvaluations(readingList, readingSearchQuery, statusOption);
 
-  const categoryOptions: Option[] = [
-    ...taskList.map(({ category }) => ({ label: category, value: category })),
+  const statusOptions: Option[] = [
     defaultOption,
+    { label: "Procesando", value: "Procesando" },
+    { label: "Enviado", value: "Enviado" },
+    { label: "Pendiente", value: "Pendiente" },
   ];
 
-    const toTableListEvaluation = (evaluations: Evaluation[]) =>
-    evaluations.map((evaluation) => ({
-      ...evaluation,
+  const toTableListEvaluation = (readings: Reading[]) =>
+    readings.map((reading) => ({
+      ...reading,
       link: (
         <Link
           href={{
             pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: { grupo: group, groupName: group, alumno: evaluation.studentName, evaluacion: 1 },
+            query: { grupo: group, groupName: group, alumno: reading.studentName, evaluacion: 1 },
           }}
         >
           Ver detalles
@@ -196,6 +172,8 @@ export default function Page({ params }: { params: Params }) {
             <h5 tabIndex={0}>Lectura: {assignment}</h5>
             <h5 tabIndex={0}>Categoría: {readingCategory}</h5>
             <h5 tabIndex={0}>Subcategoría: {readingSubcategory}</h5>
+            <h5 tabIndex={0}>Fecha de Creación: 2023-05-19 09:15</h5>
+            <h5 tabIndex={0}>Fecha de Cierre: 2023-10-20 09:15</h5>
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
@@ -230,10 +208,10 @@ export default function Page({ params }: { params: Params }) {
                 }
               }}
               onChange={({ target: { value } }) => {
-                setTaskSearchQuery(value.toLowerCase());
+                setReadingSearchQuery(value.toLowerCase());
               }}
               maxLength={30}
-              placeholder="Lectura"
+              placeholder="Documento o nombre"
             />
             <InputRightAddon>
               <SearchIcon />
@@ -243,14 +221,14 @@ export default function Page({ params }: { params: Params }) {
             <label>Estado</label>
             <Select
               defaultValue={defaultOption}
-              options={categoryOptions}
+              options={statusOptions}
               onChange={(option) => {
-                setCategoryOption(option.value);
+                setStatusOption(option.value);
               }}
             ></Select>
           </div>
         </div>
-        <ChakraTable columns={evaluationColumns} data={toTableListEvaluation(evaluationList)}></ChakraTable>
+        <ChakraTable columns={readingColumns} data={toTableListEvaluation(filteredReadings)}></ChakraTable>
       </div>
     </ChakraProvider>
   );
