@@ -29,35 +29,28 @@ interface Task {
   reading: string;
 }
 
+interface Evaluation {
+  studentName: string;
+  studentId: string;
+  email: string;
+  status: string;
+  dueDate: string;
+}
+
 type Option = {
   value?: string;
   label: string;
 };
 
-const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
+const evaluationColumns: ChakraTableColumn[] = [
+  { label: "Nombre" },
+  { label: "Documento" },
+  { label: "Mail" },
+  { label: "Estado" },
+  { label: "Fecha Entrega" },
+];
 
-const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
-
-const dataLine = {
-  labels: months,
-  datasets: [
-    {
-      id: 1,
-      label: "Grupos",
-      data: [5, 6, 7, 4, 3, 5],
-      backgroundColor: "#B1A5FF",
-      borderColor: "#B1A5FF",
-    },
-    {
-      id: 2,
-      label: "Promedio",
-      data: [3, 2, 1, 4, 7, 3],
-      backgroundColor: "#FBE38E",
-      borderColor: "#FBE38E",
-    },
-  ],
-};
 
 const dataRadar = {
   labels: metrics,
@@ -107,6 +100,37 @@ const taskList: Task[] = [
   { category: "2", subcategory: "8", reading: "Diogenes" },
 ];
 
+const evaluationList: Evaluation[] = [
+  {
+    studentName: "Ana García",
+    studentId: "4866987-2",
+    email: "agarcia@gmail.com",
+    status: "Procesando",
+    dueDate: new Date().toISOString(),
+  },
+  {
+    studentName: "Pedro López",
+    studentId: "4866987-2",
+    email: "plopez@gmail.com",
+    status: "Enviado",
+    dueDate: new Date().toISOString(),
+  },
+  {
+    studentName: "Luis Torres",
+    studentId: "4866987-2",
+    email: "ltorres@gmail.com",
+    status: "Pendiente",
+    dueDate: new Date().toISOString(),
+  },
+  {
+    studentName: "Javier Alaves",
+    studentId: "4866987-2",
+    email: "jalaves@gmail.com",
+    status: "Pendiente",
+    dueDate: new Date().toISOString(),
+  },
+];
+
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
   const assignment = router.query.tarea;
@@ -127,18 +151,14 @@ export default function Page({ params }: { params: Params }) {
     defaultOption,
   ];
 
-  const subcategoryOptions: Option[] = [
-    ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
-    defaultOption,
-  ];
-
-  const toTableListTask = (tasks: Task[]) =>
-    tasks.map((task) => ({
-      ...task,
+    const toTableListEvaluation = (evaluations: Evaluation[]) =>
+    evaluations.map((evaluation) => ({
+      ...evaluation,
       link: (
         <Link
           href={{
-            pathname: "",
+            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
+            query: { grupo: group, groupName: group, alumno: evaluation.studentName, evaluacion: 1 },
           }}
         >
           Ver detalles
@@ -230,7 +250,7 @@ export default function Page({ params }: { params: Params }) {
             ></Select>
           </div>
         </div>
-        <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
+        <ChakraTable columns={evaluationColumns} data={toTableListEvaluation(evaluationList)}></ChakraTable>
       </div>
     </ChakraProvider>
   );

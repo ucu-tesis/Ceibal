@@ -15,7 +15,7 @@ import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../assets/images/lecturas_pendientes.svg";
 import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
 import DatePicker from "react-datepicker";
-import { Line, Bar, Radar } from "react-chartjs-2";
+import { Line, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 
 interface Params {
