@@ -143,4 +143,40 @@ export class StudentsController {
       assignments_pending: readings,
     };
   }
+  @Get('/readings/details/:readingId')
+  @UseGuards(StudentGuard)
+  async getReadingDetails(
+    @UserData('id') userId: number,
+    @Param('readingId') readingId: string,
+  ) {
+    const assignment =
+      await this.prismaService.evaluationGroupReading.findFirst({
+        where: {
+          reading_id: Number(readingId),
+          EvaluationGroup: {
+            Students: {
+              some: {
+                id: userId,
+              },
+            },
+          },
+        },
+        include: {
+          Reading: true,
+        },
+      });
+
+    if (!assignment) {
+      throw new UnprocessableEntityException('Reading not found/assigned');
+    }
+
+    return {
+      reading_id: assignment.Reading.id,
+      reading_title: assignment.Reading.title,
+      reading_content: assignment.Reading.content,
+      reading_category: assignment.Reading.category,
+      reading_subcategory: assignment.Reading.subcategory,
+      evaluation_group_reading_id: assignment.id,
+    };
+  }
 }
