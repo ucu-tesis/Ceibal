@@ -154,6 +154,8 @@ describe('EvaluationGroupsController', () => {
             reading_category: associatedReading1.category,
             reading_subcategory: associatedReading1.subcategory,
             due_date: evaluationGroupReading1.due_date,
+            done: 1,
+            pending: 1,
           },
           {
             evaluation_group_reading_id: evaluationGroupReading2.id,
@@ -162,6 +164,8 @@ describe('EvaluationGroupsController', () => {
             reading_category: associatedReading2.category,
             reading_subcategory: associatedReading2.subcategory,
             due_date: evaluationGroupReading2.due_date,
+            done: 0,
+            pending: 2,
           },
         ],
       });
