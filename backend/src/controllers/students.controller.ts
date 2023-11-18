@@ -1,28 +1,31 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UnprocessableEntityException,
+  UseGuards,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { UserService } from 'src/services/user.service';
 import { ReadingsResponse } from 'src/models/reading-response.model';
 import { PendingReadingsResponse } from 'src/models/pending-reading-response.model';
+import { UserData } from 'src/decorators/userData.decorator';
 
 @Controller('students')
 export class StudentsController {
-  constructor(
-    private prismaService: PrismaService,
-    private userService: UserService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   @Get('/readings/completed')
   @UseGuards(StudentGuard)
   async getCompletedReadings(
+    @UserData('id') userId: number,
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
   ): Promise<ReadingsResponse> {
-    const user = this.userService.get();
-
     const recordings = await this.prismaService.recording.findMany({
       where: {
-        student_id: user.id,
+        student_id: userId,
       },
       include: {
         Analysis: true,
@@ -41,7 +44,7 @@ export class StudentsController {
 
     const totalRecordings = await this.prismaService.recording.count({
       where: {
-        student_id: user.id,
+        student_id: userId,
       },
     });
 
@@ -68,15 +71,14 @@ export class StudentsController {
   @Get('/readings/pending')
   @UseGuards(StudentGuard)
   async getPendingReadings(
+    @UserData('id') userId: number,
     @Pagination() { page, pageSize }: { page: number; pageSize: number },
   ): Promise<PendingReadingsResponse> {
-    const user = this.userService.get();
-
     const where = {
       EvaluationGroup: {
         Students: {
           some: {
-            id: user.id,
+            id: userId,
           },
         },
       },
@@ -119,15 +121,15 @@ export class StudentsController {
 
   @Get('/readings/pending-amount')
   @UseGuards(StudentGuard)
-  async getPendingReadingsAmount(): Promise<{ assignments_pending: number }> {
-    const user = this.userService.get();
-
+  async getPendingReadingsAmount(
+    @UserData('id') userId: number,
+  ): Promise<{ assignments_pending: number }> {
     const readings = await this.prismaService.evaluationGroupReading.count({
       where: {
         EvaluationGroup: {
           Students: {
             some: {
-              id: user.id,
+              id: userId,
             },
           },
         },
@@ -139,6 +141,42 @@ export class StudentsController {
 
     return {
       assignments_pending: readings,
+    };
+  }
+  @Get('/readings/details/:readingId')
+  @UseGuards(StudentGuard)
+  async getReadingDetails(
+    @UserData('id') userId: number,
+    @Param('readingId') readingId: string,
+  ) {
+    const assignment =
+      await this.prismaService.evaluationGroupReading.findFirst({
+        where: {
+          reading_id: Number(readingId),
+          EvaluationGroup: {
+            Students: {
+              some: {
+                id: userId,
+              },
+            },
+          },
+        },
+        include: {
+          Reading: true,
+        },
+      });
+
+    if (!assignment) {
+      throw new UnprocessableEntityException('Reading not found/assigned');
+    }
+
+    return {
+      reading_id: assignment.Reading.id,
+      reading_title: assignment.Reading.title,
+      reading_content: assignment.Reading.content,
+      reading_category: assignment.Reading.category,
+      reading_subcategory: assignment.Reading.subcategory,
+      evaluation_group_reading_id: assignment.id,
     };
   }
 }
