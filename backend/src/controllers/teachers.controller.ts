@@ -8,7 +8,10 @@ import { RecordingDetailResponse } from 'src/models/recording-detail-response.mo
 
 @Controller('teachers')
 export class TeachersController {
-  constructor(private prismaService: PrismaService, private userService: UserService) { }
+  constructor(
+    private prismaService: PrismaService,
+    private userService: UserService,
+  ) {}
 
   @Get('/')
   @UseGuards(TeacherGuard)
@@ -29,9 +32,7 @@ export class TeachersController {
 
   @Get('/recordings/:id')
   @UseGuards(TeacherGuard)
-  async getAnalysis(
-    @Param('id') id: String,
-  ): Promise<RecordingDetailResponse> {
+  async getAnalysis(@Param('id') id: string): Promise<RecordingDetailResponse> {
     const user = this.userService.get();
     const recording = await this.prismaService.recording.findFirstOrThrow({
       where: {
@@ -63,7 +64,7 @@ export class TeachersController {
       subcategory: recording.EvaluationGroupReading.Reading.subcategory,
       metrics: {
         // TODO: No definido aun.
-      }
-    }
+      },
+    };
   }
 }

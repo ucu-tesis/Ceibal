@@ -9,5 +9,5 @@ export class RecordingDetailResponse {
   subcategory: string;
   metrics: {
     // TODO: No definido aun.
-  }
+  };
 }

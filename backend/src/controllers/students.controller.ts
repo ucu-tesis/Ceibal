@@ -8,7 +8,6 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
-import { UserService } from 'src/services/user.service';
 import { ReadingsResponse } from 'src/models/reading-response.model';
 import { PendingReadingsResponse } from 'src/models/pending-reading-response.model';
 import { UserData } from 'src/decorators/userData.decorator';
@@ -16,6 +15,54 @@ import { UserData } from 'src/decorators/userData.decorator';
 @Controller('students')
 export class StudentsController {
   constructor(private prismaService: PrismaService) {}
+
+  @Get('/readings/all')
+  @UseGuards(StudentGuard)
+  async getCategorizedReadings(@UserData('id') userId: number) {
+    const student = await this.prismaService.student.findUnique({
+      where: { id: userId },
+      include: {
+        EvaluationGroups: { include: { EvaluationGroupReadings: true } },
+      },
+    });
+    const assignedReadings = student.EvaluationGroups.flatMap((eg) =>
+      eg.EvaluationGroupReadings.map((egr) => egr.reading_id),
+    );
+    const allReadings = await this.prismaService.reading.findMany({
+      where: {
+        OR: [
+          { is_public: true },
+          { id: { in: [...new Set(assignedReadings)] } },
+        ],
+      },
+    });
+
+    const categories: Array<{
+      category: string;
+      subcategories: Array<{
+        subcategory: string;
+        readings: Array<{ reading_id: number; title: string }>;
+      }>;
+    }> = [];
+
+    allReadings.forEach((r) => {
+      let category = categories.find((c) => c.category == r.category);
+      if (!category) {
+        category = { category: r.category, subcategories: [] };
+        categories.push(category);
+      }
+      let subcategory = category.subcategories.find(
+        (sc) => sc.subcategory == r.subcategory,
+      );
+      if (!subcategory) {
+        subcategory = { subcategory: r.subcategory, readings: [] };
+        category.subcategories.push(subcategory);
+      }
+      subcategory.readings.push({ reading_id: r.id, title: r.title });
+    });
+
+    return categories;
+  }
 
   @Get('/readings/completed')
   @UseGuards(StudentGuard)
