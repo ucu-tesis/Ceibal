@@ -1,0 +1,26 @@
+.reading-info-container {
+  align-self: flex-start;
+}
+
+.title {
+  font-size: 32px;
+  margin: 0px 0px 16px 0px;
+}
+
+.subtitle {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0px 0px 16px 0px;
+}
+
+@media (max-width: 500px) {
+  .title {
+    font-size: 24px;
+    margin: 0px 0px 8px 0px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    margin: 0px 0px 8px 0px;
+  }
+}
