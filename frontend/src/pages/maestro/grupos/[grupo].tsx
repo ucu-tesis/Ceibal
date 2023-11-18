@@ -55,6 +55,7 @@ interface Task {
   reading: string;
 }
 import styles from "./grupos.module.css";
+import { dateFormats } from "@/constants/constants";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -103,7 +104,7 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
     readingCategory,
     readingSubcategory,
     readingTitle,
-    dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
+    dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
     link: (
       <Link
         href={{

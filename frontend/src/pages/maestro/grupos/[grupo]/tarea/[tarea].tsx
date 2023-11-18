@@ -8,6 +8,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRig
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import Select from "@/components/selects/Select";
 import ProgressBar from "@/components/progress/ProgressBar";
+import dayjs from "dayjs";
 import styles from "./tarea.module.css";
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
@@ -15,13 +16,15 @@ import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.s
 import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
 import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
-import { Reading } from "@/models/Reading";
+import { AssignmentReading } from "@/models/AssignmentReading";
+import { dateFormats } from "@/constants/constants";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 
 interface Params {
   alumno: string;
   grupo: number;
   groupName: string;
+  tarea: number;
 }
 
 type Option = {
@@ -34,7 +37,7 @@ const readingColumns: ChakraTableColumn[] = [
   { label: "Documento" },
   { label: "Mail" },
   { label: "Estado" },
-  { label: "Fecha Entrega" },
+  { label: "Fecha de Entrega" },
 ];
 
 const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
@@ -75,34 +78,34 @@ const defaultOption: Option = {
   value: undefined,
 };
 
-const readingList: Reading[] = [
+const readingList: AssignmentReading[] = [
   {
     studentName: "Ana García",
     studentId: "4866987-2",
     email: "agarcia@gmail.com",
     status: "Procesando",
-    dateSubmitted: new Date().toISOString(),
+    dateSubmitted: new Date(),
   },
   {
     studentName: "Pedro López",
     studentId: "4866987-2",
     email: "plopez@gmail.com",
     status: "Enviado",
-    dateSubmitted: new Date().toISOString(),
+    dateSubmitted: new Date(),
   },
   {
     studentName: "Luis Torres",
     studentId: "4866987-2",
     email: "ltorres@gmail.com",
     status: "Pendiente",
-    dateSubmitted: new Date().toISOString(),
+    dateSubmitted: new Date(),
   },
   {
     studentName: "Javier Alaves",
     studentId: "4866987-2",
     email: "jalaves@gmail.com",
     status: "Pendiente",
-    dateSubmitted: new Date().toISOString(),
+    dateSubmitted: new Date(),
   },
 ];
 
@@ -127,9 +130,10 @@ export default function Page({ params }: { params: Params }) {
     { label: "Pendiente", value: "Pendiente" },
   ];
 
-  const toTableListEvaluation = (readings: Reading[]) =>
+  const toTableListEvaluation = (readings: AssignmentReading[]) =>
     readings.map((reading) => ({
       ...reading,
+      dateSubmitted: dayjs(reading.dateSubmitted).format(dateFormats.assignmentDueDate),
       link: (
         <Link
           href={{
