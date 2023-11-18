@@ -106,3 +106,5 @@ dist
 .torchcache
 
 .DS_Store
+
+.idea/

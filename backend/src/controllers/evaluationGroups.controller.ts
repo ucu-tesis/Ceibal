@@ -148,4 +148,150 @@ export class EvaluationGroupsController {
     });
     return assignment;
   }
+
+  @Get('/:evaluationGroupId/students/:studentId')
+  @UseGuards(TeacherGuard)
+  async getStudent(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Param('studentId') studentId: string,
+  ) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
+      where: {
+        id: Number(evaluationGroupId),
+        teacher_id: userId,
+      },
+    });
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+
+    const student = await this.prismaService.student.findFirst({
+      where: {
+        id: Number(studentId),
+        EvaluationGroups: {
+          some: {
+            id: evaluationGroup.id,
+          },
+        },
+      },
+    });
+    if (!student) {
+      throw new UnprocessableEntityException('Student not found');
+    }
+
+    const doneAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          Recordings: {
+            some: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const pendingAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            gt: new Date(),
+          },
+          Recordings: {
+            none: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const delayedAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            lt: new Date(),
+          },
+          Recordings: {
+            none: {
+              student_id: student.id,
+            },
+          },
+        },
+      });
+
+    const assignments =
+      await this.prismaService.evaluationGroupReading.findMany({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+        },
+        include: {
+          Reading: true,
+          Recordings: {
+            where: {
+              student_id: student.id,
+            },
+            include: {
+              Analysis: true,
+            },
+          },
+        },
+      });
+
+    const averageScore = await this.prismaService.analysis.aggregate({
+      _avg: {
+        score: true,
+      },
+      where: {
+        Recording: {
+          student_id: student.id,
+        },
+      },
+    });
+
+    // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
+    const monthlyAverages = await this.prismaService.$queryRaw`
+      SELECT
+        DATE_TRUNC('month', a.created_at) as month,
+        AVG(a.score) FILTER (WHERE r.student_id = ${student.id}) as student_avg_score,
+        AVG(a.score) as group_avg_score
+      FROM "Analysis" a
+      JOIN "Recording" r ON a.recording_id = r.id
+      JOIN "Student" s ON r.student_id = s.id
+      JOIN "EvaluationGroupReading" egr ON r.evaluation_group_reading_id = egr.id
+      JOIN "EvaluationGroup" eg ON egr.evaluation_group_id = eg.id
+      WHERE eg.id = ${evaluationGroup.id}
+      GROUP BY DATE_TRUNC('month', a.created_at)
+      ORDER BY month;
+    `;
+
+    return {
+      assignments_done: doneAssignmentsCount,
+      assignments_pending: pendingAssignmentsCount,
+      assignments_delayed: delayedAssignmentsCount,
+      average_score: averageScore._avg.score || 0,
+      Assignments: assignments.map((a) => {
+        const lastRecording = a.Recordings.length
+          ? a.Recordings[a.Recordings.length - 1]
+          : null;
+        return {
+          id: a.id,
+          reading_category: a.Reading.category,
+          reading_subcategory: a.Reading.subcategory,
+          reading_id: a.Reading.id,
+          reading_title: a.Reading.title,
+          due_date: a.due_date,
+          score: lastRecording ? lastRecording.Analysis.length : 0,
+          status: lastRecording
+            ? 'completed'
+            : a.due_date < new Date()
+            ? 'delayed'
+            : 'pending',
+        };
+      }),
+      monthly_averages: monthlyAverages,
+    };
+  }
 }
