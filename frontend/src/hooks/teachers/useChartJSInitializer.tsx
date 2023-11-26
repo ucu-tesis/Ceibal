@@ -2,6 +2,7 @@ import {
   Chart as ChartJS,
   LineElement,
   PointElement,
+  PieController,
   RadarController,
   RadialLinearScale,
   LinearScale,
@@ -9,6 +10,7 @@ import {
   CategoryScale,
   Legend,
   BarElement,
+  ArcElement
 } from "chart.js";
 
 const useChartJSInitializer = () => {
@@ -21,7 +23,9 @@ const useChartJSInitializer = () => {
     Legend,
     BarElement,
     RadarController,
-    RadialLinearScale
+    RadialLinearScale,
+    PieController,
+    ArcElement
   );
 };
 

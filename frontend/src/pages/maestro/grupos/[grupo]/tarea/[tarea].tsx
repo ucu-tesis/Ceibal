@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -7,27 +7,24 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import Select from "@/components/selects/Select";
-import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
 import ProgressBar from "@/components/progress/ProgressBar";
-import styles from "./alumno.module.css";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
-import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
-import PendingTasksIcon from "../../../../assets/images/lecturas_pendientes.svg";
-import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
-import DatePicker from "react-datepicker";
-import { Line, Radar } from "react-chartjs-2";
+import dayjs from "dayjs";
+import styles from "./tarea.module.css";
+import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
+import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
+import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
+import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
+import { AssignmentReading } from "@/models/AssignmentReading";
+import { dateFormats } from "@/constants/constants";
+import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 
 interface Params {
   alumno: string;
   grupo: number;
   groupName: string;
-}
-
-interface Task {
-  category: string;
-  subcategory: string;
-  reading: string;
+  tarea: number;
 }
 
 type Option = {
@@ -35,30 +32,15 @@ type Option = {
   label: string;
 };
 
-const taskColumns: ChakraTableColumn[] = [{ label: "Sección" }, { label: "Capítulo" }, { label: "Lectura" }];
+const readingColumns: ChakraTableColumn[] = [
+  { label: "Nombre" },
+  { label: "Documento" },
+  { label: "Mail" },
+  { label: "Estado" },
+  { label: "Fecha de Entrega" },
+];
 
-const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
-
-const dataLine = {
-  labels: months,
-  datasets: [
-    {
-      id: 1,
-      label: "Grupos",
-      data: [5, 6, 7, 4, 3, 5],
-      backgroundColor: "#B1A5FF",
-      borderColor: "#B1A5FF",
-    },
-    {
-      id: 2,
-      label: "Promedio",
-      data: [3, 2, 1, 4, 7, 3],
-      backgroundColor: "#FBE38E",
-      borderColor: "#FBE38E",
-    },
-  ],
-};
 
 const dataRadar = {
   labels: metrics,
@@ -77,58 +59,86 @@ const dataRadar = {
   ],
 };
 
+const dataPie = {
+  labels: ["Pepe", "Tortuga", "Dormido"],
+  datasets: [
+    {
+      label: "My First Dataset",
+      data: [300, 50, 100],
+      backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
+      hoverOffset: 4,
+    },
+  ],
+};
+
 const inputRegex = /\w|\d|\-|\s/;
 
 const defaultOption: Option = {
-  label: "Todas",
+  label: "Todos",
   value: undefined,
 };
 
-const taskList: Task[] = [
-  { category: "6", subcategory: "4", reading: "Coco Bandini" },
-  { category: "5", subcategory: "5", reading: "Los fantasmas de la escuela pasaron de clase!" },
-  { category: "2", subcategory: "8", reading: "Diogenes" },
+const readingList: AssignmentReading[] = [
+  {
+    studentName: "Ana García",
+    studentId: "4866987-2",
+    email: "agarcia@gmail.com",
+    status: "Procesando",
+    dateSubmitted: new Date(),
+  },
+  {
+    studentName: "Pedro López",
+    studentId: "4866987-2",
+    email: "plopez@gmail.com",
+    status: "Enviado",
+    dateSubmitted: new Date(),
+  },
+  {
+    studentName: "Luis Torres",
+    studentId: "4866987-2",
+    email: "ltorres@gmail.com",
+    status: "Pendiente",
+    dateSubmitted: new Date(),
+  },
+  {
+    studentName: "Javier Alaves",
+    studentId: "4866987-2",
+    email: "jalaves@gmail.com",
+    status: "Pendiente",
+    dateSubmitted: new Date(),
+  },
 ];
 
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
-  const student = router.query.alumno;
+  const assignment = router.query.tarea;
+  const readingCategory = router.query.readingCategory;
+  const readingSubcategory = router.query.readingSubCategory;
   const group = router.query.groupName;
-
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const onChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
 
   useChartJSInitializer();
 
-  const [taskSearchQuery, setTaskSearchQuery] = useState("");
-  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
-  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
+  const [readingSearchQuery, setReadingSearchQuery] = useState("");
+  const [statusOption, setStatusOption] = useState<string | undefined>(undefined);
 
-  const { filteredTasks } = useFilteredTasks(taskList, taskSearchQuery, categoryOption, subcategoryOption);
+  const { filteredReadings } = useFilteredEvaluations(readingList, readingSearchQuery, statusOption);
 
-  const categoryOptions: Option[] = [
-    ...taskList.map(({ category }) => ({ label: category, value: category })),
+  const statusOptions: Option[] = [
     defaultOption,
+    { label: "Procesando", value: "Procesando" },
+    { label: "Enviado", value: "Enviado" },
+    { label: "Pendiente", value: "Pendiente" },
   ];
 
-  const subcategoryOptions: Option[] = [
-    ...taskList.map(({ subcategory }) => ({ label: subcategory, value: subcategory })),
-    defaultOption,
-  ];
-
-  const toTableListTask = (tasks: Task[]) =>
-    tasks.map((task) => ({
-      ...task,
+  const toTableListEvaluation = (readings: AssignmentReading[]) =>
+    readings.map((reading) => ({
+      ...reading,
+      dateSubmitted: dayjs(reading.dateSubmitted).format(dateFormats.assignmentDueDate),
       link: (
         <Link
           href={{
             pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: { grupo: group, groupName: group, alumno: student, evaluacion: 1 },
+            query: { grupo: group, groupName: group, alumno: reading.studentName, evaluacion: 1 },
           }}
         >
           Ver detalles
@@ -139,7 +149,7 @@ export default function Page({ params }: { params: Params }) {
   return (
     <ChakraProvider>
       <Head>
-        <title>Resultado Evaluación</title>
+        <title>Resultado Tarea</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
@@ -156,11 +166,19 @@ export default function Page({ params }: { params: Params }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{student}</BreadcrumbLink>
+            <BreadcrumbLink href="#">{assignment}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>{student}</h1>
+        <h1 tabIndex={0}>Resultado de evaluación</h1>
+
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
+          <div className={`col ${styles.stats}`}>
+            <h5 tabIndex={0}>Lectura: {assignment}</h5>
+            <h5 tabIndex={0}>Categoría: {readingCategory}</h5>
+            <h5 tabIndex={0}>Subcategoría: {readingSubcategory}</h5>
+            <h5 tabIndex={0}>Fecha de Creación: 2023-05-19 09:15</h5>
+            <h5 tabIndex={0}>Fecha de Cierre: 2023-10-20 09:15</h5>
+          </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
               <ProgressBar value="92" variant="small"></ProgressBar>
@@ -178,22 +196,12 @@ export default function Page({ params }: { params: Params }) {
               </div>
             </div>
           </div>
-          <div>
-            <DatePicker
-              selected={startDate}
-              onChange={onChange}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              inline
-            />
-          </div>
         </div>
-        <div className={`row ${styles.canvas}`}>
-          <Line data={dataLine} width={400}></Line>
-          <Radar data={dataRadar}></Radar>
+        <div className={`row ${styles.canvas} ${styles.space}`}>
+          <Radar width={600} data={dataRadar}></Radar>
+          <Pie width={600} data={dataPie}></Pie>
         </div>
-        <h2 tabIndex={0}>Tareas</h2>
+        <h2 tabIndex={0}>Alumnos</h2>
         <div className={`${styles.filters} row`}>
           <InputGroup>
             <Input
@@ -204,37 +212,27 @@ export default function Page({ params }: { params: Params }) {
                 }
               }}
               onChange={({ target: { value } }) => {
-                setTaskSearchQuery(value.toLowerCase());
+                setReadingSearchQuery(value.toLowerCase());
               }}
               maxLength={30}
-              placeholder="Lectura"
+              placeholder="Documento o nombre"
             />
             <InputRightAddon>
               <SearchIcon />
             </InputRightAddon>
           </InputGroup>
           <div className="col">
-            <label>Categorías</label>
+            <label>Estado</label>
             <Select
               defaultValue={defaultOption}
-              options={categoryOptions}
+              options={statusOptions}
               onChange={(option) => {
-                setCategoryOption(option.value);
-              }}
-            ></Select>
-          </div>
-          <div className="col">
-            <label>Subcategorías</label>
-            <Select
-              defaultValue={defaultOption}
-              options={subcategoryOptions}
-              onChange={(option) => {
-                setSubcategoryOption(option.value);
+                setStatusOption(option.value);
               }}
             ></Select>
           </div>
         </div>
-        <ChakraTable columns={taskColumns} data={toTableListTask(filteredTasks)}></ChakraTable>
+        <ChakraTable columns={readingColumns} data={toTableListEvaluation(filteredReadings)}></ChakraTable>
       </div>
     </ChakraProvider>
   );

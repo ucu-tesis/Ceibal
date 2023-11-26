@@ -49,6 +49,7 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
+import { dateFormats } from "@/constants/constants";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -100,30 +101,23 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
     })
   );
 
-const toAssignmentTableList = (assignments: Assignment[]) =>
-  assignments.map(
-    ({
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-      dueDate,
-      evaluationGroupReadingId,
-    }) => ({
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-      dueDate: dayjs(dueDate).format("YYYY-MM-DD HH:mm"),
-      link: (
-        <Link
-          href={{
-            pathname: "", // TODO use evaluationGroupReadingId
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    })
-  );
+const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
+    readingCategory,
+    readingSubcategory,
+    readingTitle,
+    dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
+    link: (
+      <Link
+        href={{
+          pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+          query: {grupo: groupId, tarea: readingTitle, groupName, readingCategory, readingSubcategory}
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
 // TODO update to use fetch readings endpoint
 const toTableListModal = (assignments: Assignment[]) =>
@@ -355,10 +349,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   ></Select>
                 </div>
               </div>
-              <ChakraTable
-                columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments)}
-              ></ChakraTable>
+              <ChakraTable columns={assignmentColumns} data={toAssignmentTableList(filteredAssignments, Number(groupId), groupName)}></ChakraTable>
             </TabPanel>
             <TabPanel>
               <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
