@@ -51,12 +51,6 @@ import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
 import { dateFormats } from "@/constants/constants";
 
-interface Task {
-  category: string;
-  subcategory: string;
-  reading: string;
-}
-
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
   { label: "Documento" },
@@ -140,11 +134,6 @@ const toTableListModal = (assignments: Assignment[]) =>
       readingTitle,
     })
   );
-
-type Option = {
-  value?: string;
-  label: string;
-};
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 

@@ -1,17 +1,23 @@
-import React, { useState, useRef } from "react";
-import Head from "next/head";
 import Recorder from "@/components/Recorder";
-import Image from "next/image";
 import PrimaryButton from "@/components/buttons/PrimaryButton";
 import SecondaryButton from "@/components/buttons/SecondaryButton";
-import SendIcon from "../../../assets/images/send_icon.svg";
 import TextContainer from "@/components/containers/TextContainer";
-import Spinner from "@/components/spinners/Spinner";
 import ModalDialog from "@/components/modals/ModalDialog";
 import ProgressBar from "@/components/progress/ProgressBar";
+import Spinner from "@/components/spinners/Spinner";
 import useFileUpload from "@/hooks/students/useFileUpload";
+import { ReadingDetails } from "@/models/ReadingDetails";
+import Head from "next/head";
+import Image from "next/image";
+import React, { useRef, useState } from "react";
+import SendIcon from "../../assets/images/send_icon.svg";
+import styles from "./RecordScreen.module.css";
 
-export default function RecordScreen() {
+export interface RecordScreenProps {
+  readingDetails: ReadingDetails;
+}
+
+const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const [sendActive, setSendActive] = useState(false);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [bufferSource, setBufferSource] =
@@ -183,7 +189,22 @@ export default function RecordScreen() {
               </SecondaryButton>
             </ModalDialog>
           )}
-          <TextContainer />
+          <div className={`${styles["reading-info-container"]}`}>
+            {readingDetails.title && (
+              <h1 className={styles.title}>{readingDetails.title}</h1>
+            )}
+            {readingDetails.category && (
+              <h2 className={styles.subtitle}>
+                Categoría: {readingDetails.category}
+              </h2>
+            )}
+            {readingDetails.subcategory && (
+              <h2 className={styles.subtitle}>
+                Subcategoría: {readingDetails.subcategory}
+              </h2>
+            )}
+          </div>
+          <TextContainer content={readingDetails.content} />
           {!isLoading ? (
             <>
               <Recorder
@@ -203,9 +224,7 @@ export default function RecordScreen() {
                   <div>
                     <Image src={SendIcon} alt=""></Image>
                   </div>
-                  <div>
-                    Enviar
-                  </div>
+                  <div>Enviar</div>
                 </PrimaryButton>
               )}
             </>
@@ -216,4 +235,6 @@ export default function RecordScreen() {
       </main>
     </>
   );
-}
+};
+
+export default RecordScreen;
