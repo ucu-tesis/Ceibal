@@ -294,4 +294,46 @@ export class EvaluationGroupsController {
       monthly_averages: monthlyAverages,
     };
   }
+
+  @Get('/:evaluationGroupId/assignments/:evaluationGroupReadingId')
+  @UseGuards(TeacherGuard)
+  async getAssignment(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
+  ) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
+      where: {
+        id: Number(evaluationGroupId),
+        teacher_id: userId,
+      },
+    });
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+
+    const evaluationGroupReading =
+      await this.prismaService.evaluationGroupReading.findFirst({
+        where: {
+          id: Number(evaluationGroupReadingId),
+          evaluation_group_id: Number(evaluationGroupId),
+        },
+      });
+    if (!evaluationGroupReading) {
+      throw new UnprocessableEntityException(
+        'Evaluation group reading not found',
+      );
+    }
+    const averageScore = await this.prismaService.analysis.aggregate({
+      _avg: {
+        score: true,
+      },
+      where: {
+        Recording: {
+          evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        },
+      },
+    });
+    return { average_score: averageScore._avg.score || 0 };
+  }
 }
