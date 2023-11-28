@@ -390,11 +390,37 @@ export class EvaluationGroupsController {
       },
     });
 
+    const averageErrors = await this.prismaService.analysis.aggregate({
+      _avg: {
+        silences_count: true,
+        repetitions_count: true,
+        allosaurus_general_error: true,
+      },
+      where: {
+        Recording: {
+          evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        },
+      },
+    });
+
+    const {
+      Reading: { title, category, subcategory },
+      due_date,
+      created_at,
+    } = evaluationGroupReading;
+
+    const { allosaurus_general_error, repetitions_count, silences_count } =
+      averageErrors._avg;
+
     return {
       assignment: {
-        dueDate: evaluationGroupReading.due_date,
-        createdAt: evaluationGroupReading.created_at,
-        reading: evaluationGroupReading.Reading,
+        due_date,
+        created_at,
+        reading: {
+          title,
+          category,
+          subcategory,
+        },
       },
       assignments_done: doneAssignmentsCount,
       assignments_pending: pendingAssignmentsCount,
@@ -412,6 +438,11 @@ export class EvaluationGroupsController {
           dateSubmitted: created_at,
         };
       }),
+      average_errors: {
+        repetitions_count,
+        silences_count,
+        general_errors: allosaurus_general_error,
+      },
     };
   }
 }
