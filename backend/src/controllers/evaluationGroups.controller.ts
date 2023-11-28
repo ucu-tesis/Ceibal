@@ -318,6 +318,9 @@ export class EvaluationGroupsController {
           id: Number(evaluationGroupReadingId),
           evaluation_group_id: Number(evaluationGroupId),
         },
+        include: {
+          Reading: true,
+        },
       });
     if (!evaluationGroupReading) {
       throw new UnprocessableEntityException(
@@ -334,6 +337,81 @@ export class EvaluationGroupsController {
         },
       },
     });
-    return { average_score: averageScore._avg.score || 0 };
+
+    const doneAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          Recordings: {
+            some: {
+              evaluation_group_reading_id: Number(evaluationGroupReadingId),
+            },
+          },
+        },
+      });
+
+    const pendingAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            gt: new Date(),
+          },
+          Recordings: {
+            none: {
+              evaluation_group_reading_id: Number(evaluationGroupReadingId),
+            },
+          },
+        },
+      });
+
+    const delayedAssignmentsCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            lt: new Date(),
+          },
+          Recordings: {
+            none: {
+              evaluation_group_reading_id: Number(evaluationGroupReadingId),
+            },
+          },
+        },
+      });
+
+    const doneRecordings = await this.prismaService.recording.findMany({
+      where: {
+        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+      },
+      include: {
+        Student: true,
+        Analysis: true,
+      },
+    });
+
+    return {
+      assignment: {
+        dueDate: evaluationGroupReading.due_date,
+        createdAt: evaluationGroupReading.created_at,
+        reading: evaluationGroupReading.Reading,
+      },
+      assignments_done: doneAssignmentsCount,
+      assignments_pending: pendingAssignmentsCount,
+      assignments_delayed: delayedAssignmentsCount,
+      average_score: averageScore._avg.score || 0,
+      recordings: doneRecordings.map(({ Student, Analysis, created_at }) => {
+        const lastRecording = Analysis.length
+          ? Analysis[Analysis.length - 1]
+          : null;
+        return {
+          studentName: `${Student.first_name} ${Student.last_name}`,
+          studentId: Student.cedula,
+          email: Student.email,
+          status: lastRecording.status,
+          dateSubmitted: created_at,
+        };
+      }),
+    };
   }
 }
