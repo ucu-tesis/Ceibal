@@ -48,4 +48,97 @@ describe('RecordingsController', () => {
       });
     });
   });
+
+  describe('getCategorizedReadings', () => {
+    it('returns all available readings, grouped by category then by subcategory', async () => {
+      const student = await TestFactory.createStudent({});
+      const evaluationGroup = await TestFactory.createEvaluationGroup({});
+      await prismaService.student.update({
+        where: { id: student.id },
+        data: { EvaluationGroups: { connect: { id: evaluationGroup.id } } },
+      });
+
+      const reading1 = await TestFactory.createReading({
+        category: 'category1',
+        subcategory: 'subcategory1',
+      });
+      const reading2 = await TestFactory.createReading({
+        category: 'category1',
+        subcategory: 'subcategory1',
+      });
+      const reading3 = await TestFactory.createReading({
+        category: 'category1',
+        subcategory: 'subcategory2',
+      });
+      const reading4 = await TestFactory.createReading({
+        category: 'category2',
+        subcategory: 'subcategory1',
+      });
+      const readingWithNoSubcategory = await TestFactory.createReading({
+        category: 'category2',
+        subcategory: null,
+      });
+      const privateAssignedReading = await TestFactory.createReading({
+        category: 'category2',
+        subcategory: 'subcategory1',
+        is_public: false,
+      });
+      await TestFactory.createEvaluationGroupReading({
+        readingId: privateAssignedReading.id,
+        evaluationGroupId: evaluationGroup.id,
+      });
+      // This reading should not be visible because its not public nor assigned
+      await TestFactory.createReading({
+        category: 'category2',
+        subcategory: 'subcategory1',
+        is_public: false,
+      });
+
+      expect(await controller.getCategorizedReadings(student.id)).toEqual([
+        {
+          category: 'category1',
+          subcategories: [
+            {
+              subcategory: 'subcategory1',
+              readings: [
+                {
+                  reading_id: reading1.id,
+                  title: reading1.title,
+                },
+                { reading_id: reading2.id, title: reading2.title },
+              ],
+            },
+            {
+              subcategory: 'subcategory2',
+              readings: [{ reading_id: reading3.id, title: reading3.title }],
+            },
+          ],
+        },
+        {
+          category: 'category2',
+          subcategories: [
+            {
+              subcategory: 'subcategory1',
+              readings: [
+                { reading_id: reading4.id, title: reading4.title },
+                {
+                  reading_id: privateAssignedReading.id,
+                  title: privateAssignedReading.title,
+                },
+              ],
+            },
+            {
+              subcategory: null,
+              readings: [
+                {
+                  reading_id: readingWithNoSubcategory.id,
+                  title: readingWithNoSubcategory.title,
+                },
+              ],
+            },
+          ],
+        },
+      ]);
+    });
+  });
 });
