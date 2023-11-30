@@ -406,7 +406,7 @@ export class EvaluationGroupsController {
     const mostRepeatedWords = await this.prismaService.$queryRaw`
       SELECT word, COUNT(*)::integer AS repetition_count
       FROM (
-        SELECT unnest(words_with_errors) AS word
+        SELECT unnest(words_with_repetitions) AS word
         FROM "Analysis" analysis
 	      JOIN "Recording" recording ON analysis.recording_id = recording.id
 	      AND recording.evaluation_group_reading_id = ${evaluationGroupReading.id}
