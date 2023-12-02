@@ -338,43 +338,22 @@ export class EvaluationGroupsController {
       },
     });
 
-    const doneAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
+    const doneAssignmentsCount = await this.prismaService.recording.count({
+      where: {
+        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+      },
+    });
+
+    const allEvaluationGroupReadingStudents =
+      await this.prismaService.student.count({
         where: {
-          evaluation_group_id: evaluationGroup.id,
-          Recordings: {
+          EvaluationGroups: {
             some: {
-              evaluation_group_reading_id: Number(evaluationGroupReadingId),
-            },
-          },
-        },
-      });
-
-    const pendingAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            gt: new Date(),
-          },
-          Recordings: {
-            none: {
-              evaluation_group_reading_id: Number(evaluationGroupReadingId),
-            },
-          },
-        },
-      });
-
-    const delayedAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            lt: new Date(),
-          },
-          Recordings: {
-            none: {
-              evaluation_group_reading_id: Number(evaluationGroupReadingId),
+              EvaluationGroupReadings: {
+                some: {
+                  id: Number(evaluationGroupReadingId),
+                },
+              },
             },
           },
         },
@@ -394,7 +373,7 @@ export class EvaluationGroupsController {
       _avg: {
         silences_count: true,
         repetitions_count: true,
-        allosaurus_general_error: true,
+        similarity_error: true,
       },
       where: {
         Recording: {
@@ -422,8 +401,11 @@ export class EvaluationGroupsController {
       created_at,
     } = evaluationGroupReading;
 
-    const { allosaurus_general_error, repetitions_count, silences_count } =
+    const { similarity_error, repetitions_count, silences_count } =
       averageErrors._avg;
+
+    const isOpen =
+      evaluationGroupReading.due_date.getTime() > new Date().getTime();
 
     return {
       assignment: {
@@ -436,8 +418,9 @@ export class EvaluationGroupsController {
         },
       },
       assignments_done: doneAssignmentsCount,
-      assignments_pending: pendingAssignmentsCount,
-      assignments_delayed: delayedAssignmentsCount,
+      assignments_pending:
+        allEvaluationGroupReadingStudents - doneAssignmentsCount,
+      isOpen,
       average_score: averageScore._avg.score || 0,
       recordings: doneRecordings.map(({ Student, Analysis, created_at }) => {
         const lastRecording = Analysis.length
@@ -454,7 +437,7 @@ export class EvaluationGroupsController {
       average_errors: {
         repetitions_count,
         silences_count,
-        general_errors: allosaurus_general_error,
+        general_errors: similarity_error,
       },
       most_repeated_words: mostRepeatedWords,
     };
