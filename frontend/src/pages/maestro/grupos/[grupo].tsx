@@ -3,9 +3,7 @@ import ErrorPage from "@/components/errorPage/ErrorPage";
 import InputDate from "@/components/inputs/InputDate";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import Select from "@/components/selects/Select";
-import ChakraTable, {
-  ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
+import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
@@ -36,6 +34,20 @@ import {
   Tabs,
   useDisclosure,
 } from "@chakra-ui/react";
+import {
+  Step,
+  StepDescription,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
+  useSteps,
+  Box,
+  Stack,
+} from "@chakra-ui/react";
 import dayjs from "dayjs";
 import Head from "next/head";
 import Image from "next/image";
@@ -49,7 +61,7 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
-import { dateFormats } from "@/constants/constants";
+import { dateFormats, tableMaxHeightModal } from "@/constants/constants";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -73,33 +85,30 @@ const assignmentColumnsModal: ChakraTableColumn[] = [
   { label: "Lectura" },
 ];
 
+const studentColumnsModal: ChakraTableColumn[] = [
+  { label: "" },
+  { label: "Nombre" },
+  { label: "Documento" },
+  { label: "Correo" },
+];
+
 const toTableList = (students: Student[], groupId: number, groupName: string) =>
-  students.map(
-    ({
-      fullName,
-      cedula,
-      email,
-      assignmentsDone = 0,
-      assignmentsPending = 0,
-    }) => ({
-      fullName,
-      cedula,
-      email,
-      assignmentsCompleted: `${assignmentsDone}/${
-        assignmentsDone + assignmentsPending
-      }`,
-      link: (
-        <Link
-          href={{
-            pathname: "/maestro/grupos/[grupo]/[alumno]",
-            query: { grupo: groupId, alumno: fullName, groupName },
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    })
-  );
+  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0 }) => ({
+    fullName,
+    cedula,
+    email,
+    assignmentsCompleted: `${assignmentsDone}/${assignmentsDone + assignmentsPending}`,
+    link: (
+      <Link
+        href={{
+          pathname: "/maestro/grupos/[grupo]/[alumno]",
+          query: { grupo: groupId, alumno: fullName, groupName },
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
 const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
   assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
@@ -111,7 +120,7 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
       <Link
         href={{
           pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
-          query: {grupo: groupId, tarea: readingTitle, groupName, readingCategory, readingSubcategory}
+          query: { grupo: groupId, tarea: readingTitle, groupName, readingCategory, readingSubcategory },
         }}
       >
         Ver detalles
@@ -120,20 +129,21 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
   }));
 
 // TODO update to use fetch readings endpoint
-const toTableListModal = (assignments: Assignment[]) =>
-  assignments.map(
-    ({
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-      evaluationGroupReadingId,
-    }) => ({
-      checkbox: <Checkbox />,
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-    })
-  );
+const toAssignmentTableListModal = (assignments: Assignment[]) =>
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, evaluationGroupReadingId }) => ({
+    checkbox: <Checkbox />,
+    readingCategory,
+    readingSubcategory,
+    readingTitle,
+  }));
+
+const toStudentTableListModal = (students: Student[], groupId: number, groupName: string) =>
+  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0 }) => ({
+    checkbox: <Checkbox />,
+    fullName,
+    cedula,
+    email,
+  }));
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 
@@ -179,23 +189,18 @@ const dataBar = {
 
 const inputRegex = /\w|\d|\-|\s/;
 
+const steps = [{ title: "Agregar Tareas" }, { title: "Agregar Alumnos" }, { title: "Resumen" }];
+
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
   const { data, isLoading, isError } = useFetchGroupDetails(Number(groupId));
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryOption, setCategoryOption] = useState<string | undefined>(
-    undefined
-  );
-  const [categoryOptionModal, setCategoryOptionModal] = useState<
-    string | undefined
-  >(undefined);
-  const [subcategoryOption, setSubcategoryOption] = useState<
-    string | undefined
-  >(undefined);
-  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<
-    string | undefined
-  >(undefined);
+  const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
+  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
+  const [categoryOptionModal, setCategoryOptionModal] = useState<string | undefined>(undefined);
+  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
+  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
   const {
     name: groupName,
     students,
@@ -206,6 +211,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     assignments: [],
   };
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
+  const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -215,8 +221,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     setEndDate(end);
   };
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
-  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] =
-    useState("");
+  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] = useState("");
 
   useChartJSInitializer();
 
@@ -226,17 +231,24 @@ export default function Page({ params }: { params: { grupo: number } }) {
     categoryOption,
     subcategoryOption
   );
-  const { filteredAssignments: filteredAssignmentsModal } =
-    useFilteredAssignments(
-      assignments,
-      modalAssignmentSearchQuery,
-      categoryOptionModal,
-      subcategoryOptionModal
-    );
-  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
-    useAssignmentFilterOptions(assignments);
+  const { filteredAssignments: filteredAssignmentsModal } = useFilteredAssignments(
+    assignments,
+    modalAssignmentSearchQuery,
+    categoryOptionModal,
+    subcategoryOptionModal
+  );
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const { activeStep, setActiveStep } = useSteps({
+    index: 1,
+    count: steps.length,
+  });
+
+  const changeStep = () => {
+    setActiveStep(activeStep + 1);
+  };
 
   if (isLoading) {
     return <LoadingPage />;
@@ -266,13 +278,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
-          <Button
-            onClick={onOpen}
-            leftIcon={<AddIcon />}
-            className={styles.primary}
-            variant="solid"
-          >
-            Agregar tareas
+          <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
+            Asignar Tarea
           </Button>
         </div>
         <Tabs>
@@ -349,7 +356,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   ></Select>
                 </div>
               </div>
-              <ChakraTable columns={assignmentColumns} data={toAssignmentTableList(filteredAssignments, Number(groupId), groupName)}></ChakraTable>
+              <ChakraTable
+                columns={assignmentColumns}
+                data={toAssignmentTableList(filteredAssignments, Number(groupId), groupName)}
+              ></ChakraTable>
             </TabPanel>
             <TabPanel>
               <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
@@ -364,10 +374,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       <span>Pendientes: 25</span>
                     </div>
                     <div className="row">
-                      <Image
-                        alt="lecturas atrasadas"
-                        src={IncompleteTasksIcon}
-                      />
+                      <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
                       <span>Atrasadas: 25</span>
                     </div>
                   </div>
@@ -397,65 +404,118 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <ModalHeader tabIndex={0}>Crear Tarea</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <div>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Fecha límite:</span>
-                <InputDate></InputDate>
-              </div>
-            </div>
-            <div className={`${styles.filters} row`}>
-              <InputGroup className={styles.small}>
-                <Input
-                  width="auto"
-                  onKeyDown={(e) => {
-                    if (!e.key.match(inputRegex)) {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={({ target: { value } }) => {
-                    setModalAssignmentSearchQuery(value.toLowerCase());
-                  }}
-                  maxLength={30}
-                  placeholder="Lectura"
-                />
-                <InputRightAddon>
-                  <SearchIcon />
-                </InputRightAddon>
-              </InputGroup>
-              <div className="col">
-                <label>Categoría</label>
-                <Select
-                  defaultValue={defaultOption}
-                  options={readingCategoryOptions}
-                  onChange={(option) => {
-                    setCategoryOptionModal(option.value);
-                  }}
-                ></Select>
-              </div>
-              <div className="col">
-                <label>Subcategoría</label>
-                <Select
-                  defaultValue={defaultOption}
-                  options={readingSubcategoryOptions}
-                  onChange={(option) => {
-                    setSubcategoryOptionModal(option.value);
-                  }}
-                ></Select>
-              </div>
-            </div>
-            <ChakraTable
-              variant="simple"
-              columns={assignmentColumnsModal}
-              data={toTableListModal(filteredAssignmentsModal)}
-            ></ChakraTable>
+            <Stepper index={activeStep}>
+              {steps.map((step, index) => (
+                <Step key={index}>
+                  <StepIndicator>
+                    <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
+                  </StepIndicator>
+
+                  <Stack flexShrink="0">
+                    <StepTitle>{step.title}</StepTitle>
+                  </Stack>
+
+                  <StepSeparator />
+                </Step>
+              ))}
+            </Stepper>
+
+            {activeStep === 1 && (
+              <>
+                <div>
+                  <div className={`${styles.desc} row`}>
+                    <span tabIndex={0}>Fecha límite:</span>
+                    <InputDate></InputDate>
+                  </div>
+                </div>
+                <span>
+                  <strong tabIndex={0}>Lecturas:</strong>
+                </span>
+                <div className={`${styles.filters} row`}>
+                  <InputGroup className={styles.small}>
+                    <Input
+                      width="auto"
+                      onKeyDown={(e) => {
+                        if (!e.key.match(inputRegex)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={({ target: { value } }) => {
+                        setModalAssignmentSearchQuery(value.toLowerCase());
+                      }}
+                      maxLength={30}
+                      placeholder="Lectura"
+                    />
+                    <InputRightAddon>
+                      <SearchIcon />
+                    </InputRightAddon>
+                  </InputGroup>
+                  <div className="col">
+                    <label>Categoría</label>
+                    <Select
+                      defaultValue={defaultOption}
+                      options={readingCategoryOptions}
+                      onChange={(option) => {
+                        setCategoryOptionModal(option.value);
+                      }}
+                    ></Select>
+                  </div>
+                  <div className="col">
+                    <label>Subcategoría</label>
+                    <Select
+                      defaultValue={defaultOption}
+                      options={readingSubcategoryOptions}
+                      onChange={(option) => {
+                        setSubcategoryOptionModal(option.value);
+                      }}
+                    ></Select>
+                  </div>
+                </div>
+                <ChakraTable
+                  variant="simple"
+                  maxHeight={tableMaxHeightModal}
+                  columns={assignmentColumnsModal}
+                  data={toAssignmentTableListModal(filteredAssignmentsModal)}
+                ></ChakraTable>
+              </>
+            )}
+            {activeStep === 2 && (
+              <>
+                <span>
+                  <strong tabIndex={0}>Alumnos:</strong>
+                </span>
+                <div className={`${styles.filters} row`}>
+                  <InputGroup>
+                    <Input
+                      width="auto"
+                      onKeyDown={(e) => {
+                        if (!e.key.match(inputRegex)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={({ target: { value } }) => {
+                        setModalStudentSearchQuery(value.toLowerCase());
+                      }}
+                      maxLength={30}
+                      placeholder="Documento o Nombre"
+                    />
+                    <InputRightAddon>
+                      <SearchIcon />
+                    </InputRightAddon>
+                  </InputGroup>
+                </div>
+                <ChakraTable
+                  variant="simple"
+                  maxHeight={tableMaxHeightModal}
+                  columns={studentColumnsModal}
+                  data={toStudentTableListModal(filteredStudentsModal, Number(groupId), groupName)}
+                ></ChakraTable>
+              </>
+            )}
           </ModalBody>
           <ModalFooter className={styles["flex-center"]}>
-            <Button
-              onClick={onClose}
-              className={styles.primary}
-              variant="solid"
-            >
-              Crear tarea
+            <Button onClick={changeStep} className={styles.primary} variant="solid">
+              Asignar Tarea
             </Button>
           </ModalFooter>
         </ModalContent>
