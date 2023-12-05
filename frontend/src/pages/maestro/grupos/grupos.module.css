@@ -77,8 +77,16 @@ td .badge {
 
 .desc {
   gap: 32px;
-  align-items: center;
   margin-bottom: 16px;
+}
+
+.desc:nth-child(2) {
+  align-items: center;
+  margin-top: 16px;
+}
+
+.desc ul {
+  padding: 8px 32px;
 }
 
 .flex-center {

@@ -23,7 +23,7 @@ interface AssignmentModalProps {
   students: Student[];
   assignmentColumnsModal: ChakraTableColumn[];
   studentColumnsModal: ChakraTableColumn[];
-  styles: any
+  styles: any;
 }
 
 const toAssignmentTableListModal = (assignments: Assignment[]) =>
@@ -50,7 +50,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   students,
   assignmentColumnsModal,
   studentColumnsModal,
-  styles
+  styles,
 }) => {
   const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
   const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] = useState("");
@@ -105,11 +105,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
           {activeStep === 1 && (
             <>
-              <div>
-                <div className={`${styles.desc} row`}>
-                  <span tabIndex={0}>Fecha límite:</span>
-                  <InputDate></InputDate>
-                </div>
+              <div className={`${styles.desc} row`}>
+                <span tabIndex={0}>Fecha límite:</span>
+                <InputDate></InputDate>
               </div>
               <span>
                 <strong tabIndex={0}>Lecturas:</strong>
@@ -168,7 +166,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 <span tabIndex={0}>Fecha límite:</span>
                 <span tabIndex={0}>04/12/2023</span>
               </div>
-              <div className={`${styles.desc} col`}>
+              <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Lecturas:</span>
                 <ul>
                   <li>Lectura 1</li>
@@ -213,7 +211,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 <span tabIndex={0}>Fecha límite:</span>
                 <span tabIndex={0}>04/12/2023</span>
               </div>
-              <div className={`${styles.desc} col`}>
+              <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Lecturas:</span>
                 <ul>
                   <li>Lectura 1</li>
@@ -221,7 +219,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                   <li>Lectura 3</li>
                 </ul>
               </div>
-              <div className={`${styles.desc} col`}>
+              <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Alumnos:</span>
                 <ul>
                   <li>Alumno 1</li>

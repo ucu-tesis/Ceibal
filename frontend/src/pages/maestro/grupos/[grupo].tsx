@@ -1,6 +1,5 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
-import InputDate from "@/components/inputs/InputDate";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
 import Select from "@/components/selects/Select";
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
@@ -16,37 +15,15 @@ import {
   BreadcrumbLink,
   Button,
   ChakraProvider,
-  Checkbox,
   Input,
   InputGroup,
   InputRightAddon,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
   useDisclosure,
-} from "@chakra-ui/react";
-import {
-  Step,
-  StepDescription,
-  StepIcon,
-  StepIndicator,
-  StepNumber,
-  StepSeparator,
-  StepStatus,
-  StepTitle,
-  Stepper,
-  useSteps,
-  Box,
-  Stack,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import Head from "next/head";
@@ -129,23 +106,6 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
     ),
   }));
 
-// TODO update to use fetch readings endpoint
-const toAssignmentTableListModal = (assignments: Assignment[]) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle, evaluationGroupReadingId }) => ({
-    checkbox: <Checkbox />,
-    readingCategory,
-    readingSubcategory,
-    readingTitle,
-  }));
-
-const toStudentTableListModal = (students: Student[], groupId: number, groupName: string) =>
-  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0 }) => ({
-    checkbox: <Checkbox />,
-    fullName,
-    cedula,
-    email,
-  }));
-
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 
 const dataLine = {
@@ -195,11 +155,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const groupId = query.grupo;
   const { data, isLoading, isError } = useFetchGroupDetails(Number(groupId));
   const [searchQuery, setSearchQuery] = useState("");
-  const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
   const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
-  const [categoryOptionModal, setCategoryOptionModal] = useState<string | undefined>(undefined);
   const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
-  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
   const {
     name: groupName,
     students,
@@ -210,7 +167,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
     assignments: [],
   };
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
-  const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -220,7 +176,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
     setEndDate(end);
   };
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
-  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] = useState("");
 
   useChartJSInitializer();
 
@@ -230,29 +185,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
     categoryOption,
     subcategoryOption
   );
-  const { filteredAssignments: filteredAssignmentsModal } = useFilteredAssignments(
-    assignments,
-    modalAssignmentSearchQuery,
-    categoryOptionModal,
-    subcategoryOptionModal
-  );
+
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
-
-  const { activeStep, setActiveStep } = useSteps({
-    index: 1,
-    count: steps.length,
-  });
-
-  const changeStep = () => {
-    if (activeStep < steps.length) {
-      setActiveStep(activeStep + 1);
-    } else {
-      setActiveStep(1);
-      onClose();
-    }
-  };
 
   if (isLoading) {
     return <LoadingPage />;
