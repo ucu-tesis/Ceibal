@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
@@ -26,14 +26,6 @@ interface AssignmentModalProps {
   styles: any;
 }
 
-const toAssignmentTableListModal = (assignments: Assignment[]) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle }) => ({
-    checkbox: <Checkbox />,
-    readingCategory,
-    readingSubcategory,
-    readingTitle,
-  }));
-
 const toStudentTableListModal = (students: Student[]) =>
   students.map(({ fullName, cedula, email }) => ({
     checkbox: <Checkbox />,
@@ -57,6 +49,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [categoryOptionModal, setCategoryOptionModal] = useState<string | undefined>(undefined);
   const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
 
+  const [selectedAssignments, setSelectedAssignments] = useState<any[]>([]);
+
   const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
 
   const { filteredAssignments: filteredAssignmentsModal } = useFilteredAssignments(
@@ -66,6 +60,27 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     subcategoryOptionModal
   );
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
+
+  const toAssignmentTableListModal = (assignments: Assignment[]) =>
+    assignments.map(({ readingCategory, readingSubcategory, readingTitle }, index) => ({
+      checkbox: (
+        <Checkbox
+          onChange={(event: ChangeEvent) => {
+            const checkbox = event.target as HTMLInputElement;
+            if (checkbox.checked) {
+              setSelectedAssignments(
+                selectedAssignments.concat({ readingCategory, readingSubcategory, readingTitle, index })
+              );
+            } else {
+              setSelectedAssignments(selectedAssignments.filter((elem) => elem.index !== index));
+            }
+          }}
+        />
+      ),
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+    }));
 
   const { activeStep, setActiveStep } = useSteps({
     index: 1,
@@ -169,9 +184,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Lecturas:</span>
                 <ul>
-                  <li>Lectura 1</li>
-                  <li>Lectura 2</li>
-                  <li>Lectura 3</li>
+                  {selectedAssignments.map((assignment, index) => {
+                    return <li key={index}>{assignment?.readingTitle}</li>;
+                  })}
                 </ul>
               </div>
               <span>
