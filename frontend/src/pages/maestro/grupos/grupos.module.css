@@ -66,6 +66,10 @@ td .badge {
   color: white !important;
 }
 
+.secondary {
+  border-radius: 24px !important;
+}
+
 .space {
   justify-content: space-between;
 }
@@ -91,6 +95,7 @@ td .badge {
 
 .flex-center {
   justify-content: center;
+  gap: 16px;
 }
 
 .small {

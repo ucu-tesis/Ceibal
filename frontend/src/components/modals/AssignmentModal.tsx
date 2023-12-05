@@ -26,14 +26,6 @@ interface AssignmentModalProps {
   styles: any;
 }
 
-const toStudentTableListModal = (students: Student[]) =>
-  students.map(({ fullName, cedula, email }) => ({
-    checkbox: <Checkbox />,
-    fullName,
-    cedula,
-    email,
-  }));
-
 const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isOpen,
   onClose,
@@ -50,6 +42,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
 
   const [selectedAssignments, setSelectedAssignments] = useState<any[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
 
   const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
 
@@ -82,6 +76,25 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       readingTitle,
     }));
 
+  const toStudentTableListModal = (students: Student[]) =>
+    students.map(({ fullName, cedula, email }, index) => ({
+      checkbox: (
+        <Checkbox
+          onChange={(event: ChangeEvent) => {
+            const checkbox = event.target as HTMLInputElement;
+            if (checkbox.checked) {
+              setSelectedStudents(selectedStudents.concat({ fullName, cedula, email, index }));
+            } else {
+              setSelectedStudents(selectedStudents.filter((elem) => elem.index !== index));
+            }
+          }}
+        />
+      ),
+      fullName,
+      cedula,
+      email,
+    }));
+
   const { activeStep, setActiveStep } = useSteps({
     index: 1,
     count: steps.length,
@@ -93,6 +106,12 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     } else {
       setActiveStep(1);
       onClose();
+    }
+  };
+
+  const undoStep = () => {
+    if (activeStep > 1) {
+      setActiveStep(activeStep - 1);
     }
   };
   return (
@@ -122,7 +141,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
-                <InputDate></InputDate>
+                <InputDate
+                  value={selectedDate}
+                  onChange={(event: ChangeEvent) => {
+                    const { value } = event.target as HTMLInputElement;
+                    setSelectedDate(value);
+                  }}
+                ></InputDate>
               </div>
               <span>
                 <strong tabIndex={0}>Lecturas:</strong>
@@ -179,7 +204,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
-                <span tabIndex={0}>04/12/2023</span>
+                <span tabIndex={0}>{selectedDate}</span>
               </div>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Lecturas:</span>
@@ -224,30 +249,35 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
-                <span tabIndex={0}>04/12/2023</span>
+                <span tabIndex={0}>{selectedDate}</span>
               </div>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Lecturas:</span>
                 <ul>
-                  <li>Lectura 1</li>
-                  <li>Lectura 2</li>
-                  <li>Lectura 3</li>
+                  {selectedAssignments.map((assignment, index) => {
+                    return <li key={index}>{assignment?.readingTitle}</li>;
+                  })}
                 </ul>
               </div>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Alumnos:</span>
                 <ul>
-                  <li>Alumno 1</li>
-                  <li>Alumno 2</li>
-                  <li>Alumno 3</li>
+                  {selectedStudents.map((student, index) => {
+                    return <li key={index}>{student?.fullName}</li>;
+                  })}
                 </ul>
               </div>
             </>
           )}
         </ModalBody>
         <ModalFooter className={styles["flex-center"]}>
+          {activeStep > 1 && (
+            <Button onClick={undoStep} className={styles.secondary} variant="outline">
+              Volver
+            </Button>
+          )}
           <Button onClick={changeStep} className={styles.primary} variant="solid">
-            Asignar Tarea
+            {activeStep < 3 ? "Continuar" : "Asignar Tarea"}
           </Button>
         </ModalFooter>
       </ModalContent>
