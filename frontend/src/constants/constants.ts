@@ -3,3 +3,5 @@ export const dateFormats = {
 };
 
 export const tableMaxHeightModal = "300px";
+
+export const inputRegex = /\w|\d|\-|\s/;

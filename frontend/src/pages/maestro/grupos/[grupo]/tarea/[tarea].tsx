@@ -17,7 +17,7 @@ import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas
 import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import { AssignmentReading } from "@/models/AssignmentReading";
-import { dateFormats } from "@/constants/constants";
+import { dateFormats, inputRegex } from "@/constants/constants";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 
 interface Params {
@@ -70,8 +70,6 @@ const dataPie = {
     },
   ],
 };
-
-const inputRegex = /\w|\d|\-|\s/;
 
 const defaultOption: Option = {
   label: "Todos",

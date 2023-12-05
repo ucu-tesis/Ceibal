@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import Select from "@/components/selects/Select";
 import styles from "./listado.module.css";
+import { inputRegex } from "@/constants/constants";
 
 type Option = {
   value: string;
@@ -69,8 +70,6 @@ const ListTeachers: React.FC = () => {
   ]);
 
   const [teachersList, setTeachersList] = useState<Teacher[]>(sampleTeachers);
-
-  const inputRegex = /\w|\d|\-/;
 
   useEffect(() => {
     if (searchValue) {

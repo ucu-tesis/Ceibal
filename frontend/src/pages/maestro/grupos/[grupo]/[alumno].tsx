@@ -17,6 +17,7 @@ import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.sv
 import DatePicker from "react-datepicker";
 import { Line, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
+import { inputRegex } from "@/constants/constants";
 
 interface Params {
   alumno: string;
@@ -76,8 +77,6 @@ const dataRadar = {
     },
   ],
 };
-
-const inputRegex = /\w|\d|\-|\s/;
 
 const defaultOption: Option = {
   label: "Todas",

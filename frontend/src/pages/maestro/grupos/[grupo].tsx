@@ -61,7 +61,8 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
-import { dateFormats, tableMaxHeightModal } from "@/constants/constants";
+import { dateFormats, inputRegex, tableMaxHeightModal } from "@/constants/constants";
+import AssignmentModal from "@/components/modals/AssignmentModal";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -187,9 +188,7 @@ const dataBar = {
   ],
 };
 
-const inputRegex = /\w|\d|\-|\s/;
-
-const steps = [{ title: "Agregar Tareas" }, { title: "Agregar Alumnos" }, { title: "Resumen" }];
+const steps = ["Agregar Tareas", "Agregar Alumnos", "Resumen"];
 
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
@@ -247,7 +246,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
   });
 
   const changeStep = () => {
-    setActiveStep(activeStep + 1);
+    if (activeStep < steps.length) {
+      setActiveStep(activeStep + 1);
+    } else {
+      setActiveStep(1);
+      onClose();
+    }
   };
 
   if (isLoading) {
@@ -398,128 +402,17 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent className={styles["modal-content"]}>
-          <ModalHeader tabIndex={0}>Crear Tarea</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Stepper index={activeStep}>
-              {steps.map((step, index) => (
-                <Step key={index}>
-                  <StepIndicator>
-                    <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
-                  </StepIndicator>
-
-                  <Stack flexShrink="0">
-                    <StepTitle>{step.title}</StepTitle>
-                  </Stack>
-
-                  <StepSeparator />
-                </Step>
-              ))}
-            </Stepper>
-
-            {activeStep === 1 && (
-              <>
-                <div>
-                  <div className={`${styles.desc} row`}>
-                    <span tabIndex={0}>Fecha límite:</span>
-                    <InputDate></InputDate>
-                  </div>
-                </div>
-                <span>
-                  <strong tabIndex={0}>Lecturas:</strong>
-                </span>
-                <div className={`${styles.filters} row`}>
-                  <InputGroup className={styles.small}>
-                    <Input
-                      width="auto"
-                      onKeyDown={(e) => {
-                        if (!e.key.match(inputRegex)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      onChange={({ target: { value } }) => {
-                        setModalAssignmentSearchQuery(value.toLowerCase());
-                      }}
-                      maxLength={30}
-                      placeholder="Lectura"
-                    />
-                    <InputRightAddon>
-                      <SearchIcon />
-                    </InputRightAddon>
-                  </InputGroup>
-                  <div className="col">
-                    <label>Categoría</label>
-                    <Select
-                      defaultValue={defaultOption}
-                      options={readingCategoryOptions}
-                      onChange={(option) => {
-                        setCategoryOptionModal(option.value);
-                      }}
-                    ></Select>
-                  </div>
-                  <div className="col">
-                    <label>Subcategoría</label>
-                    <Select
-                      defaultValue={defaultOption}
-                      options={readingSubcategoryOptions}
-                      onChange={(option) => {
-                        setSubcategoryOptionModal(option.value);
-                      }}
-                    ></Select>
-                  </div>
-                </div>
-                <ChakraTable
-                  variant="simple"
-                  maxHeight={tableMaxHeightModal}
-                  columns={assignmentColumnsModal}
-                  data={toAssignmentTableListModal(filteredAssignmentsModal)}
-                ></ChakraTable>
-              </>
-            )}
-            {activeStep === 2 && (
-              <>
-                <span>
-                  <strong tabIndex={0}>Alumnos:</strong>
-                </span>
-                <div className={`${styles.filters} row`}>
-                  <InputGroup>
-                    <Input
-                      width="auto"
-                      onKeyDown={(e) => {
-                        if (!e.key.match(inputRegex)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      onChange={({ target: { value } }) => {
-                        setModalStudentSearchQuery(value.toLowerCase());
-                      }}
-                      maxLength={30}
-                      placeholder="Documento o Nombre"
-                    />
-                    <InputRightAddon>
-                      <SearchIcon />
-                    </InputRightAddon>
-                  </InputGroup>
-                </div>
-                <ChakraTable
-                  variant="simple"
-                  maxHeight={tableMaxHeightModal}
-                  columns={studentColumnsModal}
-                  data={toStudentTableListModal(filteredStudentsModal, Number(groupId), groupName)}
-                ></ChakraTable>
-              </>
-            )}
-          </ModalBody>
-          <ModalFooter className={styles["flex-center"]}>
-            <Button onClick={changeStep} className={styles.primary} variant="solid">
-              Asignar Tarea
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <AssignmentModal
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        assignmentColumnsModal={assignmentColumnsModal}
+        assignments={assignments}
+        steps={steps}
+        studentColumnsModal={studentColumnsModal}
+        students={students}
+        styles={styles}
+      />
     </ChakraProvider>
   );
 }
