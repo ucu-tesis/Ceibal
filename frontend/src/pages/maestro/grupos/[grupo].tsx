@@ -40,6 +40,7 @@ import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
 import { dateFormats, inputRegex, tableMaxHeightModal } from "@/constants/constants";
 import AssignmentModal from "@/components/modals/AssignmentModal";
+import CreateReadingModal from "@/components/modals/CreateReadingModal";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -189,6 +190,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const { isOpen: isOpenReadingModal, onClose: onCloseReadingModal, onOpen: onOpenReadingModal } = useDisclosure();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -218,9 +220,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
-          <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
-            Asignar Tarea
-          </Button>
+          <div className="row">
+            <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
+              Asignar Tarea
+            </Button>
+            <Button onClick={onOpenReadingModal} leftIcon={<AddIcon />} className={styles.secondary} variant="outline">
+              Crear Lectura
+            </Button>
+          </div>
         </div>
         <Tabs>
           <TabList>
@@ -349,6 +356,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
         students={students}
         styles={styles}
       />
+      <CreateReadingModal isOpen={isOpenReadingModal} onClose={onCloseReadingModal} styles={styles} />
     </ChakraProvider>
   );
 }

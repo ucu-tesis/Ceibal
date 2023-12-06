@@ -154,7 +154,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent className={styles["modal-content"]}>
-        <ModalHeader tabIndex={0}>Crear Tarea</ModalHeader>
+        <ModalHeader tabIndex={0}>Asignar Tarea</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stepper index={activeStep}>
