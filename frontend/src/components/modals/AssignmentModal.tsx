@@ -26,6 +26,58 @@ interface AssignmentModalProps {
   styles: any;
 }
 
+const toStudentTableListModal = (
+  students: Student[],
+  checkedCallback: (student: any) => void,
+  uncheckedCallback: (fullName: any) => void,
+  defaultValueCallback: (fullName: any) => boolean
+) =>
+  students.map(({ fullName, cedula, email }, index) => ({
+    checkbox: (
+      <Checkbox
+        key={fullName}
+        defaultChecked={defaultValueCallback(fullName)}
+        onChange={(event: ChangeEvent) => {
+          const checkbox = event.target as HTMLInputElement;
+          if (checkbox.checked) {
+            checkedCallback({ fullName, cedula, email });
+          } else {
+            uncheckedCallback(fullName);
+          }
+        }}
+      />
+    ),
+    fullName,
+    cedula,
+    email,
+  }));
+
+const toAssignmentTableListModal = (
+  assignments: Assignment[],
+  checkedCallback: (assignment: any) => void,
+  uncheckedCallback: (readingTitle: any) => void,
+  defaultValueCallback: (readingTitle: any) => boolean
+) =>
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle }, index) => ({
+    checkbox: (
+      <Checkbox
+        key={readingTitle}
+        defaultChecked={defaultValueCallback(readingTitle)}
+        onChange={(event: ChangeEvent) => {
+          const checkbox = event.target as HTMLInputElement;
+          if (checkbox.checked) {
+            checkedCallback({ readingCategory, readingSubcategory, readingTitle });
+          } else {
+            uncheckedCallback(readingTitle);
+          }
+        }}
+      />
+    ),
+    readingCategory,
+    readingSubcategory,
+    readingTitle,
+  }));
+
 const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isOpen,
   onClose,
@@ -55,45 +107,29 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   );
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
 
-  const toAssignmentTableListModal = (assignments: Assignment[]) =>
-    assignments.map(({ readingCategory, readingSubcategory, readingTitle }, index) => ({
-      checkbox: (
-        <Checkbox
-          onChange={(event: ChangeEvent) => {
-            const checkbox = event.target as HTMLInputElement;
-            if (checkbox.checked) {
-              setSelectedAssignments(
-                selectedAssignments.concat({ readingCategory, readingSubcategory, readingTitle, index })
-              );
-            } else {
-              setSelectedAssignments(selectedAssignments.filter((elem) => elem.index !== index));
-            }
-          }}
-        />
-      ),
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-    }));
+  const addStudents = (student: any) => {
+    setSelectedStudents((prevSelectedStudents) => [...prevSelectedStudents, student]);
+  };
 
-  const toStudentTableListModal = (students: Student[]) =>
-    students.map(({ fullName, cedula, email }, index) => ({
-      checkbox: (
-        <Checkbox
-          onChange={(event: ChangeEvent) => {
-            const checkbox = event.target as HTMLInputElement;
-            if (checkbox.checked) {
-              setSelectedStudents(selectedStudents.concat({ fullName, cedula, email, index }));
-            } else {
-              setSelectedStudents(selectedStudents.filter((elem) => elem.index !== index));
-            }
-          }}
-        />
-      ),
-      fullName,
-      cedula,
-      email,
-    }));
+  const removeStudents = (fullName: any) => {
+    setSelectedStudents(selectedStudents.filter((elem) => elem.fullName !== fullName));
+  };
+
+  const findStudent = (fullName: any) => {
+    return selectedStudents.find((elem) => elem.fullName === fullName) !== undefined;
+  };
+
+  const addAssignment = (assignment: any) => {
+    setSelectedAssignments((prevSelectedAssignments) => [...prevSelectedAssignments, assignment]);
+  };
+
+  const removeAssignment = (readingTitle: any) => {
+    setSelectedAssignments(selectedAssignments.filter((elem) => elem.readingTitle !== readingTitle));
+  };
+
+  const findAssignment = (readingTitle: any) => {
+    return selectedAssignments.find((elem) => elem.readingTitle === readingTitle) !== undefined;
+  };
 
   const { activeStep, setActiveStep } = useSteps({
     index: 1,
@@ -166,6 +202,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     }}
                     maxLength={30}
                     placeholder="Lectura"
+                    value={modalAssignmentSearchQuery}
                   />
                   <InputRightAddon>
                     <SearchIcon />
@@ -196,7 +233,12 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 variant="simple"
                 maxHeight={tableMaxHeightModal}
                 columns={assignmentColumnsModal}
-                data={toAssignmentTableListModal(filteredAssignmentsModal)}
+                data={toAssignmentTableListModal(
+                  filteredAssignmentsModal,
+                  addAssignment,
+                  removeAssignment,
+                  findAssignment
+                )}
               ></ChakraTable>
             </>
           )}
@@ -231,6 +273,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     }}
                     maxLength={30}
                     placeholder="Documento o Nombre"
+                    value={modalStudentSearchQuery}
                   />
                   <InputRightAddon>
                     <SearchIcon />
@@ -241,7 +284,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 variant="simple"
                 maxHeight={tableMaxHeightModal}
                 columns={studentColumnsModal}
-                data={toStudentTableListModal(filteredStudentsModal)}
+                data={toStudentTableListModal(filteredStudentsModal, addStudents, removeStudents, findStudent)}
               ></ChakraTable>
             </>
           )}
