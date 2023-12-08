@@ -147,6 +147,14 @@ h1 {
     margin: 24px;
     gap: 64px;
   }
+  .css-1t2dsn0 {
+    font-size: 12px !important;
+    width: min-content !important;
+  }
+  .css-kq5oaw {
+    width: 28px !important;
+    height: 28px !important;
+  }
 }
 
 /* Fix Chakra */

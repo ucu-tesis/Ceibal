@@ -7,14 +7,28 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Textarea,
 } from "@chakra-ui/react";
-import { Input, InputGroup } from "@chakra-ui/react";
+import { Input, InputGroup, Button, Switch } from "@chakra-ui/react";
+import Select, { Option } from "../selects/Select";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
   onClose: () => void;
   styles: any;
 }
+
+const categoryOptions: Option[] = [
+  { value: "intermedio", label: "Intermedio" },
+  { value: "basico", label: "Básico" },
+  { value: "avanzado", label: "Avanzado" },
+];
+
+const subCategoryOptions: Option[] = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+];
 
 const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose, styles }) => {
   return (
@@ -25,13 +39,37 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
         <ModalCloseButton />
         <ModalBody>
           <div className={`${styles["form-value"]} col`}>
-            <label tabIndex={0}>Nombre</label>
+            <label htmlFor="lectura">Nombre</label>
             <InputGroup className={styles.medium}>
-              <Input width="auto" maxLength={30} placeholder="Lectura" />
+              <Input id="lectura" width="auto" maxLength={30} placeholder="Lectura" />
             </InputGroup>
           </div>
+          <div className={`${styles["form-value"]} col`}>
+            <label htmlFor="texto">Texto</label>
+            <Textarea placeholder="Ingrese texto..." id="texto" className={styles.medium}></Textarea>
+          </div>
+          <div className={`${styles["form-value"]} col`}>
+            <label>Categoría</label>
+            <Select defaultValue={categoryOptions[0]} options={categoryOptions}></Select>
+          </div>
+          <div className={`${styles["form-value"]} col`}>
+            <label>Subcategoría</label>
+            <Select defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></Select>
+          </div>
+          <div className={`${styles["form-value"]} col`}>
+            <label htmlFor="repo">Repositorio Público</label>
+            <Switch id="repo" colorScheme="green" />
+          </div>
+          <div className={`${styles["form-value"]} col`}>
+            <label htmlFor="portada">Portada</label>
+            <input id="portada" type="file"></input>
+          </div>
         </ModalBody>
-        <ModalFooter></ModalFooter>
+        <ModalFooter>
+          <Button onClick={onClose} className={styles.primary} variant="solid">
+            Crear
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

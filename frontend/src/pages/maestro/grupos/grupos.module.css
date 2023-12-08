@@ -88,12 +88,21 @@ td .badge {
   margin-bottom: 16px;
 }
 
+.form-value {
+  position: relative;
+  margin-bottom: 16px;
+}
+
 .form-value label {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .form-value input {
   width: 100%;
+}
+
+.form-value textarea {
+  min-height: 150px;
 }
 
 .desc:nth-child(2) {
@@ -114,7 +123,7 @@ td .badge {
   max-width: 180px;
 }
 
-.medium {
+.medium, .form-value > div {
   max-width: 70%;
 }
 
@@ -151,6 +160,28 @@ td .badge {
 .stats-box img {
   width: 48px;
   height: auto;
+}
+
+.form-value input[type="file"] {
+  margin-top: 8px;
+}
+
+.form-value input[type="file"]:before {
+  position: absolute;
+  display: block;
+  content: "Subir";
+  padding-top: 8px;
+  width: 116px;
+  text-indent: 36px;
+  height: 32px;
+  left: -1px;
+  top: 30px;
+  background: var(--ceibal-green);
+  border: 1px solid var(--ceibal-green);
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 @media (max-width: 500px) {

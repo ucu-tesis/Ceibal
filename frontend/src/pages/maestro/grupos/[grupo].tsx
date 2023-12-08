@@ -220,7 +220,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
-          <div className="row">
+          <div className={`${styles["mob-col"]} row`}>
             <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
               Asignar Tarea
             </Button>
