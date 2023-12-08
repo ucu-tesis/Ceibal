@@ -27,6 +27,9 @@ RUN pip install python-multipart
 RUN mfa models download acoustic spanish_mfa
 RUN mfa models download dictionary spanish_latin_america_mfa
 
+RUN pip install psycopg2
+RUN pip install requests
+
 # RUN conda init bash && exec /bin/bash && conda activate audiodsp && \
 #  conda install allosaurus epitran onnxruntime vosk
 
