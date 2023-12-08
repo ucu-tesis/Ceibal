@@ -338,22 +338,24 @@ export class EvaluationGroupsController {
       },
     });
 
-    const doneAssignmentsCount = await this.prismaService.recording.count({
+    const doneAssignments = await this.prismaService.recording.findMany({
+      distinct: ['student_id'],
+      select: {
+        student_id: true,
+      },
       where: {
         evaluation_group_reading_id: Number(evaluationGroupReadingId),
       },
     });
+
+    const doneAssignmentsCount = doneAssignments.length;
 
     const allEvaluationGroupReadingStudents =
       await this.prismaService.student.count({
         where: {
           EvaluationGroups: {
             some: {
-              EvaluationGroupReadings: {
-                some: {
-                  id: Number(evaluationGroupReadingId),
-                },
-              },
+              id: Number(evaluationGroupId),
             },
           },
         },

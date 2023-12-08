@@ -160,6 +160,7 @@ async function load() {
   await addStudentReading(1, groupReading2.id);
   await addStudentReading(1, groupReading3.id);
   await addStudentReading(2, groupReading1.id);
+  await addStudentReading(1, groupReading1.id);
 
   await prisma.evaluationGroupReading.create({
     data: {
