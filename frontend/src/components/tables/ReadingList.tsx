@@ -1,24 +1,13 @@
-import { StudentReadingSelection } from "@/models/StudentReadingSelection";
+import { ReadingMinimalInfo } from "@/models/Reading";
 import { useRouter } from "next/router";
 import React from "react";
 import styles from "./Table.module.css";
 
-const readings: StudentReadingSelection[] = [
-  {
-    id: 1,
-    title: "Title 1",
-  },
-  {
-    id: 2,
-    title: "Title 2",
-  },
-  {
-    id: 3,
-    title: "Title 3",
-  },
-];
+interface ReadingListProps {
+  readings: ReadingMinimalInfo[];
+}
 
-const ReadingList: React.FC = () => {
+const ReadingList: React.FC<ReadingListProps> = ({ readings }) => {
   const router = useRouter();
   return (
     <div className="col">
