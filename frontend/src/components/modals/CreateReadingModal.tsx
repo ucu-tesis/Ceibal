@@ -33,14 +33,14 @@ const subCategoryOptions: Option[] = [
 ];
 
 const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose, styles }) => {
+  const toast = useToast();
+
   const [name, setName] = useState<string>();
   const [text, setText] = useState<string>();
 
   const createCondition = () => {
     return isNullOrEmpty(name) || isNullOrEmpty(text);
   };
-
-  const toast = useToast();
 
   const createReading = () => {
     onClose();
@@ -68,7 +68,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
                 onChange={({ target: { value } }) => {
                   setName(value);
                 }}
-                maxLength={30}
+                maxLength={100}
                 placeholder="Lectura"
               />
             </InputGroup>
@@ -82,6 +82,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
                 setText(value);
               }}
               className={styles.medium}
+              maxLength={1000}
             ></Textarea>
           </div>
           <div className={`${styles["form-value"]} col`}>
