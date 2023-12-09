@@ -38,7 +38,7 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
-import { dateFormats, inputRegex, tableMaxHeightModal } from "@/constants/constants";
+import { dateFormats, inputRegex } from "@/constants/constants";
 import AssignmentModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 

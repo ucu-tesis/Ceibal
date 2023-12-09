@@ -2,10 +2,9 @@ import React, { ChangeEvent, useState } from "react";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
-import { Stack, Checkbox, Button } from "@chakra-ui/react";
-import InputDate from "../inputs/InputDate";
+import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
 import Select from "../selects/Select";
-import { inputRegex, tableMaxHeightModal } from "@/constants/constants";
+import { dateFormats, inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
 import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 import { SearchIcon } from "@chakra-ui/icons";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
@@ -13,6 +12,8 @@ import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
 import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
+import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
+import dayjs from "dayjs";
 
 interface AssignmentModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ const toStudentTableListModal = (
   uncheckedCallback: (fullName: any) => void,
   defaultValueCallback: (fullName: any) => boolean
 ) =>
-  students.map(({ fullName, cedula, email }, index) => ({
+  students.map(({ fullName, cedula, email }) => ({
     checkbox: (
       <Checkbox
         key={fullName}
@@ -58,7 +59,7 @@ const toAssignmentTableListModal = (
   uncheckedCallback: (readingTitle: any) => void,
   defaultValueCallback: (readingTitle: any) => boolean
 ) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle }, index) => ({
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle }) => ({
     checkbox: (
       <Checkbox
         key={readingTitle}
@@ -90,12 +91,12 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 }) => {
   const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
   const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] = useState("");
-  const [categoryOptionModal, setCategoryOptionModal] = useState<string | undefined>(undefined);
-  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string | undefined>(undefined);
+  const [categoryOptionModal, setCategoryOptionModal] = useState<string>();
+  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string>();
 
-  const [selectedAssignments, setSelectedAssignments] = useState<any[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().slice(0, 10));
+  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(dayjs(new Date()).format(dateFormats.assignmentDueDate));
 
   const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
 
@@ -132,22 +133,40 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   };
 
   const { activeStep, setActiveStep } = useSteps({
-    index: 1,
+    index: 0,
     count: steps.length,
   });
 
+  const toast = useToast();
+
   const changeStep = () => {
-    if (activeStep < steps.length) {
+    if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
-      setActiveStep(1);
+      setActiveStep(0);
       onClose();
+      toast({
+        title: "Tarea creada",
+        status: "success",
+        duration: toastDuration,
+        isClosable: true,
+      });
     }
   };
 
   const undoStep = () => {
-    if (activeStep > 1) {
+    if (activeStep > 0) {
       setActiveStep(activeStep - 1);
+    }
+  };
+
+  const nextCondition = () => {
+    if (activeStep === 0) {
+      return selectedAssignments.length === 0 || !selectedDate;
+    } else if (activeStep === 1) {
+      return selectedStudents.length === 0;
+    } else {
+      return false;
     }
   };
   return (
@@ -173,17 +192,17 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             ))}
           </Stepper>
 
-          {activeStep === 1 && (
+          {activeStep === 0 && (
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
-                <InputDate
+                <InputDateTimeLocal
                   value={selectedDate}
                   onChange={(event: ChangeEvent) => {
                     const { value } = event.target as HTMLInputElement;
                     setSelectedDate(value);
                   }}
-                ></InputDate>
+                ></InputDateTimeLocal>
               </div>
               <span>
                 <strong tabIndex={0}>Lecturas:</strong>
@@ -242,7 +261,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               ></ChakraTable>
             </>
           )}
-          {activeStep === 2 && (
+          {activeStep === 1 && (
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
@@ -288,7 +307,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               ></ChakraTable>
             </>
           )}
-          {activeStep === 3 && (
+          {activeStep === 2 && (
             <>
               <div className={`${styles.desc} row`}>
                 <span tabIndex={0}>Fecha límite:</span>
@@ -314,13 +333,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           )}
         </ModalBody>
         <ModalFooter className={styles["flex-center"]}>
-          {activeStep > 1 && (
+          {activeStep > 0 && (
             <Button onClick={undoStep} className={styles.secondary} variant="outline">
               Volver
             </Button>
           )}
-          <Button onClick={changeStep} className={styles.primary} variant="solid">
-            {activeStep < 3 ? "Continuar" : "Asignar Tarea"}
+          <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+            {activeStep < 2 ? "Continuar" : "Asignar Tarea"}
           </Button>
         </ModalFooter>
       </ModalContent>

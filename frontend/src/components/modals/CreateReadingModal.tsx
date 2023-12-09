@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -9,8 +9,10 @@ import {
   ModalFooter,
   Textarea,
 } from "@chakra-ui/react";
-import { Input, InputGroup, Button, Switch } from "@chakra-ui/react";
+import { Input, InputGroup, Button, Switch, useToast } from "@chakra-ui/react";
 import Select, { Option } from "../selects/Select";
+import { isNullOrEmpty } from "@/util/util";
+import { toastDuration } from "@/constants/constants";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -31,6 +33,25 @@ const subCategoryOptions: Option[] = [
 ];
 
 const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose, styles }) => {
+  const [name, setName] = useState<string>();
+  const [text, setText] = useState<string>();
+
+  const createCondition = () => {
+    return isNullOrEmpty(name) || isNullOrEmpty(text);
+  };
+
+  const toast = useToast();
+
+  const createReading = () => {
+    onClose();
+    toast({
+      title: "Lectura creada",
+      status: "success",
+      duration: toastDuration,
+      isClosable: true,
+    });
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -41,12 +62,27 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="lectura">Nombre</label>
             <InputGroup className={styles.medium}>
-              <Input id="lectura" width="auto" maxLength={30} placeholder="Lectura" />
+              <Input
+                id="lectura"
+                width="auto"
+                onChange={({ target: { value } }) => {
+                  setName(value);
+                }}
+                maxLength={30}
+                placeholder="Lectura"
+              />
             </InputGroup>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="texto">Texto</label>
-            <Textarea placeholder="Ingrese texto..." id="texto" className={styles.medium}></Textarea>
+            <Textarea
+              placeholder="Ingrese texto..."
+              id="texto"
+              onChange={({ target: { value } }) => {
+                setText(value);
+              }}
+              className={styles.medium}
+            ></Textarea>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Categoría</label>
@@ -66,7 +102,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={onClose} className={styles.primary} variant="solid">
+          <Button onClick={createReading} isDisabled={createCondition()} className={styles.primary} variant="solid">
             Crear
           </Button>
         </ModalFooter>
