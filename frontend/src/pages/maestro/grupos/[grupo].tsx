@@ -90,7 +90,7 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
   }));
 
 const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate }) => ({
     readingCategory,
     readingSubcategory,
     readingTitle,
@@ -156,8 +156,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const groupId = query.grupo;
   const { data, isLoading, isError } = useFetchGroupDetails(Number(groupId));
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryOption, setCategoryOption] = useState<string | undefined>(undefined);
-  const [subcategoryOption, setSubcategoryOption] = useState<string | undefined>(undefined);
+  const [categoryOption, setCategoryOption] = useState<string>();
+  const [subcategoryOption, setSubcategoryOption] = useState<string>();
   const {
     name: groupName,
     students,
