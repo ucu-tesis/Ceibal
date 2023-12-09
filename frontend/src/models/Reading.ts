@@ -8,3 +8,5 @@ export interface Reading {
   status: ReadingStatus;
   dateSubmitted: string;
 }
+
+export type ReadingMinimalInfo = Pick<Reading, "id" | "title">;
