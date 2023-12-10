@@ -3,6 +3,7 @@ import requests
 import os
 import boto3
 import time
+import json
 from helpers import save_data, getImageAndJson
 from analizar_audio import analisis_audio
 from dotenv import load_dotenv
@@ -69,51 +70,55 @@ def get_recording_data(analysis_id):
     return recording_data
 
 def store_result(analysis_id, recording_id, resJson):    
-    # source for query: https://dba.stackexchange.com/questions/69471/postgres-update-limit-1
-    # this is for supporting concurrency between different processors
     sql = """
         UPDATE "Analysis"
         SET
             status = 'COMPLETED',
-            repetitions_count = %s
-            silences_count = %s
-            allosaurus_general_error = %s
-            similarity_error = %s
-            repeated_phonemes = %s
-            words_with_errors = %s
-            words_with_repetitions = %s
-            score = %s
-            error_timestamps = %s
-            repetition_timestamps = %s
-            phoneme_velocity = %s
-            words_velocity = %s
-            raw_analysis = %s
-            recording_id = %s
-        WHERE id = %s
+            repetitions_count = %(repetitions_count)s
+            silences_count = %(silences_count)s
+            allosaurus_general_error = %(allosaurus_general_error)s
+            similarity_error = %(similarity_error)s
+            repeated_phonemes = %(repeated_phonemes)s
+            words_with_errors = %(words_with_errors)s
+            words_with_repetitions = %(words_with_repetitions)s
+            score = %(score)s
+            error_timestamps = %(error_timestamps)s
+            repetition_timestamps = %(repetition_timestamps)s
+            phoneme_velocity = %(phoneme_velocity)s
+            words_velocity = %(words_velocity)s
+            raw_analysis = %(raw_analysis)s
+            recording_id = %(recording_id)s
+        WHERE id = %(analysis_id)s
     """
+
+    def to_int_or_0(value):
+        try:
+            return int(value)
+        except ValueError:
+            return 0
 
     success = False
     try:
         with get_db_connection() as conn, conn.cursor() as cur:
             cur.execute(
                 sql,
-                (
-                    resJson['cantidad_de_repeticiones'],
-                    resJson['cantidad_de_silencios'],
-                    resJson['error_general_allosaurus'],
-                    resJson['error_similitud'],
-                    resJson['fonemas_repetidos'],
-                    resJson['palabras_con_errores'],
-                    resJson['palabras_con_repeticiones'],
-                    resJson['puntaje'],
-                    resJson['tiempo_errores'],
-                    resJson['tiempo_repeticiones'],
-                    int(resJson['velocidad_fonemas']) if resJson['velocidad_fonemas'] else 0,
-                    int(resJson['velocidad_palabras']) if resJson['velocidad_palabras'] else 0,
-                    resJson,
-                    recording_id,
-                    analysis_id
-                )
+                {
+                    'repetitions_count': resJson['cantidad_de_repeticiones'],
+                    'silences_count': resJson['cantidad_de_silencios'],
+                    'allosaurus_general_error': resJson['error_general_allosaurus'],
+                    'similarity_error': resJson['error_similitud'],
+                    'repeated_phonemes': resJson['fonemas_repetidos'],
+                    'words_with_errors': resJson['palabras_con_errores'],
+                    'words_with_repetitions': resJson['palabras_con_repeticiones'],
+                    'score': resJson['puntaje'],
+                    'error_timestamps': resJson['tiempo_errores'],
+                    'repetition_timestamps': resJson['tiempo_repeticiones'],
+                    'phoneme_velocity': to_int_or_0(resJson['velocidad_fonemas']),
+                    'words_velocity': to_int_or_0(resJson['velocidad_palabras']),
+                    'raw_analysis': json.dumps(resJson),
+                    'recording_id': recording_id,
+                    'analysis_id': analysis_id,
+                }
             )
             
             updated_rows = cur.rowcount
@@ -158,9 +163,12 @@ def process_row(analysis_id):
     analisis_audio(newDir, dirName, '.webm', text, True)
     resJson, img1, img2, img3, img4 = getImageAndJson(newDir)
 
+    print("Analysis complete, storing result...")
+    print(resJson)
+
     did_store_result = store_result(analysis_id, recording_id, resJson)
 
-    print("Result: " + did_store_result)
+    print("Result: " + "Success" if did_store_result else "Failed to update analysis row")
 
 while True:
     print("fetching pending analysis rows...")
