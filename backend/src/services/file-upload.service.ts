@@ -40,21 +40,17 @@ export class FileUploadService implements MulterOptionsFactory {
 
   async uploadFileToS3(file: File): Promise<string> {
     const bucket = this.configService.get('AWS_BUCKET');
-    const filename = `${Date.now()}-${file.originalname}`;
+    const s3ObjectKey = `${Date.now()}-${file.originalname}`;
     try {
       const params = {
         Bucket: bucket,
-        Key: filename,
+        Key: s3ObjectKey,
         Body: file.buffer,
         ContentType: file.mimetype,
       };
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      const path = `https://${bucket}.s3.${this.configService.get(
-        'AWS_REGION',
-      )}.amazonaws.com/${filename}`;
-
-      return path;
+      return s3ObjectKey;
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error uploading file to S3');

@@ -29,6 +29,8 @@ RUN mfa models download dictionary spanish_latin_america_mfa
 
 RUN pip install psycopg2
 RUN pip install requests
+RUN pip install python-dotenv
+RUN pip install boto3
 
 # RUN conda init bash && exec /bin/bash && conda activate audiodsp && \
 #  conda install allosaurus epitran onnxruntime vosk
@@ -39,6 +41,6 @@ RUN pip install requests
 # conda run -n audiodsp uvicorn main:app
 # conda run --no-capture-output -n audiodsp uvicorn main:app
 # conda run --no-capture-output -n audiodsp python main.py
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "python", "main.py"]
-# ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0"]
-#ENTRYPOINT ["tail", "-f", "/dev/null"]
+# ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "python", "main.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "audiodsp", "python", "jobProcessor.py"]
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
