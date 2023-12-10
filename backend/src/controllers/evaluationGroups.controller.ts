@@ -294,4 +294,154 @@ export class EvaluationGroupsController {
       monthly_averages: monthlyAverages,
     };
   }
+
+  @Get('/:evaluationGroupId/assignments/:evaluationGroupReadingId')
+  @UseGuards(TeacherGuard)
+  async getAssignment(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
+  ) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
+      where: {
+        id: Number(evaluationGroupId),
+        teacher_id: userId,
+      },
+    });
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+
+    const evaluationGroupReading =
+      await this.prismaService.evaluationGroupReading.findFirst({
+        where: {
+          id: Number(evaluationGroupReadingId),
+          evaluation_group_id: Number(evaluationGroupId),
+        },
+        include: {
+          Reading: true,
+        },
+      });
+    if (!evaluationGroupReading) {
+      throw new UnprocessableEntityException(
+        'Evaluation group reading not found',
+      );
+    }
+    const averageScore = await this.prismaService.analysis.aggregate({
+      _avg: {
+        score: true,
+      },
+      where: {
+        Recording: {
+          evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        },
+      },
+    });
+
+    const doneAssignments = await this.prismaService.recording.findMany({
+      distinct: ['student_id'],
+      select: {
+        student_id: true,
+      },
+      where: {
+        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+      },
+    });
+
+    const doneAssignmentsCount = doneAssignments.length;
+
+    const allEvaluationGroupReadingStudents =
+      await this.prismaService.student.count({
+        where: {
+          EvaluationGroups: {
+            some: {
+              id: Number(evaluationGroupId),
+            },
+          },
+        },
+      });
+
+    const doneRecordings = await this.prismaService.recording.findMany({
+      where: {
+        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+      },
+      include: {
+        Student: true,
+        Analysis: true,
+      },
+    });
+
+    const averageErrors = await this.prismaService.analysis.aggregate({
+      _avg: {
+        silences_count: true,
+        repetitions_count: true,
+        similarity_error: true,
+      },
+      where: {
+        Recording: {
+          evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        },
+      },
+    });
+
+    const mostRepeatedWords = await this.prismaService.$queryRaw`
+      SELECT word, COUNT(*)::integer AS repetition_count
+      FROM (
+        SELECT unnest(words_with_repetitions) AS word
+        FROM "Analysis" analysis
+	      JOIN "Recording" recording ON analysis.recording_id = recording.id
+	      AND recording.evaluation_group_reading_id = ${evaluationGroupReading.id}
+      ) AS word_list
+      GROUP BY word
+      ORDER BY repetition_count DESC
+      LIMIT(6);
+    `;
+
+    const {
+      Reading: { title, category, subcategory },
+      due_date,
+      created_at,
+    } = evaluationGroupReading;
+
+    const { similarity_error, repetitions_count, silences_count } =
+      averageErrors._avg;
+
+    const isOpen =
+      evaluationGroupReading.due_date.getTime() > new Date().getTime();
+
+    return {
+      assignment: {
+        due_date,
+        created_at,
+        reading: {
+          title,
+          category,
+          subcategory,
+        },
+      },
+      assignments_done: doneAssignmentsCount,
+      assignments_pending:
+        allEvaluationGroupReadingStudents - doneAssignmentsCount,
+      isOpen,
+      average_score: averageScore._avg.score || 0,
+      recordings: doneRecordings.map(({ Student, Analysis, created_at }) => {
+        const lastRecording = Analysis.length
+          ? Analysis[Analysis.length - 1]
+          : null;
+        return {
+          studentName: `${Student.first_name} ${Student.last_name}`,
+          studentId: Student.cedula,
+          email: Student.email,
+          status: lastRecording.status,
+          dateSubmitted: created_at,
+        };
+      }),
+      average_errors: {
+        repetitions_count,
+        silences_count,
+        general_errors: similarity_error,
+      },
+      most_repeated_words: mostRepeatedWords,
+    };
+  }
 }
