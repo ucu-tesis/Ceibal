@@ -13,6 +13,7 @@ load_dotenv()
 s3_client = boto3.client('s3')
 
 def get_db_connection():
+    # TODO ensure this works with docker, the env set in docker-compose.yml should be used and not the one in .env
     return psycopg2.connect(os.getenv('DATABASE_URL'))
 
 # TODO add WORKING + stale
@@ -74,19 +75,19 @@ def store_result(analysis_id, recording_id, resJson):
         UPDATE "Analysis"
         SET
             status = 'COMPLETED',
-            repetitions_count = %(repetitions_count)s
-            silences_count = %(silences_count)s
-            allosaurus_general_error = %(allosaurus_general_error)s
-            similarity_error = %(similarity_error)s
-            repeated_phonemes = %(repeated_phonemes)s
-            words_with_errors = %(words_with_errors)s
-            words_with_repetitions = %(words_with_repetitions)s
-            score = %(score)s
-            error_timestamps = %(error_timestamps)s
-            repetition_timestamps = %(repetition_timestamps)s
-            phoneme_velocity = %(phoneme_velocity)s
-            words_velocity = %(words_velocity)s
-            raw_analysis = %(raw_analysis)s
+            repetitions_count = %(repetitions_count)s,
+            silences_count = %(silences_count)s,
+            allosaurus_general_error = %(allosaurus_general_error)s,
+            similarity_error = %(similarity_error)s,
+            repeated_phonemes = %(repeated_phonemes)s,
+            words_with_errors = %(words_with_errors)s,
+            words_with_repetitions = %(words_with_repetitions)s,
+            score = %(score)s,
+            error_timestamps = %(error_timestamps)s,
+            repetition_timestamps = %(repetition_timestamps)s,
+            phoneme_velocity = %(phoneme_velocity)s,
+            words_velocity = %(words_velocity)s,
+            raw_analysis = %(raw_analysis)s,
             recording_id = %(recording_id)s
         WHERE id = %(analysis_id)s
     """
@@ -134,6 +135,8 @@ def store_result(analysis_id, recording_id, resJson):
     return success
 
 def process_row(analysis_id):
+    print("found and locked analysis for processing. id: " + str(analysis_id))
+    
     recording_data = get_recording_data(analysis_id)
     if not recording_data:
         print("DB query failed fetching data for analysis id " + analysis_id)
@@ -170,13 +173,13 @@ def process_row(analysis_id):
 
     print("Result: " + "Success" if did_store_result else "Failed to update analysis row")
 
+# print statements here are commented to avoid flooding the logs
 while True:
-    print("fetching pending analysis rows...")
+    # print("fetching pending analysis rows...")
     updated_row_id = grab_pending_row()
     if updated_row_id:
-        print("found and locked analysis for processing. id: " + str(updated_row_id))
         process_row(updated_row_id)
         time.sleep(1)
     else:
-        print("no analysis pending to process, waiting for 30 seconds...")
+        # print("no analysis pending to process, waiting for 30 seconds...")
         time.sleep(30)
