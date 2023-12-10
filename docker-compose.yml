@@ -14,7 +14,7 @@ services:
     expose:
       - 8000
     environment:
-      - "DATABASE_URL=postgresql://postgres:password@db:5432/ceibal_development?schema=public"
+      - "DATABASE_URL=postgresql://postgres:password@db:5432/ceibal_development"
   db:
     image: postgres:12-alpine
     environment:

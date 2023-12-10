@@ -3,8 +3,8 @@ import requests
 import os
 import boto3
 import time
-from analizar_audio import analisis_audio
 from helpers import save_data, getImageAndJson
+from analizar_audio import analisis_audio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -98,18 +98,18 @@ def store_result(analysis_id, recording_id, resJson):
             cur.execute(
                 sql,
                 (
-                    resJson.cantidad_de_repeticiones,
-                    resJson.cantidad_de_silencios,
-                    resJson.error_general_allosaurus,
-                    resJson.error_similitud,
-                    resJson.fonemas_repetidos,
-                    resJson.palabras_con_errores,
-                    resJson.palabras_con_repeticiones,
-                    resJson.puntaje,
-                    resJson.tiempo_errores,
-                    resJson.tiempo_repeticiones,
-                    int(resJson.velocidad_fonemas) if resJson.velocidad_fonemas else 0,
-                    int(resJson.velocidad_palabras) if resJson.velocidad_palabras else 0,
+                    resJson['cantidad_de_repeticiones'],
+                    resJson['cantidad_de_silencios'],
+                    resJson['error_general_allosaurus'],
+                    resJson['error_similitud'],
+                    resJson['fonemas_repetidos'],
+                    resJson['palabras_con_errores'],
+                    resJson['palabras_con_repeticiones'],
+                    resJson['puntaje'],
+                    resJson['tiempo_errores'],
+                    resJson['tiempo_repeticiones'],
+                    int(resJson['velocidad_fonemas']) if resJson['velocidad_fonemas'] else 0,
+                    int(resJson['velocidad_palabras']) if resJson['velocidad_palabras'] else 0,
                     resJson,
                     recording_id,
                     analysis_id
@@ -163,11 +163,12 @@ def process_row(analysis_id):
     print("Result: " + did_store_result)
 
 while True:
+    print("fetching pending analysis rows...")
     updated_row_id = grab_pending_row()
     if updated_row_id:
         print("found and locked analysis for processing. id: " + str(updated_row_id))
         process_row(updated_row_id)
         time.sleep(1)
     else:
-        print("no analysis pending to process")
+        print("no analysis pending to process, waiting for 30 seconds...")
         time.sleep(30)
