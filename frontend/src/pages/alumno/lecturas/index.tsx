@@ -3,7 +3,7 @@ import PrimaryAccordion from "@/components/accordions/PrimaryAccordion";
 import SecondaryAccordion from "@/components/accordions/SecondaryAccordion";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ReadingList from "@/components/tables/ReadingList";
+import ReadingTable from "@/components/tables/ReadingTable";
 import { useQuery } from "@tanstack/react-query";
 import Head from "next/head";
 import React from "react";
@@ -45,7 +45,7 @@ const ReadingsSelectionScreen: React.FC = () => {
                     title={subCategoryName}
                     key={`subcategory-${subCategoryName}-${subcategoryIndex}`}
                   >
-                    <ReadingList readings={readings} />
+                    <ReadingTable readings={readings} />
                   </SecondaryAccordion>
                   {subcategoryIndex < subcategories.length - 1 && (
                     <div className={styles.secondaryAccordionSpacer}></div>

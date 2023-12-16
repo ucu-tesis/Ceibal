@@ -3,11 +3,11 @@ import { useRouter } from "next/router";
 import React from "react";
 import styles from "./Table.module.css";
 
-interface ReadingListProps {
+interface ReadingTableProps {
   readings: ReadingMinimalInfo[];
 }
 
-const ReadingList: React.FC<ReadingListProps> = ({ readings }) => {
+const ReadingTable: React.FC<ReadingTableProps> = ({ readings }) => {
   const router = useRouter();
   return (
     <div className="col">
@@ -31,4 +31,4 @@ const ReadingList: React.FC<ReadingListProps> = ({ readings }) => {
   );
 };
 
-export default ReadingList;
+export default ReadingTable;
