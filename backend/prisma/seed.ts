@@ -92,9 +92,7 @@ async function load() {
       title: 'Quiero ser Súarez',
       image_url: 'https://picsum.photos/300/400',
       content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      category: 'Básico',
-      subcategory: 'Fútbol',
+        'Había una vez un niño llamado Martín que soñaba con convertirse en un gran goleador como su héroe, Luis Suárez. Martín vivía en un pequeño pueblo donde cada tarde, después de la escuela, corría al campo de fútbol con su viejo balón desgastado. Martín admiraba a Suárez no solo por sus increíbles goles, sino también por su valentía y espíritu de equipo. Decidió que algún día, él también sería un delantero formidable, igual que su ídolo.',
     },
   });
 
@@ -202,6 +200,8 @@ async function load() {
   await addStudentReading(1, groupReading1.id);
   await addStudentReading(1, groupReading2.id);
   await addStudentReading(1, groupReading3.id);
+  await addStudentReading(2, groupReading1.id);
+  await addStudentReading(1, groupReading1.id);
 
   await prisma.evaluationGroupReading.create({
     data: {
@@ -322,7 +322,7 @@ async function addStudentReading(studentId, groupReadingId) {
     error_similitud: 15,
     fonemas_repetidos: [],
     palabras_con_errores: ['some', 'text', 'some', 'text'],
-    palabras_con_repeticiones: [],
+    palabras_con_repeticiones: ['sample', 'word', 'text', 'sample'],
     puntaje: randomInt(50, 100),
     tiempo_errores: [1.38, 2.08, 1.38, 2.08],
     tiempo_repeticiones: [],

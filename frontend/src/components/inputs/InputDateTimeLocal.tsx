@@ -6,15 +6,15 @@ interface InputDateProps {
   onChange?: (event: ChangeEvent) => void;
 }
 
-const InputDate: React.FC<InputDateProps> = ({ value, onChange }) => {
+const InputDateTimeLocal: React.FC<InputDateProps> = ({ value, onChange }) => {
   return (
     <input
-      type="date"
+      type="datetime-local"
       className={styles["input-date"]}
-      value={value ?? new Date().toISOString().slice(0, 10)}
+      value={value ?? new Date().toISOString()}
       onChange={onChange}
     ></input>
   );
 };
 
-export default InputDate;
+export default InputDateTimeLocal;

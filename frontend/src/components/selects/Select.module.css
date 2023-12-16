@@ -27,6 +27,10 @@
   min-width: max-content;
 }
 
+.select-bar svg {
+  margin-left: auto;
+}
+
 .options div:hover {
   background-color: var(--ceibal-light-grey-secondary);
 }

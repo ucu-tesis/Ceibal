@@ -9,7 +9,7 @@ interface SelectProps {
   defaultValue: Option;
 }
 
-type Option = {
+export type Option = {
   value?: string;
   label: string;
 };

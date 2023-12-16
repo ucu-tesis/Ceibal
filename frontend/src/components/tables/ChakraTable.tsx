@@ -20,11 +20,12 @@ interface TableProps {
   columns: ChakraTableColumn[];
   data: any[];
   variant?: string;
+  maxHeight?: string;
 }
 
-const ChakraTable: React.FC<TableProps> = ({ columns, data, variant }) => (
-  <TableContainer className={`${styles["table-border"]} ${variant ? styles[variant] : ""}`}>
-    <Table className={`${styles["main-table"]}`}>
+const ChakraTable: React.FC<TableProps> = ({ columns, data, variant, maxHeight }) => (
+  <TableContainer maxHeight={maxHeight} overflowY="auto" className={`${styles["table-border"]} ${variant ? styles[variant] : ""}`}>
+    <Table  className={`${styles["main-table"]}`}>
       <Thead>
         <Tr>
           {columns.map(({ label, reactKey, width }) => (
