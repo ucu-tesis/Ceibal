@@ -40,12 +40,17 @@ const ReadingsSelectionScreen: React.FC = () => {
           >
             {subcategories.map(
               ({ name: subCategoryName, readings }, subcategoryIndex) => (
-                <SecondaryAccordion
-                  title={subCategoryName}
-                  key={`subcategory-${subCategoryName}-${subcategoryIndex}`}
-                >
-                  <ReadingList readings={readings} />
-                </SecondaryAccordion>
+                <>
+                  <SecondaryAccordion
+                    title={subCategoryName}
+                    key={`subcategory-${subCategoryName}-${subcategoryIndex}`}
+                  >
+                    <ReadingList readings={readings} />
+                  </SecondaryAccordion>
+                  {subcategoryIndex < subcategories.length - 1 && (
+                    <div className={styles.secondaryAccordionSpacer}></div>
+                  )}
+                </>
               )
             )}
           </PrimaryAccordion>

@@ -13,13 +13,18 @@ const ReadingList: React.FC<ReadingListProps> = ({ readings }) => {
     <div className="col">
       {readings.map(({ id, title }, index) => {
         return (
-          <div
-            className={styles["read-list-item"]}
-            key={index}
-            onClick={() => router.push(`/alumno/grabar/${id}`)}
-          >
-            {title}
-          </div>
+          <>
+            <div
+              className={`${styles["read-list-item"]}`}
+              key={index}
+              onClick={() => router.push(`/alumno/grabar/${id}`)}
+            >
+              {title}
+            </div>
+            {index < readings.length - 1 && (
+              <div className={styles["read-list-spacer"]}></div>
+            )}
+          </>
         );
       })}
     </div>

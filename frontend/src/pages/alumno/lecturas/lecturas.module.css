@@ -11,6 +11,10 @@
   font-weight: 600;
 }
 
+.secondaryAccordionSpacer {
+  height: 8px;
+}
+
 @media (min-width: 1440px) {
   .container {
     padding: 16px 144px;

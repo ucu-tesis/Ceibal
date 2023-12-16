@@ -36,7 +36,6 @@
   font-size: 16px;
   border-radius: 4px;
   border: 1px solid var(--ceibal-black);
-  border-bottom: none;
   background: inherit;
   background-image: url(../../assets/images/chevron_right.svg);
   background-repeat: no-repeat;
@@ -52,4 +51,8 @@
 
 .read-list-item:last-child {
   border-bottom: 1px solid var(--ceibal-black);
+}
+
+.read-list-spacer {
+  margin-bottom: 4px;
 }
