@@ -43,6 +43,7 @@
   background-position-y: center;
   background-size: 16px;
   transition: background-color ease-in-out 0.2s;
+  margin-bottom: 4px;
 }
 
 .read-list-item:hover{
@@ -51,8 +52,5 @@
 
 .read-list-item:last-child {
   border-bottom: 1px solid var(--ceibal-black);
-}
-
-.read-list-spacer {
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }

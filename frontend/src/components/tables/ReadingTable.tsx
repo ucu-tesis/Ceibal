@@ -21,9 +21,6 @@ const ReadingTable: React.FC<ReadingTableProps> = ({ readings }) => {
             >
               {title}
             </div>
-            {index < readings.length - 1 && (
-              <div className={styles["read-list-spacer"]}></div>
-            )}
           </>
         );
       })}
