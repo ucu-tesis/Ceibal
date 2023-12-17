@@ -149,6 +149,100 @@ export class EvaluationGroupsController {
     return assignment;
   }
 
+  @Get('/:evaluationGroupId/stats')
+  @UseGuards(TeacherGuard)
+  async getGroupStats(@Param('evaluationGroupId') evaluationGroupId: string) {
+    const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
+      {
+        where: {
+          id: Number(evaluationGroupId),
+        },
+      },
+    );
+    if (!evaluationGroup) {
+      throw new UnprocessableEntityException('Evaluation group not found');
+    }
+
+    const assignmentsDoneCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          Recordings: {
+            some: {},
+          },
+        },
+      });
+
+    const assignmentsPendingCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            gt: new Date(),
+          },
+          Recordings: {
+            none: {},
+          },
+        },
+      });
+
+    const assignmentsDelayedCount =
+      await this.prismaService.evaluationGroupReading.count({
+        where: {
+          evaluation_group_id: evaluationGroup.id,
+          due_date: {
+            lt: new Date(),
+          },
+          Recordings: {
+            none: {},
+          },
+        },
+      });
+
+    const monthlyAverages = (await this.prismaService.$queryRaw`
+      SELECT
+        DATE_TRUNC('month', a.created_at) as month,
+        AVG(a.score) as average_score,
+        CAST(COUNT(DISTINCT CASE WHEN r.id IS NOT NULL THEN egr.id END) AS INTEGER) as assignments_done,
+        CAST(COUNT(DISTINCT CASE WHEN r.id IS NULL AND egr.due_date > NOW() THEN egr.id END) AS INTEGER) as assignments_pending,
+        CAST(COUNT(DISTINCT CASE WHEN r.id IS NULL AND egr.due_date <= NOW() THEN egr.id END) AS INTEGER) as assignments_delayed
+      FROM "EvaluationGroupReading" egr
+      LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
+      LEFT JOIN "Analysis" a ON r.id = a.recording_id
+      WHERE egr.evaluation_group_id = ${evaluationGroup.id}
+      GROUP BY DATE_TRUNC('month', a.created_at)
+      ORDER BY month;
+    `) as {
+      month: Date;
+      average_score: number;
+      assignments_done: number;
+      assignments_pending: number;
+      assignments_delayed: number;
+    }[];
+
+    return {
+      assignments_done: assignmentsDoneCount,
+      assignments_pending: assignmentsPendingCount,
+      assignments_delayed: assignmentsDelayedCount,
+      monthly_score_averages: monthlyAverages.map((m) => ({
+        month: m.month,
+        average_score: m.average_score || 0,
+      })),
+      monthly_assignments_done: monthlyAverages.map((m) => ({
+        month: m.month,
+        assignments_done: m.assignments_done || 0,
+      })),
+      monthly_assignments_pending: monthlyAverages.map((m) => ({
+        month: m.month,
+        assignments_pending: m.assignments_pending || 0,
+      })),
+      monthly_assignments_delayed: monthlyAverages.map((m) => ({
+        month: m.month,
+        assignments_delayed: m.assignments_delayed || 0,
+      })),
+    };
+  }
+
   @Get('/:evaluationGroupId/students/:studentId')
   @UseGuards(TeacherGuard)
   async getStudent(
