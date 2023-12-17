@@ -42,6 +42,7 @@ model EvaluationGroup {
   teacher_id              Int
   Creator                 User                     @relation(name: "created", fields: [created_by], references: [id])
   created_by              Int
+  created_at              DateTime                 @default(now())
   Students                Student[]
   EvaluationGroupReadings EvaluationGroupReading[]
 }
