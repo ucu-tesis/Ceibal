@@ -39,7 +39,7 @@ def save_data(file, text):
     if newDir:
         # Save file to directory
         with open(os.path.join(newDir, f'{dateString}.webm'), 'wb') as audioFile:
-            shutil.copyfileobj(file.file, audioFile)
+            shutil.copyfileobj(file, audioFile)
 
         # Save text to directory.
         with open(os.path.join(newDir, f'{dateString}.txt'), 'w') as textFile:
@@ -49,26 +49,6 @@ def save_data(file, text):
         print("Error. Can't create the folder.")    
 
     return newDir, dateString
-    
-# importing
-from analizar_audio import analisis_audio
-
-def prueba(fecha):
-    INPUT_DIR = os.path.join('data', fecha)
-    FILENAME = fecha
-    AUDIO_EXT = '.mp3'
-
-    TEXT = "¡Pobre Diógenes! Fue un error mirarse en el espejo luego de haber comido cinco páginas \
-        de un antiguo libro de animales... Cuando vio su imagen reflejada, descubrió que ya no quería \
-        ser ratón. No me gusta ser como soy, quiero ser otro. ¡Es tan difícil ser uno mismo!, \
-        pensó mientras desaprobaba sus orejas gigantescas, sus ojos saltones y sus dientes desparejos. \
-        ¡Seré un jabalí!, exclamó de pronto Diógenes. Y al instante, como por milagro, se transformó \
-        en un extraño jabalí."
-
-    analisis_audio(INPUT_DIR, FILENAME, AUDIO_EXT, TEXT, False)
-    
-
-    return "json", "imagen"
 
 def getImageAndJson_1image(dir):
     resultDir = os.path.join(dir, 'resultado')
@@ -114,6 +94,25 @@ def getImageAndJson(dir):
 
 if __name__ == "__main__":
     print("This is a helper file...")
+
+    from analizar_audio import analisis_audio
+
+    def prueba(fecha):
+        INPUT_DIR = os.path.join('data', fecha)
+        FILENAME = fecha
+        AUDIO_EXT = '.mp3'
+
+        TEXT = "¡Pobre Diógenes! Fue un error mirarse en el espejo luego de haber comido cinco páginas \
+            de un antiguo libro de animales... Cuando vio su imagen reflejada, descubrió que ya no quería \
+            ser ratón. No me gusta ser como soy, quiero ser otro. ¡Es tan difícil ser uno mismo!, \
+            pensó mientras desaprobaba sus orejas gigantescas, sus ojos saltones y sus dientes desparejos. \
+            ¡Seré un jabalí!, exclamó de pronto Diógenes. Y al instante, como por milagro, se transformó \
+            en un extraño jabalí."
+
+        analisis_audio(INPUT_DIR, FILENAME, AUDIO_EXT, TEXT, False)
+        
+
+        return "json", "imagen"
 
     # resJson, img = prueba("2022-12-08_16-33-26")
     # print(resJson)

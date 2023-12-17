@@ -17,9 +17,9 @@ app = FastAPI()
 @app.post("/process_audio")
 async def process_audio(
     text: str = Form(...),
-    file: UploadFile = File(...)
+    upload_file: UploadFile = File(...)
 ):
-    newDir, dirName = save_data(file, text)
+    newDir, dirName = save_data(upload_file.file, text)
     # TODO revisar el ultimo arg, si es False los siguientes parametros son mockeados en la respuesta:
     # puntaje, palabras_con_errores, tiempo_errores, error_general_allosaurus,
     # palabras_con_repeticiones, tiempo_repeticiones.
@@ -38,7 +38,6 @@ async def process_audio(
 @app.get("/")
 async def root():
     return {"Message": "Hello there."}
-
 
 # import os 
 # import time

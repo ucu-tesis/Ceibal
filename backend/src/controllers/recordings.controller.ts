@@ -10,7 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadService } from 'src/services/file-upload.service';
 import { File } from 'multer';
-import { Recording } from '@prisma/client';
+import { AnalysisStatus, Recording } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
@@ -24,14 +24,34 @@ export class RecordingsController {
   ) {}
 
   // TODO consider moving this to a "student" controller with all other student-facing logic
-  @Post('/upload')
+  @Post('/upload/:evaluationGroupReadingId')
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(StudentGuard)
   async upload(
     @UserData('id') userId: number,
+    @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
     @UploadedFile() file: File,
-  ): Promise<{ path: string; data: any }> {
-    return this.fileUploadService.uploadFileToS3(file, userId);
+  ): Promise<{ recordingId: number; analysisId: number }> {
+    const s3ObjectKey = await this.fileUploadService.uploadFileToS3(file);
+
+    const recording = await this.prismaService.recording.create({
+      data: {
+        recording_url: s3ObjectKey,
+        student_id: userId,
+        // TODO check student is part of evaluation group
+        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        Analysis: {
+          create: {
+            status: AnalysisStatus.PENDING,
+          },
+        },
+      },
+      include: {
+        Analysis: true,
+      },
+    });
+
+    return { recordingId: recording.id, analysisId: recording.Analysis[0].id };
   }
 
   @Get('/')

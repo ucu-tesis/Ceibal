@@ -12,6 +12,7 @@ import Image from "next/image";
 import React, { useRef, useState } from "react";
 import SendIcon from "../../assets/images/send_icon.svg";
 import styles from "./RecordScreen.module.css";
+import { Text } from "@chakra-ui/react";
 
 export interface RecordScreenProps {
   readingDetails: ReadingDetails;
@@ -26,12 +27,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const [newRecord, setNewRecord] = useState(false);
 
   const [errorModal, setErrorModal] = useState(false);
-  const [openModal, setOpen] = useState(false);
-
-  const [score, setScore] = useState<string | null>(null);
-  const [silence, setSilence] = useState<string | null>(null);
-  const [repetitions, setRepetitions] = useState<string | null>(null);
-  const [speed, setSpeed] = useState<string | null>(null);
+  const [openModal, setOpenModal] = useState(false);
 
   const ref = useRef(null);
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -39,32 +35,17 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const errorModalRef = useRef<HTMLDivElement | null>(null);
 
   // Usar data que devuelve el hook
-  const onSuccess = async (data: Response) => {
-    setOpen(true);
-    const response = data as any;
-    const {
-      data: {
-        indicadores: {
-          cantidad_de_repeticiones,
-          cantidad_de_silencios,
-          puntaje,
-          velocidad_palabras,
-        },
-      },
-    } = response;
-    setScore(puntaje + "");
-    setSilence(cantidad_de_silencios + "");
-    setRepetitions(cantidad_de_repeticiones + "");
-    setSpeed(velocidad_palabras + "");
+  const onSuccess = async () => {
+    setOpenModal(true);
   };
 
   const onError = (data: any) => {
-    console.error("Error uploading file:", data?.status);
-    console.log(`error: ${JSON.stringify(error)}`);
+    console.log(`error: ${JSON.stringify(error)}`); // TODO check why this is printing null
+    console.error(data);
     setErrorModal(true);
   };
 
-  const { mutate, isLoading, error } = useFileUpload(onSuccess, onError);
+  const { mutate, isLoading, error } = useFileUpload(readingDetails.evaluationGroupReadingId, onSuccess, onError);
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -132,7 +113,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
       modal.style.transform = "scale(0.5)";
     }
     setTimeout(() => {
-      setOpen(false);
+      setOpenModal(false);
     }, 300);
   };
 
@@ -159,18 +140,19 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
           {openModal && (
             <ModalDialog
               componentRef={modalRef}
-              title="Resultado De Evaluacion"
+              title="¡Genial!"
             >
               <div className="progress col">
-                <ProgressBar value={score ?? "50"}></ProgressBar>
-                <span>Cantidad de pausas: {silence}</span>
-                <span>Cantidad de repeticiones: {repetitions}</span>
-                <span>Velocidad de lectura: {speed} palabras/minuto</span>
+                <Text fontSize={16} lineHeight={2}>
+                  Tu lectura se ha enviado correctamente. ¡Felicidades!
+                  <br />
+                  Ahora puedes continuar explorando y aprendiendo.
+                </Text>
                 <SecondaryButton
                   onClick={closeModal}
                   variant={"blueFill" as keyof Object}
                 >
-                  Aceptar
+                  Continuar
                 </SecondaryButton>
               </div>
             </ModalDialog>
