@@ -1,6 +1,8 @@
+import { Category } from "@/models/Category";
 import { PaginatedCompletedReadings } from "@/models/CompletedReadings";
-import { Reading, ReadingStatus } from "@/models/Reading";
+import { Reading, ReadingMinimalInfo, ReadingStatus } from "@/models/Reading";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
 
 export interface CompletedReadingsRequest {
@@ -33,6 +35,21 @@ interface ReadingDetailsResponse {
   reading_title: string;
 }
 
+interface ReadingListResponse {
+  reading_id: number;
+  title?: string;
+}
+
+interface SubcategoryListResponse {
+  subcategory?: string;
+  readings: ReadingListResponse[];
+}
+
+interface CategoryListResponse {
+  category?: string;
+  subcategories: SubcategoryListResponse[];
+}
+
 export const fetchCompletedReadings = ({
   page,
   pageSize,
@@ -47,6 +64,11 @@ export const fetchReadingDetails = (id: number) =>
   axiosInstance
     .get<ReadingDetailsResponse>(`students/readings/details/${id}`)
     .then(({ data }) => parseReadingDetails(data));
+
+export const fetchReadings = () =>
+  axiosInstance
+    .get<CategoryListResponse[]>("students/readings/all")
+    .then(({ data }) => parseReadingsListResponse(data));
 
 // Parse methods
 
@@ -73,4 +95,30 @@ const parseReadingDetails = (
   id: readingDetails.reading_id,
   subcategory: readingDetails.reading_subcategory,
   title: readingDetails.reading_title,
+});
+
+const parseReadingsListResponse = (res: CategoryListResponse[]): Category[] =>
+  res
+    .map(({ category, subcategories }) => ({
+      name: category ?? "",
+      subcategories: subcategories
+        .map(parseSubcategoryListResponse)
+        .filter((s) => !!s.name), // Remove subcategories without name
+    }))
+    .filter((c) => !!c.name); // Remove categories without name
+
+const parseSubcategoryListResponse = ({
+  readings,
+  subcategory,
+}: SubcategoryListResponse): Subcategory => ({
+  name: subcategory ?? "",
+  readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
+});
+
+const parseReadingListResponse = ({
+  reading_id,
+  title,
+}: ReadingListResponse): ReadingMinimalInfo => ({
+  id: reading_id,
+  title: title ?? "",
 });

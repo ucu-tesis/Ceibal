@@ -1,13 +1,17 @@
-.accordeon {
+.accordion {
     border: 1px solid var(--ceibal-black);
     border-radius: 8px;
 }
 
-.accordeon > span.closed {
+.primaryAccordion {
+    margin-bottom: 32px;
+}
+
+.accordion > span.closed {
     border-radius: 6px;
 }
 
-.accordeon > span {
+.accordion > span {
     font-size: 24px;
     font-weight: 500;
     padding-block: 8px;
@@ -22,29 +26,29 @@
     align-items: center;
 }
 
-.accordeon > span div {
+.accordion > span div {
     margin-left: auto;
 }
 
-.accordeon > span div img {
+.accordion > span div img {
     width: 16px;
     height: 16px;
 }
 
-.accordeon > span div:last-child {
+.accordion > span div:last-child {
     margin-right: 16px;
     transition: transform linear 0.1s;
 }
 
-.accordeon > span:not(.closed) div:last-child {
+.accordion > span:not(.closed) div:last-child {
     transform: rotate(-90deg);
 }
 
-.accordeon span:not(.closed):focus {
+.accordion span:not(.closed):focus {
     box-shadow: 0px 0px 8px 6px rgba(80, 175, 50, 0.8);
 }
 
-.accordeon > span.secondary {
+.accordion > span.secondary {
     background-color: var(--ceibal-sky-blue);
     font-size: 16px;
     text-align: left;
@@ -54,14 +58,14 @@
     align-items: center;
 }
 
-.accordeon > span.secondary div:first-child {
+.accordion > span.secondary div:first-child {
     margin-left: unset;
 }
 
-.accordeon span.secondary:not(.closed):focus {
+.accordion span.secondary:not(.closed):focus {
     box-shadow: 0px 0px 8px 6px rgba(0, 160, 225, 0.8);
 }
 
-.accordeon .body.open {
+.accordion .body.open {
     padding: 8px;
 }

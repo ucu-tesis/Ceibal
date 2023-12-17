@@ -1,6 +1,6 @@
+import { fakerES as faker } from '@faker-js/faker';
 import { AnalysisStatus, PrismaClient } from '@prisma/client';
 import { randomInt } from 'crypto';
-import { fakerES as faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
@@ -102,6 +102,8 @@ async function load() {
       image_url: 'https://picsum.photos/300/400',
       content:
         'Elementum curabitur vitae nunc sed velit. Vel turpis nunc eget lorem dolor. Nisl purus in mollis nunc sed id semper risus in. Blandit aliquam etiam erat velit scelerisque in. Laoreet id donec ultrices tincidunt arcu non sodales neque. Fermentum dui faucibus in ornare quam viverra orci. Velit laoreet id donec ultrices tincidunt arcu. Adipiscing bibendum est ultricies integer. Purus faucibus ornare suspendisse sed nisi lacus sed viverra tellus. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Imperdiet nulla malesuada pellentesque elit eget gravida cum. Praesent semper feugiat nibh sed pulvinar proin gravida hendrerit. Viverra mauris in aliquam sem fringilla ut morbi. Convallis tellus id interdum velit laoreet id donec. Dui faucibus in ornare quam viverra orci. In eu mi bibendum neque.',
+      category: 'Básico',
+      subcategory: 'Fútbol',
     },
   });
 
@@ -111,6 +113,8 @@ async function load() {
       image_url: 'https://picsum.photos/300/400',
       content:
         'Dictum varius duis at consectetur lorem. Commodo viverra maecenas accumsan lacus vel facilisis volutpat est. Quisque id diam vel quam elementum. Mi eget mauris pharetra et ultrices neque ornare aenean euismod. Iaculis at erat pellentesque adipiscing commodo elit. Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+      category: 'Avanzado',
+      subcategory: 'Ciencias',
     },
   });
 
@@ -120,6 +124,8 @@ async function load() {
       image_url: 'https://picsum.photos/300/400',
       content:
         'Quisque id diam vel quam elementum. Mi eget mauris pharetra et ultrices neque ornare aenean euismod. Iaculis at erat pellentesque adipiscing commodo elit. Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+      category: 'Intermedio',
+      subcategory: 'Guerra',
     },
   });
 
@@ -129,6 +135,41 @@ async function load() {
       image_url: 'https://picsum.photos/300/400',
       content:
         'Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+      category: 'Intermedio',
+      subcategory: 'Guerra',
+    },
+  });
+
+  const testReading6 = await prisma.reading.create({
+    data: {
+      title: '200 Páginas en blanco: Edición Limitada',
+      image_url: 'https://picsum.photos/300/400',
+      content:
+        'Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+      category: 'Intermedio',
+      subcategory: 'Guerra',
+    },
+  });
+
+  const testReading7 = await prisma.reading.create({
+    data: {
+      title: '999 Páginas en blanco: Edición Limitada',
+      image_url: 'https://picsum.photos/300/400',
+      content:
+        'Felis donec et odio pellentesque diam volutpat. Vitae semper quis lectus nulla at volutpat diam. Eget est lorem ipsum dolor. Risus sed vulputate odio ut enim blandit. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Felis imperdiet proin fermentum leo vel orci porta. Neque gravida in fermentum et. Odio eu feugiat pretium nibh ipsum. Mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan. Massa sed elementum tempus egestas sed sed risus pretium quam. Faucibus purus in massa tempor nec feugiat. Dapibus ultrices in iaculis nunc sed. Nulla facilisi cras fermentum odio eu feugiat.',
+      category: 'Avanzado',
+      subcategory: 'Guerra',
+    },
+  });
+
+  const testReading8 = await prisma.reading.create({
+    data: {
+      title: 'Princesofía',
+      image_url: 'https://picsum.photos/300/400',
+      content:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      category: 'Básico',
+      subcategory: 'Princesas',
     },
   });
 
