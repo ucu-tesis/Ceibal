@@ -1,8 +1,10 @@
 import { Assignment } from "@/models/Assignment";
+import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
+import { RepeatedWords } from "@/models/Stats";
 
 interface GroupsResponse {
   data: GroupResponse[];
@@ -41,6 +43,29 @@ interface StudentResponse {
   last_name: string;
 }
 
+interface AssignmentStatsResponse {
+  assignment: {
+    due_date: string;
+    created_at: string;
+    reading: {
+      title: string;
+      category: string;
+      subcategory: string;
+    };
+  };
+  assignments_done: number;
+  assignments_pending: number;
+  isOpen: boolean;
+  average_score: number;
+  recordings: AssignmentReading[];
+  average_errors: {
+    repetitions_count: number;
+    silences_count: number;
+    general_errors: number;
+  };
+  most_repeated_words: RepeatedWords[];
+}
+
 export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
     .get<GroupDetailsResponse>(`/evaluationGroups/${groupId}`)
@@ -53,10 +78,15 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
+export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) => {
+  axiosInstance.get<AssignmentStatsResponse>(
+    `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
+  );
+};
+
 // Parse methods
 
-const parseGroupsResponse = (res: GroupsResponse): Group[] =>
-  res.data.map(parseGroupResponse);
+const parseGroupsResponse = (res: GroupsResponse): Group[] => res.data.map(parseGroupResponse);
 
 const parseGroupResponse = (group: GroupResponse): Group => ({
   createdBy: group.created_by,
@@ -66,9 +96,7 @@ const parseGroupResponse = (group: GroupResponse): Group => ({
   ...group,
 });
 
-const parseGroupDetailsResponse = (
-  res: GroupDetailsResponse
-): GroupDetails => ({
+const parseGroupDetailsResponse = (res: GroupDetailsResponse): GroupDetails => ({
   createdBy: res.created_by,
   id: res.id,
   name: res.name,
@@ -79,9 +107,7 @@ const parseGroupDetailsResponse = (
   students: res.Students?.map(parseStudentResponse) ?? [],
 });
 
-const parseAssignmentResponse = (
-  assignment: AssignmentResponse
-): Assignment => ({
+const parseAssignmentResponse = (assignment: AssignmentResponse): Assignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
   readingCategory: assignment.reading_category,
