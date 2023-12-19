@@ -398,7 +398,7 @@ export class EvaluationGroupsController {
     `;
 
     const {
-      Reading: { title, category, subcategory },
+      Reading: { title, category, subcategory, id },
       due_date,
       created_at,
     } = evaluationGroupReading;
@@ -411,9 +411,11 @@ export class EvaluationGroupsController {
 
     return {
       assignment: {
+        id: evaluationGroupReading.id,
         due_date,
         created_at,
         reading: {
+          id,
           title,
           category,
           subcategory,

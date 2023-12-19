@@ -3,20 +3,22 @@ import { AssignmentReading } from "./AssignmentReading";
 
 export interface RepeatedWords {
   word: string;
-  repetition_count: number;
+  repetitionCount: number;
+}
+
+interface AverageErrors {
+  repetitionsCount: number;
+  silencesCount: number;
+  generalErrors: number;
 }
 
 export interface AssignmentStats {
   assignment: Assignment;
-  assignments_done: number;
-  assignments_pending: number;
+  assignmentsDone: number;
+  assignmentsPending: number;
   isOpen: boolean;
-  average_score: number;
+  averageScore: number;
   recordings: AssignmentReading[];
-  average_errors: {
-    repetitions_count: number;
-    silences_count: number;
-    general_errors: number;
-  };
-  most_repeated_words: RepeatedWords[];
+  averageErrors: AverageErrors;
+  mostRepeatedWords: RepeatedWords[];
 }
