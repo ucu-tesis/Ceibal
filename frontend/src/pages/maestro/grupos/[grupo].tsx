@@ -90,7 +90,7 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
   }));
 
 const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate }) => ({
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
     readingCategory,
     readingSubcategory,
     readingTitle,
@@ -99,7 +99,14 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
       <Link
         href={{
           pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
-          query: { grupo: groupId, tarea: readingTitle, groupName, readingCategory, readingSubcategory },
+          query: {
+            grupo: groupId,
+            tarea: evaluationGroupReadingId,
+            groupName,
+            readingCategory,
+            readingSubcategory,
+            readingTitle,
+          },
         }}
       >
         Ver detalles

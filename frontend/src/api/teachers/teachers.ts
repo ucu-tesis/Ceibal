@@ -85,12 +85,11 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
-export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) => {
+export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) =>
   axiosInstance
     .get<AssignmentStatsResponse>(`evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`)
     .then(({ data }) => parseAssignmentStatsResponse(data));
-};
-
+    
 // Parse methods
 
 const parseGroupsResponse = (res: GroupsResponse): Group[] => res.data.map(parseGroupResponse);

@@ -19,6 +19,10 @@ import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import { AssignmentReading } from "@/models/AssignmentReading";
 import { dateFormats, inputRegex } from "@/constants/constants";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
+import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
+import ErrorPage from "@/components/errorPage/ErrorPage";
+import LoadingPage from "@/components/loadingPage/LoadingPage";
+import { ReadingStatus } from "@/models/Reading";
 
 interface Params {
   alumno: string;
@@ -40,97 +44,96 @@ const readingColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
-
-const dataRadar = {
-  labels: metrics,
-  datasets: [
-    {
-      label: "Puntuación",
-      data: [65, 59, 90, 81, 56, 55, 40],
-      fill: true,
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      borderColor: "rgb(255, 99, 132)",
-      pointBackgroundColor: "rgb(255, 99, 132)",
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: "rgb(255, 99, 132)",
-    },
-  ],
-};
-
-const dataPie = {
-  labels: ["Pepe", "Tortuga", "Dormido"],
-  datasets: [
-    {
-      label: "My First Dataset",
-      data: [300, 50, 100],
-      backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
-      hoverOffset: 4,
-    },
-  ],
-};
+const metrics = ["Repeticiones", "Pausas", "Faltas"];
 
 const defaultOption: Option = {
   label: "Todos",
   value: undefined,
 };
 
-const readingList: AssignmentReading[] = [
-  {
-    studentName: "Ana García",
-    studentId: "4866987-2",
-    email: "agarcia@gmail.com",
-    status: "Procesando",
-    dateSubmitted: new Date(),
-  },
-  {
-    studentName: "Pedro López",
-    studentId: "4866987-2",
-    email: "plopez@gmail.com",
-    status: "Enviado",
-    dateSubmitted: new Date(),
-  },
-  {
-    studentName: "Luis Torres",
-    studentId: "4866987-2",
-    email: "ltorres@gmail.com",
-    status: "Pendiente",
-    dateSubmitted: new Date(),
-  },
-  {
-    studentName: "Javier Alaves",
-    studentId: "4866987-2",
-    email: "jalaves@gmail.com",
-    status: "Pendiente",
-    dateSubmitted: new Date(),
-  },
-];
-
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
-  const assignment = router.query.tarea;
-  const readingCategory = router.query.readingCategory;
-  const readingSubcategory = router.query.readingSubCategory;
   const group = router.query.groupName;
+
+  const evaluationGroudReadingId = router.query.tarea;
+  const groupId = router.query.grupo;
+
+  const { data, isLoading, isError } = useFetchAssignmentStats(Number(evaluationGroudReadingId), Number(groupId));
+
+  const {
+    assignment,
+    assignmentsDone,
+    assignmentsPending,
+    isOpen,
+    averageErrors,
+    averageScore,
+    mostRepeatedWords,
+    recordings,
+  } = data ?? {
+    assignment: null,
+    assignmentsDone: 0,
+    assignmentsPending: 0,
+    isOpen: false,
+    averageScore: 0,
+    averageErrors: null,
+    mostRepeatedWords: [],
+    recordings: [],
+  };
+
+  const dataRadar = {
+    labels: metrics,
+    datasets: [
+      {
+        label: "Errores",
+        data: [averageErrors?.repetitionsCount, averageErrors?.silencesCount, averageErrors?.generalErrors],
+        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgb(255, 99, 132)",
+        pointBackgroundColor: "rgb(255, 99, 132)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
+      },
+    ],
+  };
+
+  const dataPie = {
+    labels: mostRepeatedWords.map(({ word }) => word),
+    datasets: [
+      {
+        label: "My First Dataset",
+        data: mostRepeatedWords.map(({ repetitionCount }) => repetitionCount),
+        backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
+        hoverOffset: 4,
+      },
+    ],
+  };
 
   useChartJSInitializer();
 
   const [readingSearchQuery, setReadingSearchQuery] = useState("");
   const [statusOption, setStatusOption] = useState<string | undefined>(undefined);
 
-  const { filteredReadings } = useFilteredEvaluations(readingList, readingSearchQuery, statusOption);
+  const { filteredReadings } = useFilteredEvaluations(recordings, readingSearchQuery, statusOption);
+
+  const statusList: ReadingStatus[] = ["COMPLETED", "FAILED", "PENDING", "WORKING"];
+
+  const statusLabels = {
+    COMPLETED: "Completado",
+    FAILED: "Fallido",
+    PENDING: "Pendiente",
+    WORKING: "Procesando",
+  };
 
   const statusOptions: Option[] = [
     defaultOption,
-    { label: "Procesando", value: "Procesando" },
-    { label: "Enviado", value: "Enviado" },
-    { label: "Pendiente", value: "Pendiente" },
+    ...statusList.map((status) => ({ label: statusLabels[status], value: status })),
   ];
 
   const toTableListEvaluation = (readings: AssignmentReading[]) =>
     readings.map((reading) => ({
       ...reading,
+      status: statusLabels[reading.status as keyof Object],
       dateSubmitted: dayjs(reading.dateSubmitted).format(dateFormats.assignmentDueDate),
       link: (
         <Link
@@ -143,6 +146,13 @@ export default function Page({ params }: { params: Params }) {
         </Link>
       ),
     }));
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+  if (isError) {
+    return <ErrorPage intendedAction="obtener estadísticas de la tarea" />;
+  }
 
   return (
     <ChakraProvider>
@@ -164,33 +174,35 @@ export default function Page({ params }: { params: Params }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{assignment}</BreadcrumbLink>
+            <BreadcrumbLink href="#">{assignment?.readingTitle}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>Resultado de evaluación</h1>
 
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={`col ${styles.stats}`}>
-            <h5 tabIndex={0}>Lectura: {assignment}</h5>
-            <h5 tabIndex={0}>Categoría: {readingCategory}</h5>
-            <h5 tabIndex={0}>Subcategoría: {readingSubcategory}</h5>
-            <h5 tabIndex={0}>Fecha de Creación: 2023-05-19 09:15</h5>
-            <h5 tabIndex={0}>Fecha de Cierre: 2023-10-20 09:15</h5>
+            <h5 tabIndex={0}>Lectura: {assignment?.readingTitle}</h5>
+            <h5 tabIndex={0}>Categoría: {assignment?.readingCategory}</h5>
+            <h5 tabIndex={0}>Subcategoría: {assignment?.readingSubcategory}</h5>
+            <h5 tabIndex={0}>
+              Fecha de Creación: {dayjs(assignment?.createdDate).format(dateFormats.assignmentDueDate)}
+            </h5>
+            <h5 tabIndex={0}>Fecha de Cierre: {dayjs(assignment?.dueDate).format(dateFormats.assignmentDueDate)}</h5>
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressBar value="92" variant="small"></ProgressBar>
+              <ProgressBar value={Math.round(averageScore).toString()} variant="small"></ProgressBar>
               <div className="row">
-                <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                <span>Enviadas: 25</span>
+                <Image alt="lecturas completadas" src={SentTasksIcon} />
+                <span>Completadas: {assignmentsDone}</span>
               </div>
               <div className="row">
                 <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                <span>Pendientes: 25</span>
+                <span>Pendientes: {isOpen ? assignmentsPending : 0}</span>
               </div>
               <div className="row">
                 <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                <span>Atrasadas: 25</span>
+                <span>Atrasadas: {!isOpen ? assignmentsPending : 0}</span>
               </div>
             </div>
           </div>
@@ -199,7 +211,7 @@ export default function Page({ params }: { params: Params }) {
           <Radar width={600} data={dataRadar}></Radar>
           <Pie width={600} data={dataPie}></Pie>
         </div>
-        <h2 tabIndex={0}>Alumnos</h2>
+        <h2 tabIndex={0}>Entregas</h2>
         <div className={`${styles.filters} row`}>
           <InputGroup>
             <Input
