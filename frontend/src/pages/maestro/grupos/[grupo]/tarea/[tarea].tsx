@@ -17,7 +17,7 @@ import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas
 import { Pie, Radar } from "react-chartjs-2";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import { AssignmentReading } from "@/models/AssignmentReading";
-import { dateFormats, inputRegex } from "@/constants/constants";
+import { dateFormats, inputRegex, notFoundMessage } from "@/constants/constants";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
@@ -55,10 +55,10 @@ export default function Page({ params }: { params: Params }) {
   const router = useRouter();
   const group = router.query.groupName;
 
-  const evaluationGroudReadingId = router.query.tarea;
+  const evaluationGroupReadingId = router.query.tarea;
   const groupId = router.query.grupo;
 
-  const { data, isLoading, isError } = useFetchAssignmentStats(Number(evaluationGroudReadingId), Number(groupId));
+  const { data, isLoading, isError } = useFetchAssignmentStats(Number(evaluationGroupReadingId), Number(groupId));
 
   const {
     assignment,
@@ -181,13 +181,23 @@ export default function Page({ params }: { params: Params }) {
 
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={`col ${styles.stats}`}>
-            <h5 tabIndex={0}>Lectura: {assignment?.readingTitle}</h5>
-            <h5 tabIndex={0}>Categoría: {assignment?.readingCategory}</h5>
-            <h5 tabIndex={0}>Subcategoría: {assignment?.readingSubcategory}</h5>
+            <h5 tabIndex={0}>Lectura: {assignment?.readingTitle ? assignment.readingTitle : notFoundMessage}</h5>
             <h5 tabIndex={0}>
-              Fecha de Creación: {dayjs(assignment?.createdDate).format(dateFormats.assignmentDueDate)}
+              Categoría: {assignment?.readingCategory ? assignment.readingCategory : notFoundMessage}
             </h5>
-            <h5 tabIndex={0}>Fecha de Cierre: {dayjs(assignment?.dueDate).format(dateFormats.assignmentDueDate)}</h5>
+            <h5 tabIndex={0}>
+              Subcategoría: {assignment?.readingSubcategory ? assignment.readingSubcategory : notFoundMessage}
+            </h5>
+            <h5 tabIndex={0}>
+              {assignment?.createdDate
+                ? `Fecha de Creación: ${dayjs(assignment?.createdDate).format(dateFormats.assignmentDueDate)}`
+                : notFoundMessage}
+            </h5>
+            <h5 tabIndex={0}>
+              {assignment?.dueDate
+                ? `Fecha de Cierre: ${dayjs(assignment?.dueDate).format(dateFormats.assignmentDueDate)}`
+                : notFoundMessage}
+            </h5>
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
@@ -196,14 +206,18 @@ export default function Page({ params }: { params: Params }) {
                 <Image alt="lecturas completadas" src={SentTasksIcon} />
                 <span>Completadas: {assignmentsDone}</span>
               </div>
-              <div className="row">
-                <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                <span>Pendientes: {isOpen ? assignmentsPending : 0}</span>
-              </div>
-              <div className="row">
-                <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                <span>Atrasadas: {!isOpen ? assignmentsPending : 0}</span>
-              </div>
+              {isOpen && (
+                <div className="row">
+                  <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+                  <span>Pendientes: {assignmentsPending}</span>
+                </div>
+              )}
+              {!isOpen && (
+                <div className="row">
+                  <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+                  <span>Atrasadas: {assignmentsPending}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
