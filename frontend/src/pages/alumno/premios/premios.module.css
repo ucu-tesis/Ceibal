@@ -1,5 +1,5 @@
 .container {
-  padding: 16px;
+  padding: 32px;
   gap: 16px;
   justify-content: center;
 }
@@ -13,4 +13,9 @@
 .container h2 {
   font-size: 24px;
   font-weight: 400;
+}
+
+.awards {
+  justify-content: space-around;
+  flex-wrap: wrap;
 }

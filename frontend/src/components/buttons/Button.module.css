@@ -94,7 +94,7 @@
   align-items: center;
   border-radius: 10px;
   border: 1px solid var(--ceibal-green);
-  background: #F9F9F9;
+  background: #f9f9f9;
   color: var(--ceibal-black);
   padding: 12px 16px;
   gap: 18px;
@@ -150,6 +150,32 @@
 .disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-col {
+  gap: 16px;
+  align-items: center;
+}
+
+.image-btn {
+  background: transparent;
+  width: 220px;
+  height: 220px;
+  border: 1px solid var(--ceibal-black);
+  border-radius: 50%;
+}
+
+.image-btn.silver img {
+  filter: brightness(2) grayscale(100%);
+}
+
+.image-btn.gold img {
+  filter: brightness(2) sepia(1.5) saturate(2.5);
+}
+
+.btn-col span {
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 @media (max-width: 500px) {
