@@ -4,7 +4,7 @@ import Head from "next/head";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import ProgressBar from "@/components/progress/ProgressBar";
+import ProgressCircle from "@/components/progress/ProgressCircle";
 import styles from "./resultado.module.css";
 
 interface Params {
@@ -53,7 +53,7 @@ export default function Page({ params }: { params: Params }) {
             <h5 tabIndex={0}>Sección: 6</h5>
             <h5 tabIndex={0}>Capítulo: 4</h5>
           </div>
-          <ProgressBar value="92"></ProgressBar>
+          <ProgressCircle value="92"></ProgressCircle>
         </div>
         <h2 tabIndex={0}>Métricas</h2>
         <div className={`col ${styles.stats} ${styles.border}`}>
