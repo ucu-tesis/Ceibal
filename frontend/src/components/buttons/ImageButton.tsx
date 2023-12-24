@@ -7,13 +7,25 @@ interface ImageButtonProps {
   altText: string;
   description: string;
   variant?: string;
+  overlayText?: string;
 }
 
-const ImageButton: React.FC<ImageButtonProps> = ({ src, altText, description, variant = "" }) => {
+const ImageButton: React.FC<ImageButtonProps> = ({
+  src,
+  altText,
+  description,
+  variant = "",
+  overlayText = undefined,
+}) => {
   return (
     <div className={`${styles["btn-col"]} col`}>
       <button type="button" className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}>
         <Image src={src} alt={altText}></Image>
+        {overlayText && (
+          <div className={styles.overlay}>
+            <span>{overlayText}</span>
+          </div>
+        )}
       </button>
       <span>{description}</span>
     </div>

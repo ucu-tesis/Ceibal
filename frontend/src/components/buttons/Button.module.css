@@ -158,6 +158,7 @@
 }
 
 .image-btn {
+  position: relative;
   background: transparent;
   width: 220px;
   height: 220px;
@@ -165,16 +166,36 @@
   border-radius: 50%;
 }
 
+.overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: var(--ceibal-overlay);
+}
+
 .image-btn.silver img {
   filter: brightness(2) grayscale(100%);
 }
 
 .image-btn.gold img {
-  filter: brightness(2) sepia(1.5) saturate(2.5);
+  filter: brightness(1.5) sepia(1.5) saturate(2.5);
 }
 
 .btn-col span {
   font-size: 14px;
+  text-transform: uppercase;
+}
+
+.overlay span {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ceibal-white);
   text-transform: uppercase;
 }
 
