@@ -19,3 +19,48 @@
   justify-content: space-around;
   flex-wrap: wrap;
 }
+
+.award-modal {
+  width: 100%;
+  gap: 32px;
+}
+
+.award-modal button {
+  align-self: center;
+  width: 220px !important;
+}
+
+.award-modal > div {
+  gap: 24px;
+  align-items: center;
+}
+
+.award-modal > div > div {
+  gap: 16px;
+  justify-content: center;
+}
+
+.award-modal strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.award-modal span {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  cursor: pointer;
+  width: auto !important;
+  background: transparent;
+  border: none;
+}
+
+.close-btn img {
+  width: 40px;
+  height: 40px;
+}

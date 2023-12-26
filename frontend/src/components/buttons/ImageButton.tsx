@@ -3,23 +3,25 @@ import React from "react";
 import styles from "./Button.module.css";
 
 interface ImageButtonProps {
+  onClick?: (award: any) => void;
   src: any; // Use any to avoid conflicts with @svgr/webpack plugin or babel-plugin-inline-react-svg plugin.
   altText: string;
-  description: string;
+  title: string;
   variant?: string;
   overlayText?: string;
 }
 
 const ImageButton: React.FC<ImageButtonProps> = ({
+  onClick,
   src,
   altText,
-  description,
+  title,
   variant = "",
   overlayText = undefined,
 }) => {
   return (
     <div className={`${styles["btn-col"]} col`}>
-      <button type="button" className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}>
+      <button onClick={onClick} type="button" className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}>
         <Image src={src} alt={altText}></Image>
         {overlayText && (
           <div className={styles.overlay}>
@@ -27,7 +29,7 @@ const ImageButton: React.FC<ImageButtonProps> = ({
           </div>
         )}
       </button>
-      <span>{description}</span>
+      <span>{title}</span>
     </div>
   );
 };

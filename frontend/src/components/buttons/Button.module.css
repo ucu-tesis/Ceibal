@@ -158,6 +158,7 @@
 }
 
 .image-btn {
+  cursor: pointer;
   position: relative;
   background: transparent;
   width: 220px;
