@@ -1,19 +1,45 @@
-import React, { ChangeEvent, useState } from "react";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
-import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
-import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
-import Select from "../selects/Select";
-import { dateFormats, inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
-import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
-import { SearchIcon } from "@chakra-ui/icons";
+import {
+  inputRegex,
+  tableMaxHeightModal,
+  toastDuration,
+} from "@/constants/constants";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
+import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
-import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
-import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
+import { dateFormats } from "@/util/dates";
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Checkbox,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Step,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
+  useSteps,
+  useToast,
+} from "@chakra-ui/react";
 import dayjs from "dayjs";
+import React, { ChangeEvent, useState } from "react";
+import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
+import Select from "../selects/Select";
+import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 
 interface AssignmentModalProps {
   isOpen: boolean;
@@ -67,7 +93,11 @@ const toAssignmentTableListModal = (
         onChange={(event: ChangeEvent) => {
           const checkbox = event.target as HTMLInputElement;
           if (checkbox.checked) {
-            checkedCallback({ readingCategory, readingSubcategory, readingTitle });
+            checkedCallback({
+              readingCategory,
+              readingSubcategory,
+              readingTitle,
+            });
           } else {
             uncheckedCallback(readingTitle);
           }
@@ -90,46 +120,72 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   styles,
 }) => {
   const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
-  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] = useState("");
+  const [modalAssignmentSearchQuery, setModalAssignmentSearchQuery] =
+    useState("");
   const [categoryOptionModal, setCategoryOptionModal] = useState<string>();
-  const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string>();
+  const [subcategoryOptionModal, setSubcategoryOptionModal] =
+    useState<string>();
 
-  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>(dayjs(new Date()).format(dateFormats.assignmentDueDate));
-
-  const { filteredStudents: filteredStudentsModal } = useFilteredStudents(students ?? [], modalStudentSearchQuery);
-
-  const { filteredAssignments: filteredAssignmentsModal } = useFilteredAssignments(
-    assignments,
-    modalAssignmentSearchQuery,
-    categoryOptionModal,
-    subcategoryOptionModal
+  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>(
+    []
   );
-  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
+  const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    dayjs(new Date()).format(dateFormats.assignmentDueDate)
+  );
+
+  const { filteredStudents: filteredStudentsModal } = useFilteredStudents(
+    students ?? [],
+    modalStudentSearchQuery
+  );
+
+  const { filteredAssignments: filteredAssignmentsModal } =
+    useFilteredAssignments(
+      assignments,
+      modalAssignmentSearchQuery,
+      categoryOptionModal,
+      subcategoryOptionModal
+    );
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
+    useAssignmentFilterOptions(assignments);
 
   const addStudents = (student: any) => {
-    setSelectedStudents((prevSelectedStudents) => [...prevSelectedStudents, student]);
+    setSelectedStudents((prevSelectedStudents) => [
+      ...prevSelectedStudents,
+      student,
+    ]);
   };
 
   const removeStudents = (fullName: any) => {
-    setSelectedStudents(selectedStudents.filter((elem) => elem.fullName !== fullName));
+    setSelectedStudents(
+      selectedStudents.filter((elem) => elem.fullName !== fullName)
+    );
   };
 
   const findStudent = (fullName: any) => {
-    return selectedStudents.find((elem) => elem.fullName === fullName) !== undefined;
+    return (
+      selectedStudents.find((elem) => elem.fullName === fullName) !== undefined
+    );
   };
 
   const addAssignment = (assignment: any) => {
-    setSelectedAssignments((prevSelectedAssignments) => [...prevSelectedAssignments, assignment]);
+    setSelectedAssignments((prevSelectedAssignments) => [
+      ...prevSelectedAssignments,
+      assignment,
+    ]);
   };
 
   const removeAssignment = (readingTitle: any) => {
-    setSelectedAssignments(selectedAssignments.filter((elem) => elem.readingTitle !== readingTitle));
+    setSelectedAssignments(
+      selectedAssignments.filter((elem) => elem.readingTitle !== readingTitle)
+    );
   };
 
   const findAssignment = (readingTitle: any) => {
-    return selectedAssignments.find((elem) => elem.readingTitle === readingTitle) !== undefined;
+    return (
+      selectedAssignments.find((elem) => elem.readingTitle === readingTitle) !==
+      undefined
+    );
   };
 
   const { activeStep, setActiveStep } = useSteps({
@@ -180,7 +236,11 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             {steps.map((step, index) => (
               <Step key={index}>
                 <StepIndicator>
-                  <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
+                  <StepStatus
+                    complete={<StepIcon />}
+                    incomplete={<StepNumber />}
+                    active={<StepNumber />}
+                  />
                 </StepIndicator>
 
                 <Stack flexShrink="0">
@@ -303,7 +363,12 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 variant="simple"
                 maxHeight={tableMaxHeightModal}
                 columns={studentColumnsModal}
-                data={toStudentTableListModal(filteredStudentsModal, addStudents, removeStudents, findStudent)}
+                data={toStudentTableListModal(
+                  filteredStudentsModal,
+                  addStudents,
+                  removeStudents,
+                  findStudent
+                )}
               ></ChakraTable>
             </>
           )}
@@ -334,11 +399,20 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         </ModalBody>
         <ModalFooter className={styles["flex-center"]}>
           {activeStep > 0 && (
-            <Button onClick={undoStep} className={styles.secondary} variant="outline">
+            <Button
+              onClick={undoStep}
+              className={styles.secondary}
+              variant="outline"
+            >
               Volver
             </Button>
           )}
-          <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+          <Button
+            onClick={changeStep}
+            isDisabled={nextCondition()}
+            className={styles.primary}
+            variant="solid"
+          >
             {activeStep < 2 ? "Continuar" : "Asignar Tarea"}
           </Button>
         </ModalFooter>

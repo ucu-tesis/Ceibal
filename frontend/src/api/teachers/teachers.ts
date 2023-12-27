@@ -1,8 +1,39 @@
-import { Assignment } from "@/models/Assignment";
+import {
+  Assignment,
+  AssignmentStatus,
+  StudentAssignment,
+} from "@/models/Assignment";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
+import { MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
+
+interface StudentMonthlyAverage {
+  month: string;
+  student_avg_score: number;
+  group_avg_score: number;
+}
+
+interface StudentStatsAssignment {
+  due_date: string;
+  id: number;
+  reading_category: string;
+  reading_id: number;
+  reading_subcategory?: string;
+  reading_title: string;
+  score: number;
+  status: AssignmentStatus;
+}
+
+interface StudentStatsResponse {
+  Assignments: StudentStatsAssignment[];
+  average_score: number;
+  assignments_delayed: number;
+  assignments_done: number;
+  assignments_pending: number;
+  monthly_averages: StudentMonthlyAverage[];
+}
 
 interface GroupsResponse {
   data: GroupResponse[];
@@ -53,6 +84,13 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
+export const fetchStudentStats = (groupId: number, studentId: number) =>
+  axiosInstance
+    .get<StudentStatsResponse>(
+      `/evaluationGroups/${groupId}/students/${studentId}`
+    )
+    .then(({ data }) => parseStudentStatsResponse(data));
+
 // Parse methods
 
 const parseGroupsResponse = (res: GroupsResponse): Group[] =>
@@ -63,7 +101,8 @@ const parseGroupResponse = (group: GroupResponse): Group => ({
   schoolYear: group.school_year,
   teacherId: group.teacher_id,
   schoolData: group.school_data,
-  ...group,
+  id: group.id,
+  name: group.name,
 });
 
 const parseGroupDetailsResponse = (
@@ -96,5 +135,39 @@ const parseStudentResponse = (student: StudentResponse): Student => ({
   firstName: student.first_name,
   fullName: `${student.first_name} ${student.last_name}`,
   lastName: student.last_name,
-  ...student,
+  cedula: student.cedula,
+  email: student.email,
+  id: student.id,
+});
+
+const parseStudentAssignment = (
+  assignment: StudentStatsAssignment
+): StudentAssignment => ({
+  dueDate: new Date(assignment.due_date),
+  evaluationGroupReadingId: assignment.id,
+  readingCategory: assignment.reading_category,
+  readingId: assignment.reading_id,
+  readingSubcategory: assignment.reading_subcategory ?? "", // TODO Make this nullable in Assignment.ts model
+  readingTitle: assignment.reading_title,
+  score: assignment.score,
+  status: assignment.status,
+});
+
+const parseMonthlyAverage = (
+  monthlyAverage: StudentMonthlyAverage
+): MonthlyAverage => ({
+  groupAverageScore: monthlyAverage.group_avg_score,
+  month: new Date(monthlyAverage.month).getMonth(),
+  studentAverageScore: monthlyAverage.student_avg_score,
+});
+
+const parseStudentStatsResponse = (
+  stats: StudentStatsResponse
+): StudentStats => ({
+  assignments: stats.Assignments.map(parseStudentAssignment),
+  assignmentsDone: stats.assignments_done,
+  assignmentsPending: stats.assignments_pending,
+  assignmentsUncompleted: stats.assignments_delayed,
+  averageScore: stats.average_score,
+  monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
 });

@@ -1,13 +1,19 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
+import AssignmentModal from "@/components/modals/AssignmentModal";
+import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
+import { inputRegex } from "@/constants/constants";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
+import { dateFormats } from "@/util/dates";
 import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Breadcrumb,
@@ -38,9 +44,6 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
-import { dateFormats, inputRegex } from "@/constants/constants";
-import AssignmentModal from "@/components/modals/AssignmentModal";
-import CreateReadingModal from "@/components/modals/CreateReadingModal";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -72,40 +75,68 @@ const studentColumnsModal: ChakraTableColumn[] = [
 ];
 
 const toTableList = (students: Student[], groupId: number, groupName: string) =>
-  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0 }) => ({
-    fullName,
-    cedula,
-    email,
-    assignmentsCompleted: `${assignmentsDone}/${assignmentsDone + assignmentsPending}`,
-    link: (
-      <Link
-        href={{
-          pathname: "/maestro/grupos/[grupo]/[alumno]",
-          query: { grupo: groupId, alumno: fullName, groupName },
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+  students.map(
+    ({
+      fullName,
+      cedula,
+      email,
+      assignmentsDone = 0,
+      assignmentsPending = 0,
+      id,
+    }) => ({
+      fullName,
+      cedula,
+      email,
+      assignmentsCompleted: `${assignmentsDone}/${
+        assignmentsDone + assignmentsPending
+      }`,
+      link: (
+        <Link
+          href={{
+            pathname: "/maestro/grupos/[grupo]/[alumno]",
+            query: {
+              grupo: groupId,
+              alumno: fullName,
+              groupName,
+              studentId: id,
+            },
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
-const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate }) => ({
-    readingCategory,
-    readingSubcategory,
-    readingTitle,
-    dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-    link: (
-      <Link
-        href={{
-          pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
-          query: { grupo: groupId, tarea: readingTitle, groupName, readingCategory, readingSubcategory },
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+const toAssignmentTableList = (
+  assignments: Assignment[],
+  groupId: number,
+  groupName: string
+) =>
+  assignments.map(
+    ({ readingCategory, readingSubcategory, readingTitle, dueDate }) => ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
+      link: (
+        <Link
+          href={{
+            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+            query: {
+              grupo: groupId,
+              tarea: readingTitle,
+              groupName,
+              readingCategory,
+              readingSubcategory,
+            },
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 
@@ -187,10 +218,15 @@ export default function Page({ params }: { params: { grupo: number } }) {
     subcategoryOption
   );
 
-  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
+    useAssignmentFilterOptions(assignments);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
-  const { isOpen: isOpenReadingModal, onClose: onCloseReadingModal, onOpen: onOpenReadingModal } = useDisclosure();
+  const {
+    isOpen: isOpenReadingModal,
+    onClose: onCloseReadingModal,
+    onOpen: onOpenReadingModal,
+  } = useDisclosure();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -221,10 +257,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
-            <Button onClick={onOpen} leftIcon={<AddIcon />} className={styles.primary} variant="solid">
+            <Button
+              onClick={onOpen}
+              leftIcon={<AddIcon />}
+              className={styles.primary}
+              variant="solid"
+            >
               Asignar Tarea
             </Button>
-            <Button onClick={onOpenReadingModal} leftIcon={<AddIcon />} className={styles.secondary} variant="outline">
+            <Button
+              onClick={onOpenReadingModal}
+              leftIcon={<AddIcon />}
+              className={styles.secondary}
+              variant="outline"
+            >
               Crear Lectura
             </Button>
           </div>
@@ -305,7 +351,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, Number(groupId), groupName)}
+                data={toAssignmentTableList(
+                  filteredAssignments,
+                  Number(groupId),
+                  groupName
+                )}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -321,7 +371,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       <span>Pendientes: 25</span>
                     </div>
                     <div className="row">
-                      <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+                      <Image
+                        alt="lecturas atrasadas"
+                        src={IncompleteTasksIcon}
+                      />
                       <span>Atrasadas: 25</span>
                     </div>
                   </div>
@@ -356,7 +409,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
         students={students}
         styles={styles}
       />
-      <CreateReadingModal isOpen={isOpenReadingModal} onClose={onCloseReadingModal} styles={styles} />
+      <CreateReadingModal
+        isOpen={isOpenReadingModal}
+        onClose={onCloseReadingModal}
+        styles={styles}
+      />
     </ChakraProvider>
   );
 }

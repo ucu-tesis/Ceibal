@@ -1,24 +1,34 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import ProgressBar from "@/components/progress/ProgressBar";
+import Select from "@/components/selects/Select";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
+import { inputRegex } from "@/constants/constants";
+import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
+import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
+import { AssignmentReading } from "@/models/AssignmentReading";
+import { dateFormats } from "@/util/dates";
+import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  ChakraProvider,
+  Input,
+  InputGroup,
+  InputRightAddon,
+} from "@chakra-ui/react";
+import dayjs from "dayjs";
 import Head from "next/head";
 import Image from "next/image";
-import { ChakraProvider } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
-import Select from "@/components/selects/Select";
-import ProgressBar from "@/components/progress/ProgressBar";
-import dayjs from "dayjs";
-import styles from "./tarea.module.css";
-import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Pie, Radar } from "react-chartjs-2";
+import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
 import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
-import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
-import { Pie, Radar } from "react-chartjs-2";
-import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
-import { AssignmentReading } from "@/models/AssignmentReading";
-import { dateFormats, inputRegex } from "@/constants/constants";
-import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
+import styles from "./tarea.module.css";
 
 interface Params {
   alumno: string;
@@ -40,7 +50,13 @@ const readingColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const metrics = ["Repeticiones", "Pausar", "Faltas", "Velocidad", "Pronunciación"];
+const metrics = [
+  "Repeticiones",
+  "Pausar",
+  "Faltas",
+  "Velocidad",
+  "Pronunciación",
+];
 
 const dataRadar = {
   labels: metrics,
@@ -65,7 +81,11 @@ const dataPie = {
     {
       label: "My First Dataset",
       data: [300, 50, 100],
-      backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
+      backgroundColor: [
+        "rgb(255, 99, 132)",
+        "rgb(54, 162, 235)",
+        "rgb(255, 205, 86)",
+      ],
       hoverOffset: 4,
     },
   ],
@@ -117,9 +137,15 @@ export default function Page({ params }: { params: Params }) {
   useChartJSInitializer();
 
   const [readingSearchQuery, setReadingSearchQuery] = useState("");
-  const [statusOption, setStatusOption] = useState<string | undefined>(undefined);
+  const [statusOption, setStatusOption] = useState<string | undefined>(
+    undefined
+  );
 
-  const { filteredReadings } = useFilteredEvaluations(readingList, readingSearchQuery, statusOption);
+  const { filteredReadings } = useFilteredEvaluations(
+    readingList,
+    readingSearchQuery,
+    statusOption
+  );
 
   const statusOptions: Option[] = [
     defaultOption,
@@ -131,12 +157,19 @@ export default function Page({ params }: { params: Params }) {
   const toTableListEvaluation = (readings: AssignmentReading[]) =>
     readings.map((reading) => ({
       ...reading,
-      dateSubmitted: dayjs(reading.dateSubmitted).format(dateFormats.assignmentDueDate),
+      dateSubmitted: dayjs(reading.dateSubmitted).format(
+        dateFormats.assignmentDueDate
+      ),
       link: (
         <Link
           href={{
             pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: { grupo: group, groupName: group, alumno: reading.studentName, evaluacion: 1 },
+            query: {
+              grupo: group,
+              groupName: group,
+              alumno: reading.studentName,
+              evaluacion: 1,
+            },
           }}
         >
           Ver detalles
@@ -230,7 +263,10 @@ export default function Page({ params }: { params: Params }) {
             ></Select>
           </div>
         </div>
-        <ChakraTable columns={readingColumns} data={toTableListEvaluation(filteredReadings)}></ChakraTable>
+        <ChakraTable
+          columns={readingColumns}
+          data={toTableListEvaluation(filteredReadings)}
+        ></ChakraTable>
       </div>
     </ChakraProvider>
   );
