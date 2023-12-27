@@ -3,9 +3,10 @@ import {
   AssignmentStatus,
   StudentAssignment,
 } from "@/models/Assignment";
+import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
-import { MonthlyAverage, StudentStats } from "@/models/Stats";
+import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
 
@@ -72,6 +73,36 @@ interface StudentResponse {
   last_name: string;
 }
 
+export interface RepeatedWords {
+  word: string;
+  repetition_count: number;
+}
+
+interface AssignmentStatsResponse {
+  assignment: {
+    id: string;
+    due_date: string;
+    created_at: string;
+    reading: {
+      id: string;
+      title: string;
+      category: string;
+      subcategory: string;
+    };
+  };
+  assignments_done: number;
+  assignments_pending: number;
+  isOpen: boolean;
+  average_score: number;
+  recordings: AssignmentReading[];
+  average_errors: {
+    repetitions_count: number;
+    silences_count: number;
+    general_errors: number;
+  };
+  most_repeated_words: RepeatedWords[];
+}
+
 export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
     .get<GroupDetailsResponse>(`/evaluationGroups/${groupId}`)
@@ -90,6 +121,16 @@ export const fetchStudentStats = (groupId: number, studentId: number) =>
       `/evaluationGroups/${groupId}/students/${studentId}`
     )
     .then(({ data }) => parseStudentStatsResponse(data));
+
+export const fetchAssignmentStats = (
+  evaluationGroupId: number,
+  evaluationGroupReadingId: number
+) =>
+  axiosInstance
+    .get<AssignmentStatsResponse>(
+      `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
+    )
+    .then(({ data }) => parseAssignmentStatsResponse(data));
 
 // Parse methods
 
@@ -171,3 +212,45 @@ const parseStudentStatsResponse = (
   averageScore: stats.average_score,
   monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
 });
+
+const parseAssignmentStatsResponse = (
+  stats: AssignmentStatsResponse
+): AssignmentStats => {
+  const {
+    assignment: { due_date, created_at, reading, id },
+    assignments_done,
+    assignments_pending,
+    isOpen,
+    recordings,
+    average_errors: { general_errors, repetitions_count, silences_count },
+    average_score,
+    most_repeated_words,
+  } = stats;
+  return {
+    assignment: {
+      dueDate: new Date(due_date),
+      evaluationGroupReadingId: parseInt(id),
+      createdDate: new Date(created_at),
+      readingCategory: reading.category,
+      readingId: parseInt(reading.id),
+      readingSubcategory: reading.subcategory,
+      readingTitle: reading.title,
+    },
+    assignmentsDone: assignments_done,
+    assignmentsPending: assignments_pending,
+    isOpen,
+    recordings: recordings,
+    averageErrors: {
+      generalErrors: general_errors,
+      repetitionsCount: repetitions_count,
+      silencesCount: silences_count,
+    },
+    averageScore: average_score,
+    mostRepeatedWords: most_repeated_words.map(
+      ({ repetition_count, word }) => ({
+        repetitionCount: repetition_count,
+        word,
+      })
+    ),
+  };
+};

@@ -114,7 +114,13 @@ const toAssignmentTableList = (
   groupName: string
 ) =>
   assignments.map(
-    ({ readingCategory, readingSubcategory, readingTitle, dueDate }) => ({
+    ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate,
+      evaluationGroupReadingId,
+    }) => ({
       readingCategory,
       readingSubcategory,
       readingTitle,
@@ -125,10 +131,11 @@ const toAssignmentTableList = (
             pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
             query: {
               grupo: groupId,
-              tarea: readingTitle,
+              tarea: evaluationGroupReadingId,
               groupName,
               readingCategory,
               readingSubcategory,
+              readingTitle,
             },
           }}
         >
