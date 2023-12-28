@@ -18,6 +18,7 @@
 .awards {
   justify-content: space-around;
   flex-wrap: wrap;
+  gap: 16px;
 }
 
 .award-modal {

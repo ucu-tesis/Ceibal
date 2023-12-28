@@ -3,7 +3,7 @@ import Image from "next/image";
 import React, { useRef, useState } from "react";
 import styles from "./premios.module.css";
 import ProgressBar from "@/components/progress/ProgressBar";
-import BronceAward from "@/assets/images/premio_bronce.svg";
+import BronzeAward from "@/assets/images/premio_bronce.svg";
 import ImageButton from "@/components/buttons/ImageButton";
 import { bronzeAward, goldAward, silverAward } from "@/constants/constants";
 import { Award } from "@/models/Award";
@@ -122,7 +122,7 @@ const Premios: React.FC = () => {
                       }
                     : undefined
                 }
-                src={BronceAward}
+                src={BronzeAward}
                 altText={altText}
                 title={title}
                 variant={variant}
@@ -144,7 +144,7 @@ const Premios: React.FC = () => {
                       }
                     : undefined
                 }
-                src={BronceAward}
+                src={BronzeAward}
                 altText={altText}
                 title={title}
                 variant={variant}
@@ -161,7 +161,7 @@ const Premios: React.FC = () => {
           </button>
           <div className={`${styles["award-modal"]} col`}>
             <ImageButton
-              src={BronceAward}
+              src={BronzeAward}
               altText={selectedAward.altText}
               title={""}
               variant={selectedAward.variant}
