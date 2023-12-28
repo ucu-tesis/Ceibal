@@ -39,7 +39,7 @@ const StudentHomeScreen: React.FC = () => {
           />
           <CardButton
             leftIcon={<Image src={Trofeo} alt="" />}
-            onClick={() => router.push(`${currentPathName}`)} // TODO: Modify URL when rewards page is done.
+            onClick={() => router.push(`${currentPathName}/premios`)}
             text="Ver mi colección de premios"
           />
         </div>

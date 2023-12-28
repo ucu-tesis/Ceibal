@@ -7,7 +7,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import Select from "@/components/selects/Select";
-import ProgressBar from "@/components/progress/ProgressBar";
+import ProgressCircle from "@/components/progress/ProgressCircle";
 import dayjs from "dayjs";
 import styles from "./tarea.module.css";
 import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
@@ -201,7 +201,7 @@ export default function Page({ params }: { params: Params }) {
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressBar value={Math.round(averageScore).toString()} variant="small"></ProgressBar>
+              <ProgressCircle value={Math.round(averageScore).toString()} variant="small"></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas completadas" src={SentTasksIcon} />
                 <span>Completadas: {assignmentsDone}</span>

@@ -8,7 +8,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRig
 import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import Select from "@/components/selects/Select";
 import useFilteredTasks from "@/hooks/teachers/useFilteredTasks";
-import ProgressBar from "@/components/progress/ProgressBar";
+import ProgressCircle from "@/components/progress/ProgressCircle";
 import styles from "./alumno.module.css";
 import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
 import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
@@ -162,7 +162,7 @@ export default function Page({ params }: { params: Params }) {
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressBar value="92" variant="small"></ProgressBar>
+              <ProgressCircle value="92" variant="small"></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas enviadas" src={SentTasksIcon} />
                 <span>Enviadas: 25</span>
