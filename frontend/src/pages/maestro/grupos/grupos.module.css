@@ -127,6 +127,10 @@ td .badge {
   max-width: 70%;
 }
 
+.form-value > textarea {
+  max-width: unset;
+}
+
 .modal-content {
   min-width: 700px;
 }

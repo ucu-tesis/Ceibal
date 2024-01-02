@@ -95,7 +95,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="repo">Repositorio Público</label>
-            <Switch id="repo" colorScheme="green" />
+            <Switch id="repo" colorScheme="green" size='lg' />
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="portada">Portada</label>
