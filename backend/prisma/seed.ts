@@ -219,7 +219,8 @@ async function load() {
     },
   });
 
-  addStudents(testTeacher);
+  await addStudents(testTeacher);
+  await addAchievements();
 }
 
 async function addSSOUsers(testTeacher) {
@@ -377,6 +378,53 @@ async function addStudents(teacher) {
       include: { EvaluationGroups: true },
     });
   }
+}
+
+async function addAchievements() {
+  const achievements = [
+    {
+      id: 1,
+      name: 'Lector Principiante',
+      description: 'Has completado tu primer lectura',
+      image_url: 'https://picsum.photos/400/400?random=1',
+    },
+    {
+      id: 2,
+      name: 'Lector Intermedio',
+      description: 'Has completado 5 lecturas',
+      image_url: 'https://picsum.photos/400/400?random=2',
+    },
+    {
+      id: 3,
+      name: 'Lector Avanzado',
+      description: 'Has completado 10 lecturas',
+      image_url: 'https://picsum.photos/400/400?random=3',
+    },
+    {
+      id: 4,
+      name: 'Lector Experto',
+      description: 'Has completado 20 lecturas',
+      image_url: 'https://picsum.photos/400/400?random=4',
+    },
+  ];
+  await prisma.achievement.createMany({
+    data: achievements,
+  });
+
+  const userAchievements = [
+    {
+      student_id: 1,
+      achievement_id: 1,
+    },
+    {
+      student_id: 1,
+      achievement_id: 2,
+    },
+  ];
+
+  await prisma.studentAchievement.createMany({
+    data: userAchievements,
+  });
 }
 
 const main = async () => {

@@ -226,4 +226,29 @@ export class StudentsController {
       evaluation_group_reading_id: assignment.id,
     };
   }
+
+  @Get('/achievements')
+  @UseGuards(StudentGuard)
+  async getAchievements(@UserData('id') userId: number) {
+    const achievements = await this.prismaService.achievement.findMany();
+
+    const studentAchievements =
+      await this.prismaService.studentAchievement.findMany({
+        where: {
+          student_id: userId,
+        },
+      });
+
+    const achievementsWithStatus = achievements.map((achievement) => {
+      const achieved = studentAchievements.some(
+        (sa) => sa.achievement_id === achievement.id,
+      );
+      return {
+        ...achievement,
+        achieved,
+      };
+    });
+
+    return achievementsWithStatus;
+  }
 }
