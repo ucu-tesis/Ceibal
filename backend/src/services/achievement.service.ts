@@ -14,7 +14,7 @@ export class AchievementService {
     });
   }
 
-  async processAchievements(studentId: number) {
+  async processReadingAmountAchievements(studentId: number) {
     const completedReadingsCount = await this.prismaService.recording.count({
       where: {
         student_id: studentId,

@@ -53,7 +53,7 @@ export class RecordingsController {
       },
     });
 
-    await this.achievementService.processAchievements(userId);
+    await this.achievementService.processReadingAmountAchievements(userId);
 
     return { recordingId: recording.id, analysisId: recording.Analysis[0].id };
   }
