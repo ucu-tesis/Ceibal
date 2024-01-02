@@ -21,7 +21,7 @@ const enterClick = (event: any) => {
   }
 };
 
-const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
+const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
   const divRef = useRef(null);
   const [selectValue, setValue] = useState(defaultValue);
   const [openOptions, setOpen] = useState(false);
@@ -52,8 +52,6 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
       onClick={() => {
         if (!openOptions) {
           setOpen(true);
-        } else {
-          setOpen(false)
         }
       }}
     >
@@ -61,6 +59,7 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
       <ChevronDownIcon />
       {openOptions && (
         <div className={`${styles.options} col`}>
+          <input type="text" />
           {options.map((element, index) => {
             return (
               <div
@@ -84,4 +83,4 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
   );
 };
 
-export default Select;
+export default SearchBox;

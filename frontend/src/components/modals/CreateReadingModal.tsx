@@ -13,6 +13,7 @@ import { Input, InputGroup, Button, Switch, useToast } from "@chakra-ui/react";
 import Select, { Option } from "../selects/Select";
 import { isNullOrEmpty } from "@/util/util";
 import { toastDuration } from "@/constants/constants";
+import SearchBox from "../selects/SearchBox";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
       duration: toastDuration,
       isClosable: true,
     });
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -91,11 +92,11 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Subcategoría</label>
-            <Select defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></Select>
+            <SearchBox defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="repo">Repositorio Público</label>
-            <Switch id="repo" colorScheme="green" size='lg' />
+            <Switch id="repo" colorScheme="green" size="lg" />
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="portada">Portada</label>
