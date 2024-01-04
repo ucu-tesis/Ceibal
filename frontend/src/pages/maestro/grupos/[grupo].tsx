@@ -156,8 +156,6 @@ const dataBar = {
   ],
 };
 
-const steps = ["Agregar Tareas", "Agregar Alumnos", "Resumen"];
-
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const groupId = query.grupo;
@@ -358,7 +356,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
         onClose={onClose}
         assignmentColumnsModal={assignmentColumnsModal}
         assignments={assignments}
-        steps={steps}
         studentColumnsModal={studentColumnsModal}
         students={students}
         styles={styles}
