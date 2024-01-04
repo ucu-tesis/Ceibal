@@ -174,24 +174,6 @@ td .badge {
   margin-top: 8px;
 }
 
-.form-value input[type="file"]:before {
-  position: absolute;
-  display: block;
-  content: "Subir";
-  padding-top: 8px;
-  width: 116px;
-  text-indent: 36px;
-  height: 32px;
-  left: -1px;
-  top: 30px;
-  background: var(--ceibal-green);
-  border: 1px solid var(--ceibal-green);
-  border-radius: 12px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 @media (max-width: 500px) {
   .container {
     padding: 16px;
