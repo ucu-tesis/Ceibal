@@ -123,12 +123,16 @@ td .badge {
   max-width: 180px;
 }
 
-.medium, .form-value > div {
+.medium {
   max-width: 70%;
 }
 
-.form-value > textarea {
-  max-width: unset;
+.form-value > div {
+  max-width: 100%;
+}
+
+.form-value > label {
+  width: fit-content;
 }
 
 .modal-content {

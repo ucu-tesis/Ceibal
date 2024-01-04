@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -14,6 +14,7 @@ import Select, { Option } from "../selects/Select";
 import { isNullOrEmpty } from "@/util/util";
 import { toastDuration } from "@/constants/constants";
 import SearchBox from "../selects/SearchBox";
+import InputFile from "../inputs/InputFile";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -38,6 +39,12 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
 
   const [name, setName] = useState<string>();
   const [text, setText] = useState<string>();
+  const [file, setFile] = useState<any>();
+
+  const fileChangeCallback = (event: ChangeEvent) => {
+    const element = event.target as HTMLInputElement;
+    setFile(element.files);
+  };
 
   const createCondition = () => {
     return isNullOrEmpty(name) || isNullOrEmpty(text);
@@ -82,7 +89,6 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
               onChange={({ target: { value } }) => {
                 setText(value);
               }}
-              className={styles.medium}
               maxLength={1000}
             ></Textarea>
           </div>
@@ -100,7 +106,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="portada">Portada</label>
-            <input id="portada" type="file"></input>
+            <InputFile id="portada" value={file} onChange={fileChangeCallback}></InputFile>
           </div>
         </ModalBody>
         <ModalFooter>
