@@ -27,6 +27,17 @@
   min-width: max-content;
 }
 
+.options span {
+  align-items: center;
+  gap: 8px;
+}
+
+.options svg {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+}
+
 .options input {
   border-top-right-radius: 8px;
   border-top-left-radius: 8px;
@@ -34,6 +45,7 @@
   outline: 0;
   transition-property: var(--chakra-transition-property-common);
   transition-duration: var(--chakra-transition-duration-normal);
+  padding-bottom: 2px;
 }
 
 .options input:focus {

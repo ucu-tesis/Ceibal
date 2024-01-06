@@ -94,7 +94,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Categoría</label>
-            <Select defaultValue={categoryOptions[0]} options={categoryOptions}></Select>
+            <SearchBox defaultValue={categoryOptions[0]} options={categoryOptions}></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Subcategoría</label>

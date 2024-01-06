@@ -46,7 +46,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
   }, [openOptions]);
 
   useEffect(() => {
-    setFilteredOptions(options.filter(({ value }) => value?.includes(searchValue)));
+    setFilteredOptions(options.filter(({ label }) => label.toLowerCase()?.includes(searchValue.toLowerCase())));
   }, [searchValue, options]);
 
   return (
@@ -67,7 +67,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
       <ChevronDownIcon />
       {openOptions && (
         <div className={`${styles.options} col`}>
-          <div className="row">
+          <span className="row">
             <input
               type="text"
               placeholder="Buscar"
@@ -76,7 +76,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
               }}
             />
             <SearchIcon />
-          </div>
+          </span>
           {filteredOptions.length > 0 ? (
             filteredOptions.map((element, index) => {
               return (
