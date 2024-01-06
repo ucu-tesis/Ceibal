@@ -242,7 +242,7 @@ export default function Page({ params }: { params: Params }) {
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
               <ProgressCircle
-                value={`${averageScore.toFixed(2)}`}
+                value={`${Math.round(averageScore)}`}
                 variant="small"
               ></ProgressCircle>
               <div className="row">
