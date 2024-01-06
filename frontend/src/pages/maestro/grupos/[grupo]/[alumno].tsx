@@ -10,7 +10,7 @@ import { inputRegex } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
-import { dateFormats } from "@/util/dates";
+import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
 import { getOptionsFromArray } from "@/util/select";
 import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -28,7 +28,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { Line, Radar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import DatePicker from "react-datepicker";
 import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
 import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
@@ -39,12 +39,6 @@ interface Params {
   alumno: string;
   grupo: number;
   groupName: string;
-}
-
-interface Task {
-  category: string;
-  subcategory: string;
-  reading: string;
 }
 
 type Option = {
@@ -59,52 +53,30 @@ const taskColumns: ChakraTableColumn[] = [
   { label: "Fecha de entrega" },
 ];
 
-// TODO integrate with backend
-const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
-const metrics = [
-  "Repeticiones",
-  "Pausar",
-  "Faltas",
-  "Velocidad",
-  "Pronunciación",
-];
+// const metrics = [
+//   "Repeticiones",
+//   "Pausar",
+//   "Faltas",
+//   "Velocidad",
+//   "Pronunciación",
+// ];
 
-const dataLine = {
-  labels: months,
-  datasets: [
-    {
-      id: 1,
-      label: "Grupos",
-      data: [5, 6, 7, 4, 3, 5],
-      backgroundColor: "#B1A5FF",
-      borderColor: "#B1A5FF",
-    },
-    {
-      id: 2,
-      label: "Promedio",
-      data: [3, 2, 1, 4, 7, 3],
-      backgroundColor: "#FBE38E",
-      borderColor: "#FBE38E",
-    },
-  ],
-};
-
-const dataRadar = {
-  labels: metrics,
-  datasets: [
-    {
-      label: "Puntuación",
-      data: [65, 59, 90, 81, 56, 55, 40],
-      fill: true,
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      borderColor: "rgb(255, 99, 132)",
-      pointBackgroundColor: "rgb(255, 99, 132)",
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: "rgb(255, 99, 132)",
-    },
-  ],
-};
+// const dataRadar = {
+//   labels: metrics,
+//   datasets: [
+//     {
+//       label: "Puntuación",
+//       data: [65, 59, 90, 81, 56, 55, 40],
+//       fill: true,
+//       backgroundColor: "rgba(255, 99, 132, 0.2)",
+//       borderColor: "rgb(255, 99, 132)",
+//       pointBackgroundColor: "rgb(255, 99, 132)",
+//       pointBorderColor: "#fff",
+//       pointHoverBackgroundColor: "#fff",
+//       pointHoverBorderColor: "rgb(255, 99, 132)",
+//     },
+//   ],
+// };
 
 const defaultOption: Option = {
   label: "Todas",
@@ -209,10 +181,51 @@ export default function Page({ params }: { params: Params }) {
     );
   }
 
+  const {
+    assignmentsDone,
+    assignmentsPending,
+    assignmentsUncompleted,
+    averageScore,
+    monthlyAverages,
+  } = data;
+
+  const sortedMonthlyAverages = monthlyAverages.sort(
+    ({ month: lhm }, { month: rhm }) => lhm - rhm
+  );
+
+  const labels = sortedMonthlyAverages.map(
+    ({ month }) => SPANISH_MONTH_NAMES[month] // Assuming months start at 0
+  );
+
+  const groupDataset = {
+    id: 1,
+    label: "Grupo",
+    data: sortedMonthlyAverages.map(
+      ({ groupAverageScore }) => groupAverageScore
+    ),
+    backgroundColor: "#B1A5FF",
+    borderColor: "#B1A5FF",
+  };
+  const studentDataset = {
+    id: 2,
+    label: typeof studentFullName === "string" ? studentFullName : "Alumno",
+    data: sortedMonthlyAverages.map(
+      ({ studentAverageScore }) => studentAverageScore
+    ),
+    backgroundColor: "#FBE38E",
+    borderColor: "#FBE38E",
+  };
+  const datasets = [groupDataset, studentDataset];
+
+  const monthlyAveragesChartData = {
+    labels,
+    datasets,
+  };
+
   return (
     <ChakraProvider>
       <Head>
-        <title>Resultado Evaluación</title>
+        <title>Estadísticas de alumno</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
@@ -236,18 +249,21 @@ export default function Page({ params }: { params: Params }) {
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressCircle value="92" variant="small"></ProgressCircle>
+              <ProgressCircle
+                value={`${averageScore.toFixed(2)}`}
+                variant="small"
+              ></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                <span>Enviadas: 25</span>
+                <span>Enviadas: {assignmentsDone}</span>
               </div>
               <div className="row">
                 <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                <span>Pendientes: 25</span>
+                <span>Pendientes: {assignmentsPending}</span>
               </div>
               <div className="row">
                 <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                <span>Atrasadas: 25</span>
+                <span>Atrasadas: {assignmentsUncompleted}</span>
               </div>
             </div>
           </div>
@@ -263,8 +279,10 @@ export default function Page({ params }: { params: Params }) {
           </div>
         </div>
         <div className={`row ${styles.canvas}`}>
-          <Line data={dataLine} width={400}></Line>
-          <Radar data={dataRadar}></Radar>
+          {monthlyAverages.length > 0 && (
+            <Line data={monthlyAveragesChartData} width={400}></Line>
+          )}
+          {/* <Radar data={dataRadar}></Radar> */}
         </div>
         <h2 tabIndex={0}>Tareas</h2>
         <div className={`${styles.filters} row`}>
