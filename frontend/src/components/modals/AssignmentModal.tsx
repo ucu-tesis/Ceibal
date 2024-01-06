@@ -14,6 +14,7 @@ import { Student } from "@/models/Student";
 import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
 import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
+import { useMutation } from "@tanstack/react-query";
 
 interface AssignmentModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface AssignmentModalProps {
   students: Student[];
   assignmentColumnsModal: ChakraTableColumn[];
   studentColumnsModal: ChakraTableColumn[];
+  evaluationGroupId: number;
   styles: any;
 }
 
@@ -58,7 +60,7 @@ const toAssignmentTableListModal = (
   uncheckedCallback: (readingTitle: any) => void,
   defaultValueCallback: (readingTitle: any) => boolean
 ) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle }) => ({
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, readingId }) => ({
     checkbox: (
       <Checkbox
         key={readingTitle}
@@ -66,7 +68,7 @@ const toAssignmentTableListModal = (
         onChange={(event: ChangeEvent) => {
           const checkbox = event.target as HTMLInputElement;
           if (checkbox.checked) {
-            checkedCallback({ readingCategory, readingSubcategory, readingTitle });
+            checkedCallback({ readingCategory, readingSubcategory, readingTitle, readingId });
           } else {
             uncheckedCallback(readingTitle);
           }
@@ -92,6 +94,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   students,
   assignmentColumnsModal,
   studentColumnsModal,
+  evaluationGroupId,
   styles,
 }) => {
   const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
@@ -99,7 +102,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [categoryOptionModal, setCategoryOptionModal] = useState<string>();
   const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string>();
 
-  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
+  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);  
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(dayjs(new Date()).format(dateFormats.assignmentDueDate));
 
@@ -144,10 +147,26 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   const toast = useToast();
 
-  const changeStep = () => {
-    if (activeStep < steps.length - 1) {
-      setActiveStep(activeStep + 1);
-    } else {
+  // TODO test this
+  const { mutate, isLoading, error } = useMutation({
+    mutationFn: async (assignments: Assignment[]) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/evaluationGroups/${evaluationGroupId}/assignments`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            reading_id: assignments[0].readingId,
+            due_date: selectedDate,
+          }),
+        }
+      );
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Error creating assignment: " + response.status);
+      }
+    },
+    onSuccess: () => {
       setActiveStep(0);
       onClose();
       toast({
@@ -156,6 +175,23 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         duration: toastDuration,
         isClosable: true,
       });
+    },
+    onError: () => {
+      // TODO proper error modal
+      toast({
+        title: "Error",
+        status: "error",
+        duration: toastDuration,
+        isClosable: true,
+      });
+    },
+  });
+
+  const changeStep = () => {
+    if (activeStep < steps.length - 1) {
+      setActiveStep(activeStep + 1);
+    } else {
+      mutate(selectedAssignments);
     }
   };
 

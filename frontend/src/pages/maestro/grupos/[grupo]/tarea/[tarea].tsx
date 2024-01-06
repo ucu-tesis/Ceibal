@@ -22,7 +22,7 @@ import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import { ReadingStatus } from "@/models/Reading";
+import { AnalysisStatus } from "@/models/Recording";
 
 interface Params {
   alumno: string;
@@ -116,7 +116,7 @@ export default function Page({ params }: { params: Params }) {
 
   const { filteredReadings } = useFilteredEvaluations(recordings, readingSearchQuery, statusOption);
 
-  const statusList: ReadingStatus[] = ["COMPLETED", "FAILED", "PENDING", "WORKING"];
+  const statusList: AnalysisStatus[] = ["COMPLETED", "FAILED", "PENDING", "WORKING"];
 
   const statusLabels = {
     COMPLETED: "Completado",

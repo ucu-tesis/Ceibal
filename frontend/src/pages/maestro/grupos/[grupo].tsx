@@ -71,7 +71,7 @@ const studentColumnsModal: ChakraTableColumn[] = [
   { label: "Correo" },
 ];
 
-const toTableList = (students: Student[], groupId: number, groupName: string) =>
+const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
   students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0 }) => ({
     fullName,
     cedula,
@@ -81,7 +81,7 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
       <Link
         href={{
           pathname: "/maestro/grupos/[grupo]/[alumno]",
-          query: { grupo: groupId, alumno: fullName, groupName },
+          query: { grupo: evaluationGroupId, alumno: fullName, groupName },
         }}
       >
         Ver detalles
@@ -89,7 +89,7 @@ const toTableList = (students: Student[], groupId: number, groupName: string) =>
     ),
   }));
 
-const toAssignmentTableList = (assignments: Assignment[], groupId: number, groupName: string) =>
+const toAssignmentTableList = (assignments: Assignment[], evaluationGroupId: number, groupName: string) =>
   assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
     readingCategory,
     readingSubcategory,
@@ -100,7 +100,7 @@ const toAssignmentTableList = (assignments: Assignment[], groupId: number, group
         href={{
           pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
           query: {
-            grupo: groupId,
+            grupo: evaluationGroupId,
             tarea: evaluationGroupReadingId,
             groupName,
             readingCategory,
@@ -158,8 +158,8 @@ const dataBar = {
 
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
-  const groupId = query.grupo;
-  const { data, isLoading, isError } = useFetchGroupDetails(Number(groupId));
+  const evaluationGroupId = Number(query.grupo);
+  const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -264,7 +264,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={columns}
-                data={toTableList(filteredStudents, Number(groupId), groupName)}
+                data={toTableList(filteredStudents, evaluationGroupId, groupName)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -310,7 +310,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, Number(groupId), groupName)}
+                data={toAssignmentTableList(filteredAssignments, evaluationGroupId, groupName)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -358,6 +358,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
         assignments={assignments}
         studentColumnsModal={studentColumnsModal}
         students={students}
+        evaluationGroupId={evaluationGroupId}
         styles={styles}
       />
       <CreateReadingModal isOpen={isOpenReadingModal} onClose={onCloseReadingModal} styles={styles} />
