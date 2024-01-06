@@ -1,7 +1,7 @@
 import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ProgressBar from "@/components/progress/ProgressBar";
+import ProgressCircle from "@/components/progress/ProgressCircle";
 import Select from "@/components/selects/Select";
 import ChakraTable, {
   ChakraTableColumn,
@@ -258,10 +258,10 @@ export default function Page({ params }: { params: Params }) {
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressBar
+              <ProgressCircle
                 value={Math.round(averageScore).toString()}
                 variant="small"
-              ></ProgressBar>
+              ></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas completadas" src={SentTasksIcon} />
                 <span>Completadas: {assignmentsDone}</span>

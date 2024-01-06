@@ -2,21 +2,17 @@ import React from "react";
 import styles from "./Progress.module.css";
 
 interface ProgressBarProps {
-  value: string;
-  variant?: string;
+  value: number;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ value, variant = "" }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
   return (
-    <div
-      className={`${styles["progress-bar"]} ${styles[variant] ?? ""} col`}
-      style={{
-        background: `radial-gradient(closest-side, #346608 79%, transparent 80% 100%),
-    conic-gradient(#4C950C ${value}%, white 0)`,
-      }}
-    >
-      <span tabIndex={0}>{value}</span>
-      <span tabIndex={0}>Puntos</span>
+    <div className={styles["progress-track"]}>
+      {value !== 0 && (
+        <div tabIndex={0} style={{ width: `${value}%` }}>
+          {value}%
+        </div>
+      )}
     </div>
   );
 };

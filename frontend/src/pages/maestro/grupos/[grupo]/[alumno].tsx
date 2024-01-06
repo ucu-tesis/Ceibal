@@ -1,7 +1,7 @@
 import useFetchStudentStats from "@/api/teachers/hooks/useFetchStudentStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ProgressBar from "@/components/progress/ProgressBar";
+import ProgressCircle from "@/components/progress/ProgressCircle";
 import Select from "@/components/selects/Select";
 import ChakraTable, {
   ChakraTableColumn,
@@ -236,7 +236,7 @@ export default function Page({ params }: { params: Params }) {
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressBar value="92" variant="small"></ProgressBar>
+              <ProgressCircle value="92" variant="small"></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas enviadas" src={SentTasksIcon} />
                 <span>Enviadas: 25</span>

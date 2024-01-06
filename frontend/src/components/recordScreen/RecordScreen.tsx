@@ -3,7 +3,6 @@ import PrimaryButton from "@/components/buttons/PrimaryButton";
 import SecondaryButton from "@/components/buttons/SecondaryButton";
 import TextContainer from "@/components/containers/TextContainer";
 import ModalDialog from "@/components/modals/ModalDialog";
-import ProgressBar from "@/components/progress/ProgressBar";
 import Spinner from "@/components/spinners/Spinner";
 import useFileUpload from "@/hooks/students/useFileUpload";
 import { ReadingDetails } from "@/models/ReadingDetails";

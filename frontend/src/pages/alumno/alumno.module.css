@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   height: calc(100% - 77px);
-  background-color: #faebdf;
+  background-color: var(--ceibal-student-background);
   align-items: center;
   padding: 36px 0px 0px 0px;
 }
