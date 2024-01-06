@@ -17,3 +17,40 @@
 .input-login::placeholder {
   color: var(--ceibal-grey-secondary);
 }
+
+.file-input {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+}
+
+.file-input input {
+  cursor: pointer;
+  opacity: 0;
+  width: 300px;
+}
+
+.file-input input::-webkit-file-upload-button {
+  cursor: pointer;
+}
+
+.file-input > div {
+  cursor: pointer;
+  z-index: -1;
+  position: absolute;
+  align-items: center;
+  gap: 16px;
+  top: 0;
+}
+
+.file-input button {
+  z-index: -1;
+  display: flex;
+  padding: 8px 16px;
+  background: var(--ceibal-green);
+  border: 1px solid var(--ceibal-green);
+  border-radius: 24px;
+  color: var(--ceibal-white);
+  font-weight: 600;
+  cursor: pointer;
+}
