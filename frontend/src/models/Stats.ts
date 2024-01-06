@@ -35,5 +35,5 @@ export interface AssignmentStats {
   averageScore: number;
   recordings: AssignmentReading[];
   averageErrors: AverageErrors;
-  mostRepeatedWords: RepeatedWords[];}
+  mostRepeatedWords: RepeatedWords[];
 }
