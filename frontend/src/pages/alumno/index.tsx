@@ -1,18 +1,34 @@
-import React from "react";
-import Head from "next/head";
-import styles from "./alumno.module.css";
+import useFetchPendingReadingsCount from "@/api/students/hooks/useFetchPendingReadingsCount";
 import CardButton from "@/components/buttons/CardButton";
+import Spinner from "@/components/spinners/Spinner";
+import { useUser } from "@/providers/UserContext";
+import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import React from "react";
 import ChicaLeyendo from "../../assets/images/chica_leyendo.svg";
 import PodioPrimerLugar from "../../assets/images/podio_primer_lugar.svg";
 import Trofeo from "../../assets/images/trofeo.svg";
-import { useRouter } from "next/router";
-import { useUser } from "@/providers/UserContext";
+import styles from "./alumno.module.css";
+
+const AssignmentsPendingCount = ({
+  isLoading,
+  count,
+}: {
+  isLoading: boolean;
+  count?: number;
+}) => {
+  if (isLoading) {
+    return <Spinner size="small" />;
+  }
+  return !!count ? <span>({count})</span> : null;
+};
 
 const StudentHomeScreen: React.FC = () => {
   const router = useRouter();
   const user = useUser();
   const currentPathName = router.pathname;
+  const { data, isLoading } = useFetchPendingReadingsCount();
 
   return (
     <>
@@ -31,6 +47,9 @@ const StudentHomeScreen: React.FC = () => {
             leftIcon={<Image src={ChicaLeyendo} alt="" />}
             onClick={() => router.push(`${currentPathName}/lecturas`)}
             text="Divertirme leyendo"
+            rightNode={
+              <AssignmentsPendingCount isLoading={isLoading} count={data} />
+            }
           />
           <CardButton
             leftIcon={<Image src={PodioPrimerLugar} alt="" />}
