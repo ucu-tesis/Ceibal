@@ -41,6 +41,11 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
     window.addEventListener("click", clickOutSelect);
     const chakraModal = document.querySelector('[role="dialog"]');
     chakraModal?.addEventListener("click", clickOutSelect);
+
+    return () => {
+      window.removeEventListener("click", clickOutSelect);
+      chakraModal?.removeEventListener("click", clickOutSelect);
+    };
   }, [openOptions]);
 
   return (
@@ -50,11 +55,7 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
       onKeyDown={enterClick}
       ref={divRef}
       onClick={() => {
-        if (!openOptions) {
-          setOpen(true);
-        } else {
-          setOpen(false)
-        }
+        setOpen(!openOptions);
       }}
     >
       {selectValue.label}

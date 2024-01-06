@@ -41,7 +41,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
   const [text, setText] = useState<string>();
   const [file, setFile] = useState<any>();
 
-  const fileChangeCallback = (event: ChangeEvent) => {
+  const onFileChange = (event: ChangeEvent) => {
     const element = event.target as HTMLInputElement;
     setFile(element.files);
   };
@@ -110,7 +110,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
               id="portada"
               accept="image/png, image/gif, image/jpeg"
               value={file}
-              onChange={fileChangeCallback}
+              onChange={onFileChange}
             ></InputFile>
           </div>
         </ModalBody>

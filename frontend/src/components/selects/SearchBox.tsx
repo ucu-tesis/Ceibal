@@ -29,7 +29,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
   const [filteredOptions, setFilteredOptions] = useState<Option[]>(options);
 
   useEffect(() => {
-    const clickOutSelect = (e: Event) => {
+    const clickOutSearchBox = (e: Event) => {
       const element = e.target as HTMLElement;
 
       if (divRef?.current) {
@@ -40,9 +40,13 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
       }
     };
 
-    window.addEventListener("click", clickOutSelect);
+    window.addEventListener("click", clickOutSearchBox);
     const chakraModal = document.querySelector('[role="dialog"]');
-    chakraModal?.addEventListener("click", clickOutSelect);
+    chakraModal?.addEventListener("click", clickOutSearchBox);
+    return () => {
+      window.removeEventListener("click", clickOutSearchBox);
+      chakraModal?.removeEventListener("click", clickOutSearchBox);
+    };
   }, [openOptions]);
 
   useEffect(() => {
@@ -58,7 +62,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
       onClick={(event) => {
         if (!openOptions) {
           setOpen(true);
-        } else if (openOptions && event.target === divRef?.current) {
+        } else if (event.target === divRef?.current) {
           setOpen(false);
         }
       }}
