@@ -21,16 +21,29 @@
   z-index: 2;
 }
 
-.options div {
+.options > div, .options > input, .options > span {
   font-size: 14px;
   padding: 12px 16px;
   min-width: max-content;
+}
+
+.options input {
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  border-bottom: 1px solid var(--ceibal-light-grey);
+  outline: 0;
+  transition-property: var(--chakra-transition-property-common);
+  transition-duration: var(--chakra-transition-duration-normal);
+}
+
+.options input:focus {
+  border-bottom: 2px solid var(--chakra-colors-blue-500);
 }
 
 .select-bar svg {
   margin-left: auto;
 }
 
-.options div:hover {
+.options > div:hover {
   background-color: var(--ceibal-light-grey-secondary);
 }

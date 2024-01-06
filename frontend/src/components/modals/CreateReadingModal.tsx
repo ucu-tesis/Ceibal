@@ -106,7 +106,12 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="portada">Portada</label>
-            <InputFile id="portada" value={file} onChange={fileChangeCallback}></InputFile>
+            <InputFile
+              id="portada"
+              accept="image/png, image/gif, image/jpeg"
+              value={file}
+              onChange={fileChangeCallback}
+            ></InputFile>
           </div>
         </ModalBody>
         <ModalFooter>

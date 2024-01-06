@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
 import styles from "./Select.module.css";
 
 interface SelectProps {
@@ -24,7 +24,9 @@ const enterClick = (event: any) => {
 const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
   const divRef = useRef(null);
   const [selectValue, setValue] = useState(defaultValue);
+  const [searchValue, setSearchValue] = useState<string>("");
   const [openOptions, setOpen] = useState(false);
+  const [filteredOptions, setFilteredOptions] = useState<Option[]>(options);
 
   useEffect(() => {
     const clickOutSelect = (e: Event) => {
@@ -43,15 +45,21 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
     chakraModal?.addEventListener("click", clickOutSelect);
   }, [openOptions]);
 
+  useEffect(() => {
+    setFilteredOptions(options.filter(({ value }) => value?.includes(searchValue)));
+  }, [searchValue, options]);
+
   return (
     <div
       tabIndex={0}
       className={`${styles["select-bar"]} row`}
       onKeyDown={enterClick}
       ref={divRef}
-      onClick={() => {
+      onClick={(event) => {
         if (!openOptions) {
           setOpen(true);
+        } else if (openOptions && event.target === divRef?.current) {
+          setOpen(false);
         }
       }}
     >
@@ -59,24 +67,37 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
       <ChevronDownIcon />
       {openOptions && (
         <div className={`${styles.options} col`}>
-          <input type="text" />
-          {options.map((element, index) => {
-            return (
-              <div
-                tabIndex={0}
-                key={index}
-                onKeyDown={enterClick}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setValue(element);
-                  onChange(element);
-                  setOpen(false);
-                }}
-              >
-                {element.label}
-              </div>
-            );
-          })}
+          <div className="row">
+            <input
+              type="text"
+              placeholder="Buscar"
+              onChange={(event) => {
+                setSearchValue(event.target.value);
+              }}
+            />
+            <SearchIcon />
+          </div>
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((element, index) => {
+              return (
+                <div
+                  tabIndex={0}
+                  key={index}
+                  onKeyDown={enterClick}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setValue(element);
+                    onChange(element);
+                    setOpen(false);
+                  }}
+                >
+                  {element.label}
+                </div>
+              );
+            })
+          ) : (
+            <span>No hay resultados</span>
+          )}
         </div>
       )}
     </div>
