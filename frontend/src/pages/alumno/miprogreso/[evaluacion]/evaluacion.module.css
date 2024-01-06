@@ -16,26 +16,32 @@
   font-weight: 600;
 }
 
-.container img {
+.container img.rounded {
   border-radius: 360px;
+  background-size: cover;
 }
 
 .info {
-    margin-block: 16px;
-    gap: 64px;
+  margin-block: 8px;
+  gap: 64px;
 }
 
 .info > div {
-    gap: 8px;
+  gap: 8px;
 }
 
 .info label {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .container button {
-    margin-top: 8px;
-    font-weight: 600;
-    padding-inline: 120px !important;
-    font-size: 24px !important;
+  margin-top: 8px;
+  font-weight: 600;
+  padding-inline: 120px !important;
+  font-size: 24px !important;
+}
+
+.stars {
+  gap: 24px;
+  margin-bottom: 16px;
 }

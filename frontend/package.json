@@ -23,6 +23,7 @@
     "dayjs": "^1.11.10",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.2",
+    "fast-average-color": "^9.4.0",
     "framer-motion": "^10.12.17",
     "next": "13.3.2",
     "react": "18.2.0",
