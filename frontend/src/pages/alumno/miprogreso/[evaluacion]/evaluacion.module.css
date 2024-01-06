@@ -1,6 +1,41 @@
 .container {
-    padding: 16px;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
+  padding: 16px;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.container h1 {
+  font-size: 32px;
+  font-weight: 600;
+  text-decoration-line: underline;
+}
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.container img {
+  border-radius: 360px;
+}
+
+.info {
+    margin-block: 16px;
+    gap: 64px;
+}
+
+.info > div {
+    gap: 8px;
+}
+
+.info label {
+    font-weight: 600;
+}
+
+.container button {
+    margin-top: 8px;
+    font-weight: 600;
+    padding-inline: 120px !important;
+    font-size: 24px !important;
 }
