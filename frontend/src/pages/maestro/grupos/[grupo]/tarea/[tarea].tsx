@@ -1,28 +1,38 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import Image from "next/image";
-import { ChakraProvider } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
-import Select from "@/components/selects/Select";
-import ProgressCircle from "@/components/progress/ProgressCircle";
-import dayjs from "dayjs";
-import styles from "./tarea.module.css";
-import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
-import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
-import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
-import { Pie, Radar } from "react-chartjs-2";
-import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
-import { AssignmentReading } from "@/models/AssignmentReading";
-import { dateFormats, inputRegex, notFoundMessage } from "@/constants/constants";
-import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
+import ProgressCircle from "@/components/progress/ProgressCircle";
+import Select from "@/components/selects/Select";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
+import { inputRegex, notFoundMessage } from "@/constants/constants";
+import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
+import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
+import { AssignmentReading } from "@/models/AssignmentReading";
 import { ReadingStatus } from "@/models/Reading";
+import { dateFormats } from "@/util/dates";
+import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  ChakraProvider,
+  Input,
+  InputGroup,
+  InputRightAddon,
+} from "@chakra-ui/react";
+import dayjs from "dayjs";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Pie, Radar } from "react-chartjs-2";
+import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
+import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
+import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
+import styles from "./tarea.module.css";
 
 interface Params {
   alumno: string;
@@ -58,7 +68,10 @@ export default function Page({ params }: { params: Params }) {
   const evaluationGroupReadingId = router.query.tarea;
   const groupId = router.query.grupo;
 
-  const { data, isLoading, isError } = useFetchAssignmentStats(Number(evaluationGroupReadingId), Number(groupId));
+  const { data, isLoading, isError } = useFetchAssignmentStats(
+    Number(evaluationGroupReadingId),
+    Number(groupId)
+  );
 
   const {
     assignment,
@@ -85,7 +98,11 @@ export default function Page({ params }: { params: Params }) {
     datasets: [
       {
         label: "Errores",
-        data: [averageErrors?.repetitionsCount, averageErrors?.silencesCount, averageErrors?.generalErrors],
+        data: [
+          averageErrors?.repetitionsCount,
+          averageErrors?.silencesCount,
+          averageErrors?.generalErrors,
+        ],
         fill: true,
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         borderColor: "rgb(255, 99, 132)",
@@ -103,7 +120,11 @@ export default function Page({ params }: { params: Params }) {
       {
         label: "My First Dataset",
         data: mostRepeatedWords.map(({ repetitionCount }) => repetitionCount),
-        backgroundColor: ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"],
+        backgroundColor: [
+          "rgb(255, 99, 132)",
+          "rgb(54, 162, 235)",
+          "rgb(255, 205, 86)",
+        ],
         hoverOffset: 4,
       },
     ],
@@ -112,11 +133,22 @@ export default function Page({ params }: { params: Params }) {
   useChartJSInitializer();
 
   const [readingSearchQuery, setReadingSearchQuery] = useState("");
-  const [statusOption, setStatusOption] = useState<string | undefined>(undefined);
+  const [statusOption, setStatusOption] = useState<string | undefined>(
+    undefined
+  );
 
-  const { filteredReadings } = useFilteredEvaluations(recordings, readingSearchQuery, statusOption);
+  const { filteredReadings } = useFilteredEvaluations(
+    recordings,
+    readingSearchQuery,
+    statusOption
+  );
 
-  const statusList: ReadingStatus[] = ["COMPLETED", "FAILED", "PENDING", "WORKING"];
+  const statusList: ReadingStatus[] = [
+    "COMPLETED",
+    "FAILED",
+    "PENDING",
+    "WORKING",
+  ];
 
   const statusLabels = {
     COMPLETED: "Completado",
@@ -127,19 +159,29 @@ export default function Page({ params }: { params: Params }) {
 
   const statusOptions: Option[] = [
     defaultOption,
-    ...statusList.map((status) => ({ label: statusLabels[status], value: status })),
+    ...statusList.map((status) => ({
+      label: statusLabels[status],
+      value: status,
+    })),
   ];
 
   const toTableListEvaluation = (readings: AssignmentReading[]) =>
     readings.map((reading) => ({
       ...reading,
       status: statusLabels[reading.status as keyof Object],
-      dateSubmitted: dayjs(reading.dateSubmitted).format(dateFormats.assignmentDueDate),
+      dateSubmitted: dayjs(reading.dateSubmitted).format(
+        dateFormats.assignmentDueDate
+      ),
       link: (
         <Link
           href={{
             pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: { grupo: group, groupName: group, alumno: reading.studentName, evaluacion: 1 },
+            query: {
+              grupo: group,
+              groupName: group,
+              alumno: reading.studentName,
+              evaluacion: 1,
+            },
           }}
         >
           Ver detalles
@@ -181,27 +223,45 @@ export default function Page({ params }: { params: Params }) {
 
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={`col ${styles.stats}`}>
-            <h5 tabIndex={0}>Lectura: {assignment?.readingTitle ? assignment.readingTitle : notFoundMessage}</h5>
             <h5 tabIndex={0}>
-              Categoría: {assignment?.readingCategory ? assignment.readingCategory : notFoundMessage}
+              Lectura:{" "}
+              {assignment?.readingTitle
+                ? assignment.readingTitle
+                : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
-              Subcategoría: {assignment?.readingSubcategory ? assignment.readingSubcategory : notFoundMessage}
+              Categoría:{" "}
+              {assignment?.readingCategory
+                ? assignment.readingCategory
+                : notFoundMessage}
+            </h5>
+            <h5 tabIndex={0}>
+              Subcategoría:{" "}
+              {assignment?.readingSubcategory
+                ? assignment.readingSubcategory
+                : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
               {assignment?.createdDate
-                ? `Fecha de Creación: ${dayjs(assignment?.createdDate).format(dateFormats.assignmentDueDate)}`
+                ? `Fecha de Creación: ${dayjs(assignment?.createdDate).format(
+                    dateFormats.assignmentDueDate
+                  )}`
                 : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
               {assignment?.dueDate
-                ? `Fecha de Cierre: ${dayjs(assignment?.dueDate).format(dateFormats.assignmentDueDate)}`
+                ? `Fecha de Cierre: ${dayjs(assignment?.dueDate).format(
+                    dateFormats.assignmentDueDate
+                  )}`
                 : notFoundMessage}
             </h5>
           </div>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
-              <ProgressCircle value={Math.round(averageScore).toString()} variant="small"></ProgressCircle>
+              <ProgressCircle
+                value={Math.round(averageScore).toString()}
+                variant="small"
+              ></ProgressCircle>
               <div className="row">
                 <Image alt="lecturas completadas" src={SentTasksIcon} />
                 <span>Completadas: {assignmentsDone}</span>
@@ -256,7 +316,10 @@ export default function Page({ params }: { params: Params }) {
             ></Select>
           </div>
         </div>
-        <ChakraTable columns={readingColumns} data={toTableListEvaluation(filteredReadings)}></ChakraTable>
+        <ChakraTable
+          columns={readingColumns}
+          data={toTableListEvaluation(filteredReadings)}
+        ></ChakraTable>
       </div>
     </ChakraProvider>
   );
