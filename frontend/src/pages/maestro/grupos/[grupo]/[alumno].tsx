@@ -189,29 +189,21 @@ export default function Page({ params }: { params: Params }) {
     monthlyAverages,
   } = data;
 
-  const sortedMonthlyAverages = monthlyAverages.sort(
-    ({ month: lhm }, { month: rhm }) => lhm - rhm
-  );
-
-  const labels = sortedMonthlyAverages.map(
+  const labels = monthlyAverages.map(
     ({ month }) => SPANISH_MONTH_NAMES[month] // Assuming months start at 0
   );
 
   const groupDataset = {
     id: 1,
     label: "Grupo",
-    data: sortedMonthlyAverages.map(
-      ({ groupAverageScore }) => groupAverageScore
-    ),
+    data: monthlyAverages.map(({ groupAverageScore }) => groupAverageScore),
     backgroundColor: "#B1A5FF",
     borderColor: "#B1A5FF",
   };
   const studentDataset = {
     id: 2,
     label: typeof studentFullName === "string" ? studentFullName : "Alumno",
-    data: sortedMonthlyAverages.map(
-      ({ studentAverageScore }) => studentAverageScore
-    ),
+    data: monthlyAverages.map(({ studentAverageScore }) => studentAverageScore),
     backgroundColor: "#FBE38E",
     borderColor: "#FBE38E",
   };
