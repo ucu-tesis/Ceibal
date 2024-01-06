@@ -50,12 +50,16 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
+interface PendingReadingsCountResponse {
+  assignments_pending: number;
+}
+
 export const fetchCompletedReadings = ({
   page,
   pageSize,
 }: CompletedReadingsRequest) =>
   axiosInstance
-    .get<CompletedReadingsResponse>(`/students/readings/completed`, {
+    .get<CompletedReadingsResponse>("/students/readings/completed", {
       params: { page, pageSize },
     })
     .then(({ data }) => parseCompletedReadingsResponse(data));
@@ -69,6 +73,11 @@ export const fetchReadings = () =>
   axiosInstance
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
+
+export const fetchPendingReadingsCount = () =>
+  axiosInstance
+    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
