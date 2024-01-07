@@ -1,57 +1,61 @@
 .read-card {
-    border-radius: 10px;
-    border: 1px solid var(--ceibal-black);
-    background: #00A096;
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    gap: 20px;
-    padding: 16px 32px;
-    justify-content: space-between;
+  border-radius: 10px;
+  border: 1px solid var(--ceibal-black);
+  background: #00a096;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  gap: 20px;
+  padding: 16px 32px;
+  justify-content: space-between;
 }
 
 .read-card span {
-    color: #000;
-    text-align: center;
-    font-size: 16px;
-    font-style: italic;
-    font-weight: 400;
-    max-width: 200px;
-    white-space: break-spaces;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  color: #000;
+  text-align: center;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  max-width: 200px;
+  white-space: break-spaces;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .read-card img {
-    max-height: 300px;
-    max-width: 200px;
+  max-height: 300px;
+  max-width: 200px;
 }
 
 .stars {
-    gap: 8px;
-    justify-content: center;
+  gap: 8px;
+  justify-content: center;
 }
 
 .stars img {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 @media (max-width: 500px) {
-    .read-card {
-        padding: 12px 24px;
-        gap: 16px;
-    }
-    .read-card span {
-        font-size: 12px;
-        max-width: 150px;
-    }
-    .read-card img {
-        max-height: 150px;
-        max-width: 150px;
-    }
-    .stars img {
-        width: 14px;
-        height: 14px;
-    }
+  .read-card {
+    padding: 12px 24px;
+    gap: 16px;
+  }
+  .read-card span {
+    font-size: 12px;
+    max-width: 150px;
+  }
+  .read-card img {
+    max-height: 150px;
+    max-width: 150px;
+  }
+  .stars img {
+    width: 14px;
+    height: 14px;
+  }
 }
