@@ -89,6 +89,9 @@ model Analysis {
   id                       Int            @id @default(autoincrement())
   recording_id             Int
   status                   AnalysisStatus
+  processing_start         DateTime?
+  processing_retries       Int            @default(0)
+  processing_errors        String[]       @default([])
   repetitions_count        Int?
   silences_count           Int?
   allosaurus_general_error Int?
