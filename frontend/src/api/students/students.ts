@@ -1,28 +1,29 @@
 import { Category } from "@/models/Category";
-import { PaginatedCompletedReadings } from "@/models/CompletedReadings";
-import { Reading, ReadingMinimalInfo, ReadingStatus } from "@/models/Reading";
+import { PaginatedRecordings } from "@/models/CompletedReadings";
+import { ReadingMinimalInfo } from "@/models/Reading";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { AnalysisStatus, Recording } from "@/models/Recording";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
 
-interface CompletedReadingsRequest {
+interface RecordingsRequest {
   page: number;
   pageSize: number;
 }
 
-interface ReadingResponse {
-  date_submitted: string;
+interface RecordingResponse {
   id: number;
-  image: string;
-  score: number;
-  status: ReadingStatus;
-  title: string;
+  reading_image: string;
+  reading_title: string;
+  analysis_score: number;
+  analysis_status: AnalysisStatus;
+  date_submitted: string;
 }
 
-interface CompletedReadingsResponse {
+interface PaginatedRecordingsResponse {
   page: number;
   page_size: number;
-  Readings: ReadingResponse[];
+  Recordings: RecordingResponse[];
   total: number;
 }
 
@@ -64,15 +65,12 @@ type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
   subcategories: PendingSubcategoryListResponse[];
 };
 
-export const fetchCompletedReadings = ({
-  page,
-  pageSize,
-}: CompletedReadingsRequest) =>
+export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
-    .get<CompletedReadingsResponse>(`/students/readings/completed`, {
+    .get<PaginatedRecordingsResponse>(`/students/readings/completed`, {
       params: { page, pageSize },
     })
-    .then(({ data }) => parseCompletedReadingsResponse(data));
+    .then(({ data }) => parseRecordingsResponse(data));
 
 export const fetchReadingDetails = (id: number) =>
   axiosInstance
@@ -91,18 +89,18 @@ export const fetchPendingReadings = () =>
 
 // Parse methods
 
-const parseCompletedReadingsResponse = (
-  res: CompletedReadingsResponse
-): PaginatedCompletedReadings => ({
+const parseRecordingsResponse = (
+  res: PaginatedRecordingsResponse
+): PaginatedRecordings => ({
   page: res.page,
   pageSize: res.page_size,
-  readings: res.Readings.map(parseReadingResponse),
+  recordings: res.Recordings.map(parseReadingResponse),
   total: res.total,
 });
 
-const parseReadingResponse = (reading: ReadingResponse): Reading => ({
-  dateSubmitted: reading.date_submitted,
-  ...reading,
+const parseReadingResponse = (recording: RecordingResponse): Recording => ({
+  dateSubmitted: recording.date_submitted,
+  ...recording,
 });
 
 const parseReadingDetails = (

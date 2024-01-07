@@ -4,7 +4,7 @@ import { fetchStudentStats } from "../teachers";
 
 const select = (data: StudentStats): StudentStats => ({
   ...data,
-  monthlyAverages: data.monthlyAverages.toSorted(
+  monthlyAverages: [...data.monthlyAverages].sort(
     ({ month: lhm }, { month: rhm }) => lhm - rhm
   ),
 });

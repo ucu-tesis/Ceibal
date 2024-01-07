@@ -1,8 +1,8 @@
-import { Reading } from "./Reading";
+import { Recording } from "./Recording";
 
-export interface PaginatedCompletedReadings {
+export interface PaginatedRecordings {
   page: number;
   pageSize: number;
-  readings: Reading[];
+  recordings: Recording[];
   total: number;
 }
