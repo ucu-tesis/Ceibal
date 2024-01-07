@@ -51,10 +51,25 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
-export const fetchCompletedReadings = ({
-  page,
-  pageSize,
-}: RecordingsRequest) =>
+interface RecordingResponse {
+  id: number;
+  recording_url: string;
+  created_at: string;
+  Analysis: {
+    score: number;
+    status: AnalysisStatus;
+  };
+  EvaluationGroupReading: {
+    Reading: {
+      title: string;
+      image_url: string;
+      category: string;
+      subcategory: string;
+    };
+  };
+}
+
+export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
     .get<PaginatedRecordingsResponse>(`/students/readings/completed`, {
       params: { page, pageSize },
@@ -71,11 +86,12 @@ export const fetchReadings = () =>
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
 
+export const fetchRecording = (recordingId: number) =>
+  axiosInstance.get<RecordingResponse>(`recordings/${recordingId}`).then(({ data }) => parseRecordingResponse(data));
+
 // Parse methods
 
-const parseRecordingsResponse = (
-  res: PaginatedRecordingsResponse
-): PaginatedRecordings => ({
+const parseRecordingsResponse = (res: PaginatedRecordingsResponse): PaginatedRecordings => ({
   page: res.page,
   pageSize: res.page_size,
   recordings: res.Recordings.map(parseReadingResponse),
@@ -87,9 +103,7 @@ const parseReadingResponse = (recording: RecordingResponse): Recording => ({
   ...recording,
 });
 
-const parseReadingDetails = (
-  readingDetails: ReadingDetailsResponse
-): ReadingDetails => ({
+const parseReadingDetails = (readingDetails: ReadingDetailsResponse): ReadingDetails => ({
   category: readingDetails.reading_category,
   content: readingDetails.reading_content,
   evaluationGroupReadingId: readingDetails.evaluation_group_reading_id,
@@ -102,24 +116,34 @@ const parseReadingsListResponse = (res: CategoryListResponse[]): Category[] =>
   res
     .map(({ category, subcategories }) => ({
       name: category ?? "",
-      subcategories: subcategories
-        .map(parseSubcategoryListResponse)
-        .filter((s) => !!s.name), // Remove subcategories without name
+      subcategories: subcategories.map(parseSubcategoryListResponse).filter((s) => !!s.name), // Remove subcategories without name
     }))
     .filter((c) => !!c.name); // Remove categories without name
 
-const parseSubcategoryListResponse = ({
-  readings,
-  subcategory,
-}: SubcategoryListResponse): Subcategory => ({
+const parseSubcategoryListResponse = ({ readings, subcategory }: SubcategoryListResponse): Subcategory => ({
   name: subcategory ?? "",
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
-const parseReadingListResponse = ({
-  reading_id,
-  title,
-}: ReadingListResponse): ReadingMinimalInfo => ({
+const parseReadingListResponse = ({ reading_id, title }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
   title: title ?? "",
+});
+
+const parseRecordingResponse = ({
+  Analysis: { score, status },
+  id,
+  created_at,
+  EvaluationGroupReading: {
+    Reading: { image_url, title, category, subcategory },
+  },
+}: RecordingResponse): Recording => ({
+  analysis_score: score,
+  analysis_status: status,
+  id: id,
+  dateSubmitted: created_at,
+  reading_image: image_url,
+  reading_title: title,
+  reading_category: category,
+  reading_subcategory: subcategory,
 });
