@@ -5,7 +5,7 @@ import { ReadingDetails } from "@/models/ReadingDetails";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
 
-export interface CompletedReadingsRequest {
+interface CompletedReadingsRequest {
   page: number;
   pageSize: number;
 }
@@ -40,15 +40,29 @@ interface ReadingListResponse {
   title?: string;
 }
 
+type PendingReadingListResponse = Pick<
+  ReadingListResponse,
+  "reading_id" | "title"
+> & { due_date: string };
+
 interface SubcategoryListResponse {
   subcategory?: string;
   readings: ReadingListResponse[];
 }
 
+type PendingSubcategoryListResponse = Pick<
+  SubcategoryListResponse,
+  "subcategory"
+> & { readings: PendingReadingListResponse[] };
+
 interface CategoryListResponse {
   category?: string;
   subcategories: SubcategoryListResponse[];
 }
+
+type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
+  subcategories: PendingSubcategoryListResponse[];
+};
 
 export const fetchCompletedReadings = ({
   page,
@@ -69,6 +83,11 @@ export const fetchReadings = () =>
   axiosInstance
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
+
+export const fetchPendingReadings = () =>
+  axiosInstance
+    .get<PendingCategoryListResponse[]>("students/readings/pending")
+    .then(({ data }) => parsePendingReadingsListResponse(data));
 
 // Parse methods
 
@@ -121,4 +140,36 @@ const parseReadingListResponse = ({
 }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
   title: title ?? "",
+});
+
+const parsePendingReadingsListResponse = (
+  res: PendingCategoryListResponse[]
+): Category[] =>
+  res
+    .map(({ category, subcategories }) => ({
+      name: category ?? "",
+      subcategories: subcategories
+        .map(parsePendingSubcategoryListResponse)
+        .filter((s) => !!s.name), // Remove subcategories without name
+    }))
+    .filter((c) => !!c.name); // Remove categories without name
+
+const parsePendingSubcategoryListResponse = ({
+  readings,
+  subcategory,
+}: PendingSubcategoryListResponse): Subcategory => ({
+  name: subcategory ?? "",
+  readings: readings
+    .map(parsePendingReadingListResponse)
+    .filter((r) => !!r.title), // Remove readings without name
+});
+
+const parsePendingReadingListResponse = ({
+  reading_id,
+  title,
+  due_date,
+}: PendingReadingListResponse): ReadingMinimalInfo & { dueDate: Date } => ({
+  id: reading_id,
+  title: title ?? "",
+  dueDate: new Date(due_date),
 });
