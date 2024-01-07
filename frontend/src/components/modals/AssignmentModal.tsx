@@ -4,7 +4,7 @@ import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTit
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
 import Select from "../selects/Select";
-import { dateFormats, inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
+import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
 import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 import { SearchIcon } from "@chakra-ui/icons";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
@@ -15,6 +15,7 @@ import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
 import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
 import { useMutation } from "@tanstack/react-query";
+import { dateFormats } from "@/util/dates";
 
 interface AssignmentModalProps {
   isOpen: boolean;
@@ -102,7 +103,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [categoryOptionModal, setCategoryOptionModal] = useState<string>();
   const [subcategoryOptionModal, setSubcategoryOptionModal] = useState<string>();
 
-  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);  
+  const [selectedAssignments, setSelectedAssignments] = useState<Assignment[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(dayjs(new Date()).format(dateFormats.assignmentDueDate));
 

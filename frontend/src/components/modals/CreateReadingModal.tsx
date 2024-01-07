@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -13,6 +13,8 @@ import { Input, InputGroup, Button, Switch, useToast } from "@chakra-ui/react";
 import Select, { Option } from "../selects/Select";
 import { isNullOrEmpty } from "@/util/util";
 import { toastDuration } from "@/constants/constants";
+import SearchBox from "../selects/SearchBox";
+import InputFile from "../inputs/InputFile";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -37,6 +39,12 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
 
   const [name, setName] = useState<string>();
   const [text, setText] = useState<string>();
+  const [file, setFile] = useState<any>();
+
+  const onFileChange = (event: ChangeEvent) => {
+    const element = event.target as HTMLInputElement;
+    setFile(element.files);
+  };
 
   const createCondition = () => {
     return isNullOrEmpty(name) || isNullOrEmpty(text);
@@ -50,7 +58,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
       duration: toastDuration,
       isClosable: true,
     });
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -81,25 +89,29 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
               onChange={({ target: { value } }) => {
                 setText(value);
               }}
-              className={styles.medium}
               maxLength={1000}
             ></Textarea>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Categoría</label>
-            <Select defaultValue={categoryOptions[0]} options={categoryOptions}></Select>
+            <SearchBox defaultValue={categoryOptions[0]} options={categoryOptions}></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Subcategoría</label>
-            <Select defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></Select>
+            <SearchBox defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="repo">Repositorio Público</label>
-            <Switch id="repo" colorScheme="green" />
+            <Switch id="repo" colorScheme="green" size="lg" />
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="portada">Portada</label>
-            <input id="portada" type="file"></input>
+            <InputFile
+              id="portada"
+              accept="image/png, image/gif, image/jpeg"
+              value={file}
+              onChange={onFileChange}
+            ></InputFile>
           </div>
         </ModalBody>
         <ModalFooter>

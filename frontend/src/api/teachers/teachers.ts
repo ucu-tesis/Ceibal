@@ -1,10 +1,40 @@
-import { Assignment } from "@/models/Assignment";
+import {
+  Assignment,
+  AssignmentStatus,
+  StudentAssignment,
+} from "@/models/Assignment";
 import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
+import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
-import { AssignmentStats } from "@/models/Stats";
+
+interface StudentMonthlyAverage {
+  month: string;
+  student_avg_score: number;
+  group_avg_score: number;
+}
+
+interface StudentStatsAssignment {
+  due_date: string;
+  id: number;
+  reading_category: string;
+  reading_id: number;
+  reading_subcategory?: string;
+  reading_title: string;
+  score: number;
+  status: AssignmentStatus;
+}
+
+interface StudentStatsResponse {
+  Assignments: StudentStatsAssignment[];
+  average_score: number;
+  assignments_delayed: number;
+  assignments_done: number;
+  assignments_pending: number;
+  monthly_averages: StudentMonthlyAverage[];
+}
 
 interface GroupsResponse {
   data: GroupResponse[];
@@ -85,24 +115,40 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
-export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) =>
+export const fetchStudentStats = (groupId: number, studentId: number) =>
   axiosInstance
-    .get<AssignmentStatsResponse>(`evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`)
+    .get<StudentStatsResponse>(
+      `/evaluationGroups/${groupId}/students/${studentId}`
+    )
+    .then(({ data }) => parseStudentStatsResponse(data));
+
+export const fetchAssignmentStats = (
+  evaluationGroupId: number,
+  evaluationGroupReadingId: number
+) =>
+  axiosInstance
+    .get<AssignmentStatsResponse>(
+      `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
+    )
     .then(({ data }) => parseAssignmentStatsResponse(data));
-    
+
 // Parse methods
 
-const parseGroupsResponse = (res: GroupsResponse): Group[] => res.data.map(parseGroupResponse);
+const parseGroupsResponse = (res: GroupsResponse): Group[] =>
+  res.data.map(parseGroupResponse);
 
 const parseGroupResponse = (group: GroupResponse): Group => ({
   createdBy: group.created_by,
   schoolYear: group.school_year,
   teacherId: group.teacher_id,
   schoolData: group.school_data,
-  ...group,
+  id: group.id,
+  name: group.name,
 });
 
-const parseGroupDetailsResponse = (res: GroupDetailsResponse): GroupDetails => ({
+const parseGroupDetailsResponse = (
+  res: GroupDetailsResponse
+): GroupDetails => ({
   createdBy: res.created_by,
   id: res.id,
   name: res.name,
@@ -113,7 +159,9 @@ const parseGroupDetailsResponse = (res: GroupDetailsResponse): GroupDetails => (
   students: res.Students?.map(parseStudentResponse) ?? [],
 });
 
-const parseAssignmentResponse = (assignment: AssignmentResponse): Assignment => ({
+const parseAssignmentResponse = (
+  assignment: AssignmentResponse
+): Assignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
   readingCategory: assignment.reading_category,
@@ -128,10 +176,46 @@ const parseStudentResponse = (student: StudentResponse): Student => ({
   firstName: student.first_name,
   fullName: `${student.first_name} ${student.last_name}`,
   lastName: student.last_name,
-  ...student,
+  cedula: student.cedula,
+  email: student.email,
+  id: student.id,
 });
 
-const parseAssignmentStatsResponse = (stats: AssignmentStatsResponse): AssignmentStats => {
+const parseStudentAssignment = (
+  assignment: StudentStatsAssignment
+): StudentAssignment => ({
+  dueDate: new Date(assignment.due_date),
+  evaluationGroupReadingId: assignment.id,
+  readingCategory: assignment.reading_category,
+  readingId: assignment.reading_id,
+  readingSubcategory: assignment.reading_subcategory ?? "", // TODO Make this nullable in Assignment.ts model
+  readingTitle: assignment.reading_title,
+  score: assignment.score,
+  status: assignment.status,
+});
+
+const parseMonthlyAverage = (
+  monthlyAverage: StudentMonthlyAverage
+): MonthlyAverage => ({
+  groupAverageScore: monthlyAverage.group_avg_score,
+  month: new Date(monthlyAverage.month).getMonth(),
+  studentAverageScore: monthlyAverage.student_avg_score,
+});
+
+const parseStudentStatsResponse = (
+  stats: StudentStatsResponse
+): StudentStats => ({
+  assignments: stats.Assignments.map(parseStudentAssignment),
+  assignmentsDone: stats.assignments_done,
+  assignmentsPending: stats.assignments_pending,
+  assignmentsUncompleted: stats.assignments_delayed,
+  averageScore: stats.average_score,
+  monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
+});
+
+const parseAssignmentStatsResponse = (
+  stats: AssignmentStatsResponse
+): AssignmentStats => {
   const {
     assignment: { due_date, created_at, reading, id },
     assignments_done,
@@ -162,9 +246,11 @@ const parseAssignmentStatsResponse = (stats: AssignmentStatsResponse): Assignmen
       silencesCount: silences_count,
     },
     averageScore: average_score,
-    mostRepeatedWords: most_repeated_words.map(({ repetition_count, word }) => ({
-      repetitionCount: repetition_count,
-      word,
-    })),
+    mostRepeatedWords: most_repeated_words.map(
+      ({ repetition_count, word }) => ({
+        repetitionCount: repetition_count,
+        word,
+      })
+    ),
   };
 };
