@@ -27,11 +27,13 @@ const MiProgreso: React.FC = () => {
   const { ref: lastElementRef, inView: lastElementInView } = useInView();
   const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage, isError } = useFetchCompletedReadings();
 
-  const readings = useMemo(() => (data?.pages ?? []).flatMap(({ readings }) => readings), [data?.pages]);
-
   const router = useRouter();
   const user = useUser();
   const currentPathName = router.pathname;
+  const recordings = useMemo(
+    () => (data?.pages ?? []).flatMap(({ recordings }) => recordings),
+    [data?.pages]
+  );
 
   useEffect(() => {
     if (lastElementInView && hasNextPage) {
@@ -53,16 +55,16 @@ const MiProgreso: React.FC = () => {
         <title>Mi Progreso</title>
       </Head>
       <div className={`${styles.container} row`}>
-        {readings.map(
-          // TODO use status and date_submitted
-          ({ id, image, score, status, title, dateSubmitted }, index) => (
+        {recordings.map(
+          // TODO use analysis_status and date_submitted
+          ({ id, reading_image, analysis_score, analysis_status, reading_title, dateSubmitted }, index) => (
             <ReadCard
-              ref={index === readings.length - 1 ? lastElementRef : undefined}
+              ref={index === recordings.length - 1 ? lastElementRef : undefined}
               key={id}
-              title={title}
-              image={image}
+              title={reading_title}
+              image={reading_image}
               onClick={() => router.push(`${currentPathName}/${id}`)}
-              starsCount={Math.round(score / 20)}
+              starsCount={Math.round(analysis_score / 20)}
             />
           )
         )}

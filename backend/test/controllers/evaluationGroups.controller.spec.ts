@@ -60,6 +60,7 @@ describe('EvaluationGroupsController', () => {
                 school_data: null,
                 teacher_id: testTeacher.id,
                 created_by: testTeacher.id,
+                created_at: expect.any(Date),
               },
             ],
           });
