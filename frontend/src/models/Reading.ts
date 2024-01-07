@@ -9,4 +9,6 @@ export interface Reading {
   dateSubmitted: string;
 }
 
-export type ReadingMinimalInfo = Pick<Reading, "id" | "title">;
+export type ReadingMinimalInfo = Pick<Reading, "id" | "title"> & {
+  dueDate?: Date;
+};
