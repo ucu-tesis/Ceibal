@@ -1,9 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-type OnSuccess = ((data: Response, variables: FormData, context: unknown) => void | Promise<unknown>) | undefined;
-type OnError = ((error: unknown, variables: FormData, context: unknown) => void | Promise<unknown>) | undefined;
-
-const useFileUpload = (evaluationGroupReadingId: number, onSuccess: OnSuccess, onError: OnError) => {
+const useFileUpload = (evaluationGroupReadingId: number) => {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch(
@@ -19,8 +16,6 @@ const useFileUpload = (evaluationGroupReadingId: number, onSuccess: OnSuccess, o
         throw new Error("Error uploading file: " + response.status);
       }
     },
-    onSuccess,
-    onError,
   });
 };
 
