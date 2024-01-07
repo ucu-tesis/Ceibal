@@ -96,17 +96,17 @@ export class StudentsController {
     });
 
     return {
-      Readings: recordings.map((r) => {
+      Recordings: recordings.map((r) => {
         const newestAnalysis = r.Analysis.length
           ? r.Analysis[r.Analysis.length - 1]
           : null;
         return {
           id: r.id,
           date_submitted: r.created_at,
-          title: r.EvaluationGroupReading.Reading.title,
-          image: r.EvaluationGroupReading.Reading.image_url,
-          score: newestAnalysis?.score || 0,
-          status: newestAnalysis?.status || 'NOT_STARTED',
+          reading_title: r.EvaluationGroupReading.Reading.title,
+          reading_image: r.EvaluationGroupReading.Reading.image_url,
+          analysis_score: newestAnalysis?.score || 0,
+          analysis_status: newestAnalysis?.status || 'NOT_STARTED',
         };
       }),
       total: totalRecordings,
