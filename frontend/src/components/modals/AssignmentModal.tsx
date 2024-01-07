@@ -4,7 +4,7 @@ import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTit
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
 import Select from "../selects/Select";
-import { dateFormats, inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
+import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
 import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 import { SearchIcon } from "@chakra-ui/icons";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
@@ -14,16 +14,18 @@ import { Student } from "@/models/Student";
 import useFilteredStudents from "@/hooks/teachers/useFilteredStudents";
 import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
+import { useMutation } from "@tanstack/react-query";
+import { dateFormats } from "@/util/dates";
 
 interface AssignmentModalProps {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  steps: String[];
   assignments: Assignment[];
   students: Student[];
   assignmentColumnsModal: ChakraTableColumn[];
   studentColumnsModal: ChakraTableColumn[];
+  evaluationGroupId: number;
   styles: any;
 }
 
@@ -59,7 +61,7 @@ const toAssignmentTableListModal = (
   uncheckedCallback: (readingTitle: any) => void,
   defaultValueCallback: (readingTitle: any) => boolean
 ) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle }) => ({
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, readingId }) => ({
     checkbox: (
       <Checkbox
         key={readingTitle}
@@ -67,7 +69,7 @@ const toAssignmentTableListModal = (
         onChange={(event: ChangeEvent) => {
           const checkbox = event.target as HTMLInputElement;
           if (checkbox.checked) {
-            checkedCallback({ readingCategory, readingSubcategory, readingTitle });
+            checkedCallback({ readingCategory, readingSubcategory, readingTitle, readingId });
           } else {
             uncheckedCallback(readingTitle);
           }
@@ -79,14 +81,21 @@ const toAssignmentTableListModal = (
     readingTitle,
   }));
 
+const READINGS_STEP = "Agregar Tareas";
+const STUDENTS_STEP = "Agregar Alumnos";
+const SUMMARY_STEP = "Resumen";
+
+// TODO CEIB-151 add STUDENTS_STEP
+const steps = [READINGS_STEP, SUMMARY_STEP];
+
 const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isOpen,
   onClose,
-  steps,
   assignments,
   students,
   assignmentColumnsModal,
   studentColumnsModal,
+  evaluationGroupId,
   styles,
 }) => {
   const [modalStudentSearchQuery, setModalStudentSearchQuery] = useState("");
@@ -139,10 +148,26 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   const toast = useToast();
 
-  const changeStep = () => {
-    if (activeStep < steps.length - 1) {
-      setActiveStep(activeStep + 1);
-    } else {
+  // TODO test this
+  const { mutate, isLoading, error } = useMutation({
+    mutationFn: async (assignments: Assignment[]) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/evaluationGroups/${evaluationGroupId}/assignments`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            reading_id: assignments[0].readingId,
+            due_date: selectedDate,
+          }),
+        }
+      );
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Error creating assignment: " + response.status);
+      }
+    },
+    onSuccess: () => {
       setActiveStep(0);
       onClose();
       toast({
@@ -151,6 +176,23 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         duration: toastDuration,
         isClosable: true,
       });
+    },
+    onError: () => {
+      // TODO proper error modal
+      toast({
+        title: "Error",
+        status: "error",
+        duration: toastDuration,
+        isClosable: true,
+      });
+    },
+  });
+
+  const changeStep = () => {
+    if (activeStep < steps.length - 1) {
+      setActiveStep(activeStep + 1);
+    } else {
+      mutate(selectedAssignments);
     }
   };
 
@@ -161,14 +203,155 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   };
 
   const nextCondition = () => {
-    if (activeStep === 0) {
+    if (steps[activeStep] === READINGS_STEP) {
       return selectedAssignments.length === 0 || !selectedDate;
-    } else if (activeStep === 1) {
+    } else if (steps[activeStep] === STUDENTS_STEP) {
       return selectedStudents.length === 0;
     } else {
       return false;
     }
   };
+
+  function renderReadingsSelection(): React.ReactNode {
+    return <>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Fecha límite:</span>
+        <InputDateTimeLocal
+          value={selectedDate}
+          onChange={(event: ChangeEvent) => {
+            const { value } = event.target as HTMLInputElement;
+            setSelectedDate(value);
+          }}
+        ></InputDateTimeLocal>
+      </div>
+      <span>
+        <strong tabIndex={0}>Lecturas:</strong>
+      </span>
+      <div className={`${styles.filters} row`}>
+        <InputGroup className={styles.small}>
+          <Input
+            width="auto"
+            onKeyDown={(e) => {
+              if (!e.key.match(inputRegex)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={({ target: { value } }) => {
+              setModalAssignmentSearchQuery(value.toLowerCase());
+            }}
+            maxLength={30}
+            placeholder="Lectura"
+            value={modalAssignmentSearchQuery} />
+          <InputRightAddon>
+            <SearchIcon />
+          </InputRightAddon>
+        </InputGroup>
+        <div className="col">
+          <label>Categoría</label>
+          <Select
+            defaultValue={defaultOption}
+            options={readingCategoryOptions}
+            onChange={(option) => {
+              setCategoryOptionModal(option.value);
+            }}
+          ></Select>
+        </div>
+        <div className="col">
+          <label>Subcategoría</label>
+          <Select
+            defaultValue={defaultOption}
+            options={readingSubcategoryOptions}
+            onChange={(option) => {
+              setSubcategoryOptionModal(option.value);
+            }}
+          ></Select>
+        </div>
+      </div>
+      <ChakraTable
+        variant="simple"
+        maxHeight={tableMaxHeightModal}
+        columns={assignmentColumnsModal}
+        data={toAssignmentTableListModal(
+          filteredAssignmentsModal,
+          addAssignment,
+          removeAssignment,
+          findAssignment
+        )}
+      ></ChakraTable>
+    </>;
+  }
+
+  function renderStudentSelection(): React.ReactNode {
+    return <>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Fecha límite:</span>
+        <span tabIndex={0}>{selectedDate}</span>
+      </div>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Lecturas:</span>
+        <ul>
+          {selectedAssignments.map((assignment, index) => {
+            return <li key={index}>{assignment?.readingTitle}</li>;
+          })}
+        </ul>
+      </div>
+      <span>
+        <strong tabIndex={0}>Alumnos:</strong>
+      </span>
+      <div className={`${styles.filters} row`}>
+        <InputGroup>
+          <Input
+            width="auto"
+            onKeyDown={(e) => {
+              if (!e.key.match(inputRegex)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={({ target: { value } }) => {
+              setModalStudentSearchQuery(value.toLowerCase());
+            }}
+            maxLength={30}
+            placeholder="Documento o Nombre"
+            value={modalStudentSearchQuery} />
+          <InputRightAddon>
+            <SearchIcon />
+          </InputRightAddon>
+        </InputGroup>
+      </div>
+      <ChakraTable
+        variant="simple"
+        maxHeight={tableMaxHeightModal}
+        columns={studentColumnsModal}
+        data={toStudentTableListModal(filteredStudentsModal, addStudents, removeStudents, findStudent)}
+      ></ChakraTable>
+    </>;
+  }
+
+  function renderSummary(): React.ReactNode {
+    return <>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Fecha límite:</span>
+        <span tabIndex={0}>{selectedDate}</span>
+      </div>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Lecturas:</span>
+        <ul>
+          {selectedAssignments.map((assignment, index) => {
+            return <li key={index}>{assignment?.readingTitle}</li>;
+          })}
+        </ul>
+      </div>
+      {steps.includes(STUDENTS_STEP) && (<div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Alumnos:</span>
+        <ul>
+          {selectedStudents.map((student, index) => {
+            return <li key={index}>{student?.fullName}</li>;
+          })}
+        </ul>
+      </div>)}
+    </>;
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -192,145 +375,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             ))}
           </Stepper>
 
-          {activeStep === 0 && (
-            <>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Fecha límite:</span>
-                <InputDateTimeLocal
-                  value={selectedDate}
-                  onChange={(event: ChangeEvent) => {
-                    const { value } = event.target as HTMLInputElement;
-                    setSelectedDate(value);
-                  }}
-                ></InputDateTimeLocal>
-              </div>
-              <span>
-                <strong tabIndex={0}>Lecturas:</strong>
-              </span>
-              <div className={`${styles.filters} row`}>
-                <InputGroup className={styles.small}>
-                  <Input
-                    width="auto"
-                    onKeyDown={(e) => {
-                      if (!e.key.match(inputRegex)) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={({ target: { value } }) => {
-                      setModalAssignmentSearchQuery(value.toLowerCase());
-                    }}
-                    maxLength={30}
-                    placeholder="Lectura"
-                    value={modalAssignmentSearchQuery}
-                  />
-                  <InputRightAddon>
-                    <SearchIcon />
-                  </InputRightAddon>
-                </InputGroup>
-                <div className="col">
-                  <label>Categoría</label>
-                  <Select
-                    defaultValue={defaultOption}
-                    options={readingCategoryOptions}
-                    onChange={(option) => {
-                      setCategoryOptionModal(option.value);
-                    }}
-                  ></Select>
-                </div>
-                <div className="col">
-                  <label>Subcategoría</label>
-                  <Select
-                    defaultValue={defaultOption}
-                    options={readingSubcategoryOptions}
-                    onChange={(option) => {
-                      setSubcategoryOptionModal(option.value);
-                    }}
-                  ></Select>
-                </div>
-              </div>
-              <ChakraTable
-                variant="simple"
-                maxHeight={tableMaxHeightModal}
-                columns={assignmentColumnsModal}
-                data={toAssignmentTableListModal(
-                  filteredAssignmentsModal,
-                  addAssignment,
-                  removeAssignment,
-                  findAssignment
-                )}
-              ></ChakraTable>
-            </>
-          )}
-          {activeStep === 1 && (
-            <>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Fecha límite:</span>
-                <span tabIndex={0}>{selectedDate}</span>
-              </div>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Lecturas:</span>
-                <ul>
-                  {selectedAssignments.map((assignment, index) => {
-                    return <li key={index}>{assignment?.readingTitle}</li>;
-                  })}
-                </ul>
-              </div>
-              <span>
-                <strong tabIndex={0}>Alumnos:</strong>
-              </span>
-              <div className={`${styles.filters} row`}>
-                <InputGroup>
-                  <Input
-                    width="auto"
-                    onKeyDown={(e) => {
-                      if (!e.key.match(inputRegex)) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={({ target: { value } }) => {
-                      setModalStudentSearchQuery(value.toLowerCase());
-                    }}
-                    maxLength={30}
-                    placeholder="Documento o Nombre"
-                    value={modalStudentSearchQuery}
-                  />
-                  <InputRightAddon>
-                    <SearchIcon />
-                  </InputRightAddon>
-                </InputGroup>
-              </div>
-              <ChakraTable
-                variant="simple"
-                maxHeight={tableMaxHeightModal}
-                columns={studentColumnsModal}
-                data={toStudentTableListModal(filteredStudentsModal, addStudents, removeStudents, findStudent)}
-              ></ChakraTable>
-            </>
-          )}
-          {activeStep === 2 && (
-            <>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Fecha límite:</span>
-                <span tabIndex={0}>{selectedDate}</span>
-              </div>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Lecturas:</span>
-                <ul>
-                  {selectedAssignments.map((assignment, index) => {
-                    return <li key={index}>{assignment?.readingTitle}</li>;
-                  })}
-                </ul>
-              </div>
-              <div className={`${styles.desc} row`}>
-                <span tabIndex={0}>Alumnos:</span>
-                <ul>
-                  {selectedStudents.map((student, index) => {
-                    return <li key={index}>{student?.fullName}</li>;
-                  })}
-                </ul>
-              </div>
-            </>
-          )}
+          {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
+          {steps[activeStep] === STUDENTS_STEP && renderStudentSelection()}
+          {steps[activeStep] === SUMMARY_STEP && renderSummary()}
         </ModalBody>
         <ModalFooter className={styles["flex-center"]}>
           {activeStep > 0 && (
@@ -339,7 +386,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             </Button>
           )}
           <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
-            {activeStep < 2 ? "Continuar" : "Asignar Tarea"}
+            {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
           </Button>
         </ModalFooter>
       </ModalContent>

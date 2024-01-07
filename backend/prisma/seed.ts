@@ -197,11 +197,23 @@ async function load() {
     },
   });
 
-  await addStudentReading(1, groupReading1.id);
-  await addStudentReading(1, groupReading2.id);
-  await addStudentReading(1, groupReading3.id);
-  await addStudentReading(2, groupReading1.id);
-  await addStudentReading(1, groupReading1.id);
+  const octoberDate = new Date('2023-10-5');
+  const novemberDate = new Date('2023-11-18');
+  const decemberDate = new Date('2023-12-22');
+
+  await addStudentReading(1, groupReading1.id, octoberDate);
+  await addStudentReading(1, groupReading1.id, octoberDate);
+  await addStudentReading(1, groupReading1.id, novemberDate);
+  await addStudentReading(1, groupReading1.id, novemberDate);
+  await addStudentReading(1, groupReading1.id, decemberDate);
+  await addStudentReading(1, groupReading1.id, decemberDate);
+
+  await addStudentReading(2, groupReading1.id, octoberDate);
+  await addStudentReading(2, groupReading1.id, octoberDate);
+  await addStudentReading(2, groupReading1.id, novemberDate);
+  await addStudentReading(2, groupReading1.id, novemberDate);
+  await addStudentReading(2, groupReading1.id, decemberDate);
+  await addStudentReading(2, groupReading1.id, decemberDate);
 
   await prisma.evaluationGroupReading.create({
     data: {
@@ -305,7 +317,11 @@ async function addSSOUsers(testTeacher) {
   });
 }
 
-async function addStudentReading(studentId, groupReadingId) {
+async function addStudentReading(
+  studentId,
+  groupReadingId,
+  createdAt = undefined,
+) {
   const recording = await prisma.recording.create({
     data: {
       recording_url:
@@ -348,6 +364,7 @@ async function addStudentReading(studentId, groupReadingId) {
       phoneme_velocity: analysisRawData.velocidad_fonemas,
       words_velocity: analysisRawData.velocidad_palabras,
       raw_analysis: analysisRawData,
+      created_at: createdAt,
     },
   });
 }

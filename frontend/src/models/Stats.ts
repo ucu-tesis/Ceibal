@@ -1,5 +1,20 @@
-import { Assignment } from "./Assignment";
+import { Assignment, StudentAssignment } from "./Assignment";
 import { AssignmentReading } from "./AssignmentReading";
+
+export interface MonthlyAverage {
+  groupAverageScore: number;
+  month: number; // Starting from 0 as January
+  studentAverageScore: number;
+}
+
+export interface StudentStats {
+  assignmentsDone: number;
+  assignmentsPending: number;
+  assignmentsUncompleted: number;
+  averageScore: number;
+  assignments: StudentAssignment[];
+  monthlyAverages: MonthlyAverage[];
+}
 
 export interface RepeatedWords {
   word: string;
