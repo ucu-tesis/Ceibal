@@ -16,18 +16,24 @@ def get_db_connection():
     # TODO ensure this works with docker, the env set in docker-compose.yml should be used and not the one in .env
     return psycopg2.connect(os.getenv('DATABASE_URL'))
 
-# TODO add WORKING + stale
-# TODO add retrying failed jobs
+# Will retry when processing for more than 1 hour or on failure. Up to 3 times.
 def grab_pending_row():    
     # source for query: https://dba.stackexchange.com/questions/69471/postgres-update-limit-1
     # this is for supporting concurrency between different processors
     sql = """
         UPDATE "Analysis"
-        SET status = 'WORKING'
+        SET status = 'WORKING',
+            processing_retries = processing_retries + 1,
+            processing_start = NOW()
         WHERE id = (
             SELECT id
             FROM   "Analysis"
-            WHERE  status = 'PENDING'
+            WHERE processing_retries <= 3
+            AND (
+                status = 'PENDING'
+                OR (status = 'FAILED')
+                OR (status = 'WORKING' AND processing_start < NOW() - INTERVAL '1 hour')
+            )
             LIMIT  1
             FOR    UPDATE SKIP LOCKED
         )
@@ -134,6 +140,41 @@ def store_result(analysis_id, recording_id, resJson):
     
     return success
 
+def store_error(analysis_id, error_message):    
+    sql = """
+        UPDATE "Analysis"
+        SET
+            status = 'FAILED',
+            processing_errors = array_append(processing_errors, %(error_message)s)
+        WHERE id = %(analysis_id)s
+    """
+
+    def to_int_or_0(value):
+        try:
+            return int(value)
+        except ValueError:
+            return 0
+
+    success = False
+    try:
+        with get_db_connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                sql,
+                { 'error_message': error_message, 'analysis_id': analysis_id }
+            )
+            
+            updated_rows = cur.rowcount
+            
+            conn.commit()
+
+            if updated_rows > 0:
+                success = True
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("query error:")
+        print(error)
+    
+    return success
+
 def process_row(analysis_id):
     print("found and locked analysis for processing. id: " + str(analysis_id))
     
@@ -163,15 +204,22 @@ def process_row(analysis_id):
     
     print("File successfully fetched and stored at " + newDir)
     
-    analisis_audio(newDir, dirName, '.webm', text, True)
-    resJson, img1, img2, img3, img4 = getImageAndJson(newDir)
+    try:
+        analisis_audio(newDir, dirName, '.webm', text, True)
+        resJson, img1, img2, img3, img4 = getImageAndJson(newDir)
 
-    print("Analysis complete, storing result...")
-    print(resJson)
+        print("Analysis complete, storing result...")
+        print(resJson)
 
-    did_store_result = store_result(analysis_id, recording_id, resJson)
+        did_store_result = store_result(analysis_id, recording_id, resJson)
 
-    print("Result: " + "Success" if did_store_result else "Failed to update analysis row")
+        print("Result: " + "Success" if did_store_result else "Failed to update analysis row")
+    except Exception as error:
+        print("An error occurred:", type(error).__name__, "-", error)
+        
+        did_store_error = store_error(analysis_id, str(error))
+
+        print("Error stored" if did_store_error else "Failed to store error")
 
 # print statements here are commented to avoid flooding the logs
 while True:

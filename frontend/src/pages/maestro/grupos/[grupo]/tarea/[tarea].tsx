@@ -10,7 +10,7 @@ import { inputRegex, notFoundMessage } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 import { AssignmentReading } from "@/models/AssignmentReading";
-import { ReadingStatus } from "@/models/Reading";
+import { AnalysisStatus } from "@/models/Recording";
 import { dateFormats } from "@/util/dates";
 import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -143,7 +143,7 @@ export default function Page({ params }: { params: Params }) {
     statusOption
   );
 
-  const statusList: ReadingStatus[] = [
+  const statusList: AnalysisStatus[] = [
     "COMPLETED",
     "FAILED",
     "PENDING",
