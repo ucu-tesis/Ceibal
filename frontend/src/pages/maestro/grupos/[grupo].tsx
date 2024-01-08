@@ -1,7 +1,7 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import AssignmentModal from "@/components/modals/AssignmentModal";
+import AssignmentCreationModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
 import ChakraTable, {
@@ -58,20 +58,6 @@ const assignmentColumns: ChakraTableColumn[] = [
   { label: "Subcategoría" },
   { label: "Lectura" },
   { label: "Fecha de Entrega" },
-];
-
-const assignmentColumnsModal: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Categoría" },
-  { label: "Subcategoría" },
-  { label: "Lectura" },
-];
-
-const studentColumnsModal: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Correo" },
 ];
 
 const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
@@ -399,14 +385,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      <AssignmentModal
+      <AssignmentCreationModal
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
-        assignmentColumnsModal={assignmentColumnsModal}
-        assignments={assignments}
-        studentColumnsModal={studentColumnsModal}
-        students={students}
         evaluationGroupId={evaluationGroupId}
         styles={styles}
       />

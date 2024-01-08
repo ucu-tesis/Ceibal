@@ -21,6 +21,8 @@ const enterClick = (event: any) => {
   }
 };
 
+// TODO this is a mix of controlled and uncontrolled. it should use `value` instead of `defaultValue`
+// Also the label should not be part of selectValue, it should be calculated from `value` + `options` instead
 const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
   const divRef = useRef(null);
   const [selectValue, setValue] = useState(defaultValue);
