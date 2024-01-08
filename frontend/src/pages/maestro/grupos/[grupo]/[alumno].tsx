@@ -9,7 +9,7 @@ import ChakraTable, {
 import { inputRegex } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
-import { Assignment } from "@/models/Assignment";
+import { Assignment, StudentAssignment } from "@/models/Assignment";
 import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
 import { getOptionsFromArray } from "@/util/select";
 import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
@@ -86,35 +86,34 @@ const defaultOption: Option = {
 const toTableListAssignment = (
   assignments: Assignment[],
   groupId: string,
-  groupName: string,
-  studentFullName: string
+  studentId: string
 ) =>
-  assignments.map(
+  (assignments as StudentAssignment[]).map(
     ({
       readingCategory,
       readingSubcategory,
       readingTitle,
       dueDate,
       evaluationGroupReadingId,
+      status
     }) => ({
       readingCategory,
       readingSubcategory,
       readingTitle,
       dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-      link: (
+      link: ( status == 'completed' ?
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
+            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]",
             query: {
               grupo: groupId,
-              groupName,
-              alumno: studentFullName,
-              evaluacion: evaluationGroupReadingId,
+              alumno: studentId,
+              tarea: evaluationGroupReadingId,
             },
           }}
         >
           Ver detalles
-        </Link>
+        </Link> : null
       ),
     })
   );
@@ -322,8 +321,7 @@ export default function Page({ params }: { params: Params }) {
           data={toTableListAssignment(
             filteredAssignments,
             `${groupId}`,
-            `${groupName}`,
-            `${studentFullName}`
+            `${studentId}`
           )}
         ></ChakraTable>
       </div>

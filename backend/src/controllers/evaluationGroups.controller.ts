@@ -12,6 +12,7 @@ import { IsDateString, IsNumber } from 'class-validator';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
+import { StudentAssignmentDetailsResponse } from 'src/models/student-assignment-details-response';
 import { PrismaService } from 'src/prisma.service';
 
 class CreateAssignmentDTO {
@@ -376,6 +377,7 @@ export class EvaluationGroupsController {
           reading_subcategory: a.Reading.subcategory,
           reading_id: a.Reading.id,
           reading_title: a.Reading.title,
+          recording_id: lastRecording ? lastRecording.id : null,
           due_date: a.due_date,
           score: lastRecording ? lastRecording.Analysis.length : 0,
           status: lastRecording
@@ -538,6 +540,82 @@ export class EvaluationGroupsController {
         general_errors: similarity_error,
       },
       most_repeated_words: mostRepeatedWords,
+    };
+  }
+
+  @Get('/assignments/:evaluationGroupReadingId/:studentId')
+  @UseGuards(TeacherGuard)
+  async getStudentAssignmentDetail(
+    @UserData('id') userId: number,
+    @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
+    @Param('studentId') studentId: string,
+  ): Promise<StudentAssignmentDetailsResponse> {
+    const reading = await this.prismaService.evaluationGroupReading.findFirst({
+      where: {
+        id: Number(evaluationGroupReadingId),
+        EvaluationGroup: {
+          teacher_id: userId,
+          Students: {
+            some: {
+              id: Number(studentId),
+            },
+          },
+        },
+      },
+      include: {
+        Reading: true,
+        EvaluationGroup: true,
+      },
+    });
+
+    if (!reading) {
+      throw new UnprocessableEntityException('Reading not found');
+    }
+
+    const recording = await this.prismaService.recording.findFirst({
+      where: {
+        student_id: Number(studentId),
+        EvaluationGroupReading: {
+          id: Number(evaluationGroupReadingId),
+          EvaluationGroup: {
+            teacher_id: userId,
+          },
+        },
+      },
+      include: {
+        Analysis: true,
+      },
+    });
+
+    const student = await this.prismaService.student.findFirstOrThrow({
+      where: {
+        id: Number(studentId),
+      },
+    });
+
+    return {
+      analysis_id: recording?.Analysis[0]?.id ?? null,
+      student_id: student.id,
+      student_first_name: student.first_name,
+      student_last_name: student.last_name,
+      evaluation_group_reading_id: reading.id,
+      reading_id: reading.Reading.id,
+      reading_title: reading.Reading.title,
+      category: reading.Reading.category,
+      subcategory: reading.Reading.subcategory,
+      group_id: reading.EvaluationGroup.id,
+      group_name: reading.EvaluationGroup.name,
+      score: recording?.Analysis[0]?.score ?? null,
+      words_velocity: recording?.Analysis[0]?.words_velocity ?? null,
+      silences_count: recording?.Analysis[0]?.silences_count ?? null,
+      repetitions_count: recording?.Analysis[0]?.repetitions_count ?? null,
+      recording_id: recording?.id,
+      recording_url: recording?.recording_url ?? null,
+      status: recording
+        ? 'completed'
+        : reading.due_date < new Date()
+        ? 'delayed'
+        : 'pending',
     };
   }
 }

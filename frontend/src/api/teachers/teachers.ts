@@ -9,6 +9,7 @@ import { GroupDetails } from "@/models/GroupDetails";
 import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
+import { StudentAssignmentDetails } from "@/models/RecordingDetails";
 
 interface StudentMonthlyAverage {
   month: string;
@@ -103,6 +104,27 @@ interface AssignmentStatsResponse {
   most_repeated_words: RepeatedWords[];
 }
 
+interface StudentAssignmentDetailsResponse {
+  analysis_id: number | null;
+  student_id: number;
+  student_first_name: string;
+  student_last_name: string;
+  evaluation_group_reading_id: number;
+  reading_id: number;
+  reading_title: string;
+  category: string;
+  subcategory: string;
+  group_id: number;
+  group_name: string;
+  score: number | null;
+  words_velocity: number | null;
+  silences_count: number | null;
+  repetitions_count: number | null;
+  recording_id: number | null;
+  recording_url: string | null;
+  status: string;
+}
+
 export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
     .get<GroupDetailsResponse>(`/evaluationGroups/${groupId}`)
@@ -131,6 +153,12 @@ export const fetchAssignmentStats = (
       `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
     )
     .then(({ data }) => parseAssignmentStatsResponse(data));
+
+export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
+  axiosInstance
+    .get<StudentAssignmentDetailsResponse>(`/evaluationGroups/assignments/${assignmentId}/${studentId}`)
+    .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
+      
 
 // Parse methods
 
@@ -254,3 +282,26 @@ const parseAssignmentStatsResponse = (
     ),
   };
 };
+
+const parseStudentAssignmentDetailsResponse = (
+  recording: StudentAssignmentDetailsResponse
+): StudentAssignmentDetails => ({
+  analysisId: recording.analysis_id,
+  studentId: recording.student_id,
+  studentFirstName: recording.student_first_name,
+  studentLastName: recording.student_last_name,
+  evaluationGroupReadingId: recording.evaluation_group_reading_id,
+  readingId: recording.reading_id,
+  readingTitle: recording.reading_title,
+  category: recording.category,
+  subcategory: recording.subcategory,
+  groupId: recording.group_id,
+  groupName: recording.group_name,
+  score: recording.score,
+  wordsVelocity: recording.words_velocity,
+  silencesCount: recording.silences_count,
+  repetitionsCount: recording.repetitions_count,
+  recordingId: recording.recording_id,
+  recordingUrl: recording.recording_url,
+  status: recording.status,
+});
