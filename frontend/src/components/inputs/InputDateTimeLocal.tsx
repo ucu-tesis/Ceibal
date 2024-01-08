@@ -1,4 +1,5 @@
 import React, { ChangeEvent } from "react";
+import dayjs from "dayjs";
 import styles from "./Input.module.css";
 
 interface InputDateProps {
@@ -11,7 +12,7 @@ const InputDateTimeLocal: React.FC<InputDateProps> = ({ value, onChange }) => {
     <input
       type="datetime-local"
       className={styles["input-date"]}
-      value={value ?? new Date().toISOString()}
+      value={dayjs(value).format("YYYY-MM-DDThh:mm")}
       onChange={onChange}
     ></input>
   );

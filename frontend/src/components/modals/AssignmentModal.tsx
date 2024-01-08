@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useReducer, useState } from "react";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Box, Flex, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
@@ -104,8 +104,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
 
   const toast = useToast();
 
-  // TODO test this
-  const { mutate, isLoading, isError } = useMutation({
+  const createAssignmentMutation = useMutation({
     mutationFn: async (readings: Reading[]) => {
       await createAssignment(evaluationGroupId, readings, selectedDueDate);
     },
@@ -119,28 +118,20 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
         isClosable: true,
       });
     },
-    onError: () => {
-      // TODO proper error modal
-      toast({
-        title: "Error",
-        status: "error",
-        duration: toastDuration,
-        isClosable: true,
-      });
-    },
   });
 
   const changeStep = () => {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
-      mutate(selectedReadings);
+      createAssignmentMutation.mutate(selectedReadings);
     }
   };
 
   const undoStep = () => {
     if (activeStep > 0) {
       setActiveStep(activeStep - 1);
+      createAssignmentMutation.reset();
     }
   };
 
@@ -297,16 +288,33 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
 
           {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
           {steps[activeStep] === SUMMARY_STEP && renderSummary()}
+          <Box>
+            {createAssignmentMutation.isError && (
+              <Box textColor="red">
+                Ha ocurrido un error al asignar la tarea:{' '}
+                {(createAssignmentMutation.error as Error)?.message}
+              </Box>
+            )}
+          </Box>
         </ModalBody>
-        <ModalFooter className={styles["flex-center"]}>
-          {activeStep > 0 && (
-            <Button onClick={undoStep} className={styles.secondary} variant="outline">
-              Volver
-            </Button>
+        <ModalFooter>
+          {createAssignmentMutation.isLoading ? (
+            <Flex align="center" gap={2}>
+              <Spinner />
+              Creando tarea...
+            </Flex>
+          ) : (
+            <Flex align="center" gap={2}>
+              {activeStep > 0 && (
+                <Button onClick={undoStep} className={styles.secondary} variant="outline">
+                  Volver
+                </Button>
+              )}
+              <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+                {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
+              </Button>
+            </Flex>
           )}
-          <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
-            {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
-          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
