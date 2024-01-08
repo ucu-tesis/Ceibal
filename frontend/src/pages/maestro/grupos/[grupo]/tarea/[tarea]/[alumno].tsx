@@ -60,10 +60,16 @@ export default function Page() {
           <ProgressCircle value={data.score?.toString() ?? '0'}></ProgressCircle>
         </div>
         <h2 tabIndex={0}>Métricas</h2>
-        <div className={`col ${styles.stats} ${styles.border}`}>
-          <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
-          <h5 tabIndex={0}>Cantidad Repeticiones: {data.repetitionsCount}</h5>
-          <h5 tabIndex={0}>Velocidad de lectura: {data.wordsVelocity} palabras/minuto</h5>
+        <div className={`row ${styles.stats} ${styles.border}`}>
+          <div className={`col`}>
+            <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
+            <h5 tabIndex={0}>Cantidad Repeticiones: {data.repetitionsCount}</h5>
+            <h5 tabIndex={0}>Velocidad de lectura: {data.wordsVelocity} palabras/minuto</h5>
+          </div>
+          {data.recordingUrl ? <audio controls className={`${styles.audio}`}>
+            <source src={data.recordingUrl}/>
+\            Your browser does not support the audio element.
+          </audio> : null}
         </div>
       </div>
     </ChakraProvider>
