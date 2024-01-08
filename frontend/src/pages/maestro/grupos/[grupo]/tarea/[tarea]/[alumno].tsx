@@ -42,7 +42,7 @@ export default function Page() {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}>{data.studentFirstName} {data.studentLastName}</BreadcrumbLink>
+            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}>{data.studentName}</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
@@ -52,7 +52,7 @@ export default function Page() {
         <h1 tabIndex={0}>Resultado de Evaluación</h1>
         <div className={`row ${styles.space}`}>
           <div className={`col ${styles.stats}`}>
-            <h5 tabIndex={0}>Alumno: {data.studentFirstName} {data.studentLastName}</h5>
+            <h5 tabIndex={0}>Alumno: {data.studentName}</h5>
             <h5 tabIndex={0}>Lectura: {data.readingTitle}</h5>
             <h5 tabIndex={0}>Categoría: {data.category}</h5>
             <h5 tabIndex={0}>Subcategoría: {data.subcategory}</h5>

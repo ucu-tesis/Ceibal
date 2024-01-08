@@ -388,6 +388,10 @@ export class EvaluationGroupsController {
         };
       }),
       monthly_averages: monthlyAverages,
+      student_name: `${student.first_name} ${student.last_name}`,
+      student_id: student.id,
+      group_name: evaluationGroup.name,
+      group_id: evaluationGroup.id,
     };
   }
 
@@ -596,8 +600,7 @@ export class EvaluationGroupsController {
     return {
       analysis_id: recording?.Analysis[0]?.id ?? null,
       student_id: student.id,
-      student_first_name: student.first_name,
-      student_last_name: student.last_name,
+      student_name: `${student.first_name} ${student.last_name}`,
       evaluation_group_reading_id: reading.id,
       reading_id: reading.Reading.id,
       reading_title: reading.Reading.title,

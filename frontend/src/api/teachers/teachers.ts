@@ -35,6 +35,10 @@ interface StudentStatsResponse {
   assignments_done: number;
   assignments_pending: number;
   monthly_averages: StudentMonthlyAverage[];
+  student_name: string;
+  student_id: number;
+  group_name: string;
+  group_id: number;
 }
 
 interface GroupsResponse {
@@ -107,8 +111,7 @@ interface AssignmentStatsResponse {
 interface StudentAssignmentDetailsResponse {
   analysis_id: number | null;
   student_id: number;
-  student_first_name: string;
-  student_last_name: string;
+  student_name: string;
   evaluation_group_reading_id: number;
   reading_id: number;
   reading_title: string;
@@ -239,6 +242,10 @@ const parseStudentStatsResponse = (
   assignmentsUncompleted: stats.assignments_delayed,
   averageScore: stats.average_score,
   monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
+  studentName: stats.student_name,
+  studentId: stats.student_id,
+  groupName: stats.group_name,
+  groupId: stats.group_id,
 });
 
 const parseAssignmentStatsResponse = (
@@ -288,8 +295,7 @@ const parseStudentAssignmentDetailsResponse = (
 ): StudentAssignmentDetails => ({
   analysisId: recording.analysis_id,
   studentId: recording.student_id,
-  studentFirstName: recording.student_first_name,
-  studentLastName: recording.student_last_name,
+  studentName: recording.student_name,
   evaluationGroupReadingId: recording.evaluation_group_reading_id,
   readingId: recording.reading_id,
   readingTitle: recording.reading_title,

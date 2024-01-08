@@ -1,8 +1,7 @@
 export class StudentAssignmentDetailsResponse {
   analysis_id: number | null;
   student_id: number;
-  student_first_name: string;
-  student_last_name: string;
+  student_name: string;
   evaluation_group_reading_id: number;
   reading_id: number;
   reading_title: string;

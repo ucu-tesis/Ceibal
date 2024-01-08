@@ -1,8 +1,7 @@
 export interface StudentAssignmentDetails {
     analysisId: number | null;
     studentId: number;
-    studentFirstName: string;
-    studentLastName: string;
+    studentName: string;
     evaluationGroupReadingId: number;
     readingId: number;
     readingTitle: string;
