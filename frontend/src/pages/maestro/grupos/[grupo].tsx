@@ -212,7 +212,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
     useAssignmentFilterOptions(assignments);
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const assignmentModalDisclosure = useDisclosure();
   const {
     isOpen: isOpenReadingModal,
     onClose: onCloseReadingModal,
@@ -249,7 +249,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={onOpen}
+              onClick={assignmentModalDisclosure.onOpen}
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
@@ -385,13 +385,13 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      <AssignmentCreationModal
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        evaluationGroupId={evaluationGroupId}
-        styles={styles}
-      />
+      {assignmentModalDisclosure.isOpen && (
+        <AssignmentCreationModal
+          onClose={assignmentModalDisclosure.onClose}
+          evaluationGroupId={evaluationGroupId}
+          styles={styles}
+        />
+      )}      
       <CreateReadingModal
         isOpen={isOpenReadingModal}
         onClose={onCloseReadingModal}

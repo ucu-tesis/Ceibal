@@ -15,8 +15,6 @@ import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
 
 interface AssignmentCreationModalProps {
-  isOpen: boolean;
-  onOpen: () => void;
   onClose: () => void;
   evaluationGroupId: number;
   styles: any;
@@ -67,7 +65,6 @@ const getReadingSubcategories = (readings: Reading[]) => {
 };
 
 const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
-  isOpen,
   onClose,
   evaluationGroupId,
   styles
@@ -163,7 +160,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
           value={selectedDueDate}
           onChange={(event: ChangeEvent) => {
             const { value } = event.target as HTMLInputElement;
-            setSelectedDueDate(value);
+            setSelectedDueDate(dayjs(value).toISOString());
           }}
         ></InputDateTimeLocal>
       </div>
@@ -264,7 +261,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
       <ModalContent className={styles["modal-content"]}>
         <ModalHeader tabIndex={0}>Asignar Tarea</ModalHeader>

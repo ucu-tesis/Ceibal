@@ -147,7 +147,7 @@ export const fetchAllReadings = () =>
 
 export const createAssignment = (evaluationGroupId: number, readings: Reading[], dueDate: string) => {
   return axiosInstance.post(`/evaluationGroups/${evaluationGroupId}/assignments`, {
-    reading_id: readings[0].id, // TODO create all readings
+    reading_ids: readings.map(reading => reading.id),
     due_date: dueDate,
   })
 };
