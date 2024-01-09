@@ -5,11 +5,19 @@ import { PrismaService } from 'src/prisma.service';
 export class AchievementService {
   constructor(private prismaService: PrismaService) {}
 
-  async assign(studentId: number, achievementId: number) {
+  async assign(studentId: number, triggerId: string) {
+    const achievement = await this.prismaService.achievement.findFirst({
+      where: {
+        trigger_id: triggerId,
+      },
+    });
+    if (!achievement) {
+      return;
+    }
     return await this.prismaService.studentAchievement.create({
       data: {
         student_id: studentId,
-        achievement_id: achievementId,
+        achievement_id: achievement.id,
       },
     });
   }
@@ -23,13 +31,13 @@ export class AchievementService {
     });
 
     if (completedReadingsCount === 1) {
-      await this.assign(studentId, 1);
+      await this.assign(studentId, 'completed:1');
     } else if (completedReadingsCount === 5) {
-      await this.assign(studentId, 2);
+      await this.assign(studentId, 'completed:5');
     } else if (completedReadingsCount === 10) {
-      await this.assign(studentId, 3);
+      await this.assign(studentId, 'completed:10');
     } else if (completedReadingsCount === 20) {
-      await this.assign(studentId, 4);
+      await this.assign(studentId, 'completed:20');
     }
   }
 }
