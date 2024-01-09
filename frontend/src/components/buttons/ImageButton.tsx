@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./Button.module.css";
 
 interface ImageButtonProps {
-  onClick?: (award: any) => void;
+  onClick?: (achievement: any) => void;
   src: any; // Use any to avoid conflicts with @svgr/webpack plugin or babel-plugin-inline-react-svg plugin.
   altText: string;
   title: string;
