@@ -156,6 +156,7 @@ export class StudentsController {
       }>;
     }> = [];
 
+    // TODO This forEach and getCategorizedReadings's could be unified in a helper method
     assignments.forEach((a) => {
       let category = categories.find((c) => c.category == a.reading_category);
       if (!category) {
