@@ -51,14 +51,16 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
+interface AnalysisItem {
+  score: number;
+  status: AnalysisStatus;
+}
+
 interface RecordingResponse {
   id: number;
   recording_url: string;
   created_at: string;
-  Analysis: {
-    score: number;
-    status: AnalysisStatus;
-  };
+  Analysis: AnalysisItem[];
   EvaluationGroupReading: {
     Reading: {
       title: string;
@@ -131,16 +133,18 @@ const parseReadingListResponse = ({ reading_id, title }: ReadingListResponse): R
 });
 
 const parseRecordingResponse = ({
-  Analysis: { score, status },
+  Analysis,
   id,
   created_at,
   EvaluationGroupReading: {
     Reading: { image_url, title, category, subcategory },
   },
+  recording_url,
 }: RecordingResponse): Recording => ({
-  analysis_score: score,
-  analysis_status: status,
+  analysis_score: Analysis[0].score,
+  analysis_status: Analysis[0].status,
   id: id,
+  url: recording_url,
   dateSubmitted: created_at,
   reading_image: image_url,
   reading_title: title,
