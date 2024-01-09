@@ -3,7 +3,7 @@ import { Box, Flex, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Mo
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
-import Select from "../selects/Select";
+import Select, { Option } from "../selects/Select";
 import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
 import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -13,6 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { dateFormats } from "@/util/dates";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
+import { getOptionsFromArray } from "@/util/select";
 
 interface AssignmentCreationModalProps {
   onClose: () => void;
@@ -54,14 +55,9 @@ const filterReadings = (
   });
 }
 
-const getReadingCategories = (readings: Reading[]) => {
-  return Array.from(new Set(readings.map(r => r.category)));
-};
-
-const getReadingSubcategories = (readings: Reading[]) => {
-  return Array.from(
-    new Set(readings.map(r => r.subcategory).filter(Boolean))
-  );
+const defaultOption: Option = {
+  label: "Todas",
+  value: undefined,
 };
 
 const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
@@ -190,13 +186,12 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
           <label>Categoría</label>
           <Select
             defaultValue={{ label: categoryFilter || "Todas", value: categoryFilter }}
-            options={[
-              { label: "Todas", value: undefined },
-              ...getReadingCategories(readingsQueryData.data.Readings).map(c => ({
-                label: c,
-                value: c,
-              })),
-            ]}
+            options={
+              getOptionsFromArray(
+                readingsQueryData.data.Readings.map(r => r.category),
+                defaultOption,
+              )
+            }
             onChange={(option) => {
               setCategoryFilter(option.value);
             }}
@@ -206,13 +201,12 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
           <label>Subcategoría</label>
           <Select
             defaultValue={{ label: subcategoryFilter || "Todas", value: subcategoryFilter }}
-            options={[
-              { label: "Todas", value: undefined },
-              ...getReadingSubcategories(readingsQueryData.data.Readings).map(sc => ({
-                label: sc,
-                value: sc,
-              })),
-            ]}
+            options={
+              getOptionsFromArray(
+                readingsQueryData.data.Readings.map(r => r.subcategory).filter(Boolean),
+                defaultOption,
+              )
+            }
             onChange={(option) => {
               setSubcategoryFilter(option.value);
             }}
