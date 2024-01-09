@@ -38,7 +38,7 @@ interface ReadingDetailsResponse {
 
 interface ReadingListResponse {
   reading_id: number;
-  title?: string;
+  title: string;
 }
 
 type PendingReadingListResponse = Pick<
@@ -57,7 +57,7 @@ type PendingSubcategoryListResponse = Pick<
 > & { readings: PendingReadingListResponse[] };
 
 interface CategoryListResponse {
-  category?: string;
+  category: string;
   subcategories: SubcategoryListResponse[];
 }
 
@@ -115,20 +115,16 @@ const parseReadingDetails = (
 });
 
 const parseReadingsListResponse = (res: CategoryListResponse[]): Category[] =>
-  res
-    .map(({ category, subcategories }) => ({
-      name: category ?? "",
-      subcategories: subcategories
-        .map(parseSubcategoryListResponse)
-        .filter((s) => !!s.name), // Remove subcategories without name
-    }))
-    .filter((c) => !!c.name); // Remove categories without name
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parseSubcategoryListResponse),
+  }));
 
 const parseSubcategoryListResponse = ({
   readings,
   subcategory,
 }: SubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "",
+  name: subcategory ?? "Otros",
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
@@ -137,29 +133,23 @@ const parseReadingListResponse = ({
   title,
 }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
-  title: title ?? "",
+  title,
 });
 
 const parsePendingReadingsListResponse = (
   res: PendingCategoryListResponse[]
 ): Category[] =>
-  res
-    .map(({ category, subcategories }) => ({
-      name: category ?? "",
-      subcategories: subcategories
-        .map(parsePendingSubcategoryListResponse)
-        .filter((s) => !!s.name), // Remove subcategories without name
-    }))
-    .filter((c) => !!c.name); // Remove categories without name
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parsePendingSubcategoryListResponse),
+  }));
 
 const parsePendingSubcategoryListResponse = ({
   readings,
   subcategory,
 }: PendingSubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "",
-  readings: readings
-    .map(parsePendingReadingListResponse)
-    .filter((r) => !!r.title), // Remove readings without name
+  name: subcategory ?? "Otros",
+  readings: readings.map(parsePendingReadingListResponse),
 });
 
 const parsePendingReadingListResponse = ({
@@ -168,6 +158,6 @@ const parsePendingReadingListResponse = ({
   due_date,
 }: PendingReadingListResponse): ReadingMinimalInfo & { dueDate: Date } => ({
   id: reading_id,
-  title: title ?? "",
+  title,
   dueDate: new Date(due_date),
 });
