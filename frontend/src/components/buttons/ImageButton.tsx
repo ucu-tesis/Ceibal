@@ -21,8 +21,18 @@ const ImageButton: React.FC<ImageButtonProps> = ({
 }) => {
   return (
     <div className={`${styles["btn-col"]} col`}>
-      <button onClick={onClick} type="button" className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}>
-        <Image src={src} alt={altText}></Image>
+      <button
+        onClick={onClick}
+        type="button"
+        className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}
+      >
+        <Image
+          className={`${styles.image}`}
+          src={src}
+          alt={altText}
+          width={220}
+          height={220}
+        />
         {overlayText && (
           <div className={styles.overlay}>
             <span>{overlayText}</span>
