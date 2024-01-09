@@ -21,7 +21,11 @@ const AssignmentsPendingCount = ({
   if (isLoading) {
     return <Spinner size="small" />;
   }
-  return !!count ? <span>({count})</span> : null;
+  return !!count ? (
+    <div className={styles["pending-amount-container"]}>
+      <span>{count}</span>
+    </div>
+  ) : null;
 };
 
 const StudentHomeScreen: React.FC = () => {
