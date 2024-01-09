@@ -1,10 +1,19 @@
+import { Achievement } from "@/models/Achievement";
 import { Category } from "@/models/Category";
 import { PaginatedRecordings } from "@/models/CompletedReadings";
-import { Recording, AnalysisStatus } from "@/models/Recording";
+import { ReadingMinimalInfo } from "@/models/Reading";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { AnalysisStatus, Recording } from "@/models/Recording";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
-import { ReadingMinimalInfo } from "@/models/Reading";
+
+interface AchievementResponse {
+  achieved: boolean;
+  description: string;
+  id: number;
+  image_url: string;
+  name: string;
+}
 
 export interface RecordingsRequest {
   page: number;
@@ -51,10 +60,7 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
-export const fetchCompletedReadings = ({
-  page,
-  pageSize,
-}: RecordingsRequest) =>
+export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
     .get<PaginatedRecordingsResponse>(`/students/readings/completed`, {
       params: { page, pageSize },
@@ -70,6 +76,11 @@ export const fetchReadings = () =>
   axiosInstance
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
+
+export const fetchAchievements = () =>
+  axiosInstance
+    .get<AchievementResponse[]>("students/achievements")
+    .then(({ data }) => parseAchievementsResponse(data));
 
 // Parse methods
 
@@ -123,3 +134,12 @@ const parseReadingListResponse = ({
   id: reading_id,
   title: title ?? "",
 });
+
+const parseAchievementsResponse = (res: AchievementResponse[]): Achievement[] =>
+  res.map((a) => ({
+    achieved: a.achieved,
+    description: a.description,
+    id: a.id,
+    imageUrl: a.image_url,
+    name: a.name,
+  }));
