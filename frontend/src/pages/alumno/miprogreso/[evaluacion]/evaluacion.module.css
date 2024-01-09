@@ -1,0 +1,66 @@
+.container {
+  padding: 16px;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.container h1 {
+  font-size: 32px;
+  font-weight: 600;
+  text-decoration-line: underline;
+}
+
+.container h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.container img.rounded {
+  border-radius: 360px;
+  background-size: cover;
+}
+
+.info {
+  margin-block: 8px;
+  gap: 64px;
+}
+
+.info > div {
+  gap: 8px;
+}
+
+.info label {
+  font-weight: 600;
+}
+
+.container button {
+  margin-top: 8px;
+  font-weight: 600;
+  padding-inline: 120px !important;
+  font-size: 24px !important;
+}
+
+.stars {
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .container {
+    padding: 8px;
+  }
+  .info {
+    margin-block: 8px;
+    gap: 32px;
+  }
+  .container button {
+    padding-inline: 80px !important;
+  }
+  .stars {
+    gap: 0px;
+  }
+  .stars img {
+    transform: scale(0.75);
+  }
+}
