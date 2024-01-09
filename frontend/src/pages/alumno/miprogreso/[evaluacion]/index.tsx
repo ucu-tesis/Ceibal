@@ -107,7 +107,7 @@ export default function Page() {
           <div>{audioPlaying ? <Image src={StopIcon} alt=""></Image> : <Image src={PlayIcon} alt=""></Image>}</div>
           <div>{audioPlaying ? "Parar" : "Reproducir"}</div>
         </SecondaryButton>
-        <audio className={`${styles.audio}`}>
+        <audio>
           <source src={url} />
         </audio>
       </div>
