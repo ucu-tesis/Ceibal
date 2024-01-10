@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import localFont from "next/font/local";
 import { useRouter } from "next/router";
 import styles from "./evaluacion.module.css";
-import SuarezImage from "@/assets/images/suarez.svg";
 import SecondaryButton from "@/components/buttons/SecondaryButton";
 import PlayIcon from "@/assets/images/play_icon.svg";
-import StopIcon from "@/assets/images/stop_icon.svg";
+import StopIcon from "@/assets/images/pause_icon.svg";
 import Head from "next/head";
 import { FastAverageColor } from "fast-average-color";
 import Star from "@/assets/images/star_eval.svg";
@@ -20,6 +20,15 @@ const useFetchRecordings = (recordingId: number) =>
     queryKey: ["student", "recording", recordingId],
     queryFn: () => fetchRecording(recordingId),
   });
+
+const mozaicFont = localFont({
+  src: [
+    {
+      path: "../../../../assets/fonts/ceibalmozaic-regular-webfont.woff2",
+      style: "normal",
+    },
+  ],
+});
 
 export default function Page() {
   const { evaluacion } = useRouter().query;
@@ -62,7 +71,7 @@ export default function Page() {
     if (container) {
       fac.getColorAsync(container.querySelector("img")).then(({ hex }) => setImageAverageColor(hex));
     }
-  }, [imageAverageColor, data]);
+  }, [data]);
 
   const stars = Array.from({ length: 5 }, (_, index) => (
     <Image key={`star-${index}`} src={starsCount > index ? Star : StarOutlined} alt="estrella" />
@@ -73,7 +82,7 @@ export default function Page() {
   }
 
   if (isError) {
-    return <ErrorPage intendedAction="cargar tus lecturas" />;
+    return <ErrorPage intendedAction="cargar tu evaluación" />;
   }
 
   return (
@@ -86,7 +95,7 @@ export default function Page() {
         <h2>{title}</h2>
         <Image
           className={styles.rounded}
-          src={imageURL ?? SuarezImage}
+          src={imageURL ?? ""}
           width={300}
           height={400}
           alt={`imagen de lectura: ${title}`}
@@ -105,7 +114,7 @@ export default function Page() {
         <div className={`${styles.stars} row`}>{stars}</div>
         <SecondaryButton onClick={onClickPlay} variant={"outlined" as keyof Object}>
           <div>{audioPlaying ? <Image src={StopIcon} alt=""></Image> : <Image src={PlayIcon} alt=""></Image>}</div>
-          <div>{audioPlaying ? "Parar" : "Reproducir"}</div>
+          <div style={{ fontFamily: mozaicFont.style.fontFamily }}>{audioPlaying ? "Parar" : "Reproducir"}</div>
         </SecondaryButton>
         <audio>
           <source src={url} />
