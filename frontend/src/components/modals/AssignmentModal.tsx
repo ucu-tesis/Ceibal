@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useReducer, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { Box, Flex, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
@@ -10,7 +10,6 @@ import { SearchIcon } from "@chakra-ui/icons";
 import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { dateFormats } from "@/util/dates";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
@@ -31,13 +30,6 @@ const readingSelectionColumns: ChakraTableColumn[] = [
   { label: "Categoría" },
   { label: "Subcategoría" },
   { label: "Lectura" },
-];
-
-const studentSelectionColumns: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Correo" },
 ];
 
 const filterReadings = (
@@ -255,7 +247,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose}>
+    <Modal isOpen onClose={onClose}>
       <ModalOverlay />
       <ModalContent className={styles["modal-content"]}>
         <ModalHeader tabIndex={0}>Asignar Tarea</ModalHeader>
