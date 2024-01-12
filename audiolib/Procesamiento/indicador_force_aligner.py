@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 from allosaurus.app import read_recognizer
 
 import epitran
-import panphon
 from panphon import distance
 
 import os
@@ -59,7 +58,7 @@ def process_text_grid(folder, filename, audio, sr):
     """
     allosaurus_model = read_recognizer()
     epi = epitran.Epitran('spa-Latn')
-    dst_measure = panphon.distance.Distance()
+    dst_measure = distance.Distance()
 
     #Lectura de archivo textgrid
     tg = textgrid.openTextgrid(os.path.join(folder, filename+'.TextGrid'), False)
