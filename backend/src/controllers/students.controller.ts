@@ -5,12 +5,11 @@ import {
   UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
+import { UserData } from 'src/decorators/userData.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { ReadingsResponse } from 'src/models/reading-response.model';
-import { PendingReadingsResponse } from 'src/models/pending-reading-response.model';
-import { UserData } from 'src/decorators/userData.decorator';
+import { PrismaService } from 'src/prisma.service';
 
 @Controller('students')
 export class StudentsController {
@@ -117,10 +116,7 @@ export class StudentsController {
 
   @Get('/readings/pending')
   @UseGuards(StudentGuard)
-  async getPendingReadings(
-    @UserData('id') userId: number,
-    @Pagination() { page, pageSize }: { page: number; pageSize: number },
-  ): Promise<PendingReadingsResponse> {
+  async getPendingReadings(@UserData('id') userId: number) {
     const where = {
       EvaluationGroup: {
         Students: {
@@ -129,7 +125,7 @@ export class StudentsController {
           },
         },
       },
-      Recording: {
+      Recordings: {
         none: {},
       },
     };
@@ -139,31 +135,49 @@ export class StudentsController {
       include: {
         Reading: true,
       },
-      skip: page * pageSize,
-      take: pageSize,
       orderBy: {
         due_date: 'asc',
       },
     });
 
-    const totalReadings = await this.prismaService.evaluationGroupReading.count(
-      {
-        where: where,
-      },
-    );
+    const assignments = readings.map((r) => ({
+      due_date: r.due_date,
+      reading_category: r.Reading.category,
+      reading_id: r.id,
+      reading_subcategory: r.Reading.subcategory,
+      reading_title: r.Reading.title,
+    }));
 
-    return {
-      Assignments: readings.map((r) => {
-        return {
-          reading_id: r.id,
-          reading_title: r.Reading.title,
-          due_date: r.due_date,
-        };
-      }),
-      total: totalReadings,
-      page: page,
-      page_size: pageSize,
-    };
+    const categories: Array<{
+      category: string;
+      subcategories: Array<{
+        subcategory: string;
+        readings: Array<{ reading_id: number; title: string; due_date: Date }>;
+      }>;
+    }> = [];
+
+    // TODO This forEach and getCategorizedReadings's could be unified in a helper method
+    assignments.forEach((a) => {
+      let category = categories.find((c) => c.category == a.reading_category);
+      if (!category) {
+        category = { category: a.reading_category, subcategories: [] };
+        categories.push(category);
+      }
+      let subcategory = category.subcategories.find(
+        (sc) => sc.subcategory == a.reading_subcategory,
+      );
+      if (!subcategory) {
+        subcategory = { subcategory: a.reading_subcategory, readings: [] };
+        category.subcategories.push(subcategory);
+      }
+      subcategory.readings.push({
+        reading_id: a.reading_id,
+        title: a.reading_title,
+        due_date: a.due_date,
+      });
+    });
+
+    return categories;
   }
 
   @Get('/readings/pending-amount')
