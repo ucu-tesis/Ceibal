@@ -64,6 +64,9 @@ interface CategoryListResponse {
 type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
   subcategories: PendingSubcategoryListResponse[];
 };
+interface PendingReadingsCountResponse {
+  assignments_pending: number;
+}
 
 export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
@@ -86,6 +89,11 @@ export const fetchPendingReadings = () =>
   axiosInstance
     .get<PendingCategoryListResponse[]>("students/readings/pending")
     .then(({ data }) => parsePendingReadingsListResponse(data));
+
+export const fetchPendingReadingsCount = () =>
+  axiosInstance
+    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
