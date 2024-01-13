@@ -15,4 +15,5 @@ export const SPANISH_MONTH_NAMES = [
 
 export const dateFormats = {
   assignmentDueDate: "DD/MM/YYYY HH:mm",
+  inputDateTimeLocalDate: "YYYY-MM-DDThh:mm",
 };
