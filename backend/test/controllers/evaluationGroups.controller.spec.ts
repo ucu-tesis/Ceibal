@@ -181,7 +181,7 @@ describe('EvaluationGroupsController', () => {
       });
       const reading = await TestFactory.createReading({});
       const payload = {
-        reading_id: reading.id,
+        reading_ids: [reading.id],
         due_date: new Date('2024-09-10').toISOString(),
       };
       expect(
@@ -190,20 +190,62 @@ describe('EvaluationGroupsController', () => {
           String(evaluationGroup.id),
           payload,
         ),
-      ).toEqual({
-        id: expect.any(Number),
-        evaluation_group_id: evaluationGroup.id,
-        reading_id: reading.id,
-        due_date: new Date(payload.due_date),
-        created_at: expect.any(Date),
+      ).toEqual({ count: 1 });
+
+      const assignments = await prismaService.evaluationGroupReading.findMany();
+      expect(assignments).toEqual([
+        {
+          id: expect.any(Number),
+          evaluation_group_id: evaluationGroup.id,
+          reading_id: reading.id,
+          due_date: new Date(payload.due_date),
+          created_at: expect.any(Date),
+        },
+      ]);
+    });
+
+    it('creates multiple assignments when passed multiple reading ids', async () => {
+      const teacher = await TestFactory.createTeacher({ cedula: '1234' });
+      const evaluationGroup = await TestFactory.createEvaluationGroup({
+        teacherId: teacher.id,
       });
+      const reading1 = await TestFactory.createReading({});
+      const reading2 = await TestFactory.createReading({});
+      const payload = {
+        reading_ids: [reading1.id, reading2.id],
+        due_date: new Date('2024-09-10').toISOString(),
+      };
+      expect(
+        await controller.createAssignment(
+          teacher.id,
+          String(evaluationGroup.id),
+          payload,
+        ),
+      ).toEqual({ count: 2 });
+      const assignments = await prismaService.evaluationGroupReading.findMany();
+      expect(assignments).toEqual([
+        {
+          id: expect.any(Number),
+          evaluation_group_id: evaluationGroup.id,
+          reading_id: reading1.id,
+          due_date: new Date(payload.due_date),
+          created_at: expect.any(Date),
+        },
+        {
+          id: expect.any(Number),
+          evaluation_group_id: evaluationGroup.id,
+          reading_id: reading2.id,
+          due_date: new Date(payload.due_date),
+          created_at: expect.any(Date),
+        },
+      ]);
     });
 
     it('throws an error if the evaluation group does not exist', async () => {
       const teacher = await TestFactory.createTeacher({ cedula: '1234' });
       const reading = await TestFactory.createReading({});
       const payload = {
-        reading_id: reading.id,
+        reading_ids: [reading.id],
         due_date: new Date('2024-09-10').toISOString(),
       };
       await expect(
@@ -217,7 +259,7 @@ describe('EvaluationGroupsController', () => {
         teacherId: teacher.id,
       });
       const payload = {
-        reading_id: 1,
+        reading_ids: [1],
         due_date: new Date('2024-09-10').toISOString(),
       };
       await expect(
@@ -226,7 +268,7 @@ describe('EvaluationGroupsController', () => {
           String(evaluationGroup.id),
           payload,
         ),
-      ).rejects.toThrow('Reading not found');
+      ).rejects.toThrow('Some reading was not found');
     });
 
     it('throws an error if the group does not belong to the teacher', async () => {
@@ -237,7 +279,7 @@ describe('EvaluationGroupsController', () => {
       });
       const reading = await TestFactory.createReading({});
       const payload = {
-        reading_id: reading.id,
+        reading_ids: [reading.id],
         due_date: new Date('2024-09-10').toISOString(),
       };
       await expect(
