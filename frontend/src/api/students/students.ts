@@ -1,10 +1,10 @@
 import { Category } from "@/models/Category";
 import { PaginatedRecordings } from "@/models/CompletedReadings";
-import { Recording, AnalysisStatus } from "@/models/Recording";
+import { ReadingMinimalInfo } from "@/models/Reading";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { AnalysisStatus, Recording } from "@/models/Recording";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
-import { ReadingMinimalInfo } from "@/models/Reading";
 
 export interface RecordingsRequest {
   page: number;
@@ -51,10 +51,11 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
-export const fetchCompletedReadings = ({
-  page,
-  pageSize,
-}: RecordingsRequest) =>
+interface PendingReadingsCountResponse {
+  assignments_pending: number;
+}
+
+export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
     .get<PaginatedRecordingsResponse>(`/students/readings/completed`, {
       params: { page, pageSize },
@@ -70,6 +71,11 @@ export const fetchReadings = () =>
   axiosInstance
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
+
+export const fetchPendingReadingsCount = () =>
+  axiosInstance
+    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
