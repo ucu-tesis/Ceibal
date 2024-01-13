@@ -17,6 +17,7 @@ import { ForbiddenFilter } from './filters/forbidden.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { StudentsController } from './controllers/students.controller';
 import { ReadingsController } from './controllers/readings.controller';
+import { AchievementService } from './services/achievement.service';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ReadingsController } from './controllers/readings.controller';
     PrismaService,
     AuthService,
     UserService,
+    AchievementService,
     JwtStrategy,
     GoogleStrategy,
   ],
