@@ -622,10 +622,7 @@ export class EvaluationGroupsController {
       repetitions_count: recording?.Analysis[0]?.repetitions_count ?? null,
       recording_id: recording?.id,
       recording_url: recording?.recording_url
-        ? await this.fileUploadService.getSignedUrl(
-            recording.recording_url,
-            3600,
-          )
+        ? await this.fileUploadService.getSignedUrl(recording.recording_url)
         : null,
       status: recording
         ? 'completed'

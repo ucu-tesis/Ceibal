@@ -64,7 +64,7 @@ export class FileUploadService implements MulterOptionsFactory {
 
   async getSignedUrl(
     s3ObjectKey: string,
-    durationInSeconds: number,
+    durationInSeconds = 3600,
   ): Promise<string> {
     const bucket = this.configService.get('AWS_BUCKET');
     const getObjectParams = {
