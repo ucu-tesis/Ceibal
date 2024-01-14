@@ -554,25 +554,26 @@ export class EvaluationGroupsController {
     @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
     @Param('studentId') studentId: string,
   ): Promise<StudentAssignmentDetailsResponse> {
-    const reading = await this.prismaService.evaluationGroupReading.findFirst({
-      where: {
-        id: Number(evaluationGroupReadingId),
-        EvaluationGroup: {
-          teacher_id: userId,
-          Students: {
-            some: {
-              id: Number(studentId),
+    const evaluationGroupReading =
+      await this.prismaService.evaluationGroupReading.findFirst({
+        where: {
+          id: Number(evaluationGroupReadingId),
+          EvaluationGroup: {
+            teacher_id: userId,
+            Students: {
+              some: {
+                id: Number(studentId),
+              },
             },
           },
         },
-      },
-      include: {
-        Reading: true,
-        EvaluationGroup: true,
-      },
-    });
+        include: {
+          Reading: true,
+          EvaluationGroup: true,
+        },
+      });
 
-    if (!reading) {
+    if (!evaluationGroupReading) {
       throw new UnprocessableEntityException('Reading not found');
     }
 
@@ -601,13 +602,13 @@ export class EvaluationGroupsController {
       analysis_id: recording?.Analysis[0]?.id ?? null,
       student_id: student.id,
       student_name: `${student.first_name} ${student.last_name}`,
-      evaluation_group_reading_id: reading.id,
-      reading_id: reading.Reading.id,
-      reading_title: reading.Reading.title,
-      category: reading.Reading.category,
-      subcategory: reading.Reading.subcategory,
-      group_id: reading.EvaluationGroup.id,
-      group_name: reading.EvaluationGroup.name,
+      evaluation_group_reading_id: evaluationGroupReading.id,
+      reading_id: evaluationGroupReading.Reading.id,
+      reading_title: evaluationGroupReading.Reading.title,
+      category: evaluationGroupReading.Reading.category,
+      subcategory: evaluationGroupReading.Reading.subcategory,
+      group_id: evaluationGroupReading.EvaluationGroup.id,
+      group_name: evaluationGroupReading.EvaluationGroup.name,
       score: recording?.Analysis[0]?.score ?? null,
       words_velocity: recording?.Analysis[0]?.words_velocity ?? null,
       silences_count: recording?.Analysis[0]?.silences_count ?? null,
@@ -616,7 +617,7 @@ export class EvaluationGroupsController {
       recording_url: recording?.recording_url ?? null,
       status: recording
         ? 'completed'
-        : reading.due_date < new Date()
+        : evaluationGroupReading.due_date < new Date()
         ? 'delayed'
         : 'pending',
     };
