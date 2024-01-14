@@ -95,7 +95,7 @@ const toTableListAssignment = (
       readingSubcategory,
       readingTitle,
       dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-      link: ( status == 'completed' ?
+      link: ( status === 'completed' ?
         <Link
           href={{
             pathname: "/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]",
