@@ -1,3 +1,4 @@
+import { Achievement } from "@/models/Achievement";
 import { Category } from "@/models/Category";
 import { PaginatedRecordings } from "@/models/CompletedReadings";
 import { ReadingMinimalInfo } from "@/models/Reading";
@@ -5,6 +6,14 @@ import { ReadingDetails } from "@/models/ReadingDetails";
 import { AnalysisStatus, Recording } from "@/models/Recording";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
+
+interface AchievementResponse {
+  achieved: boolean;
+  description: string;
+  id: number;
+  image_url: string;
+  name: string;
+}
 
 interface RecordingsRequest {
   page: number;
@@ -84,6 +93,7 @@ interface RecordingResponse {
 type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
   subcategories: PendingSubcategoryListResponse[];
 };
+
 interface PendingReadingsCountResponse {
   assignments_pending: number;
 }
@@ -105,8 +115,16 @@ export const fetchReadings = () =>
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
 
+export const fetchAchievements = () =>
+  axiosInstance
+    .get<AchievementResponse[]>("students/achievements")
+    .then(({ data }) => parseAchievementsResponse(data));
+
 export const fetchRecording = (recordingId: number) =>
-  axiosInstance.get<RecordingResponse>(`recordings/${recordingId}`).then(({ data }) => parseRecordingResponse(data));
+  axiosInstance
+    .get<RecordingResponse>(`recordings/${recordingId}`)
+    .then(({ data }) => parseRecordingResponse(data));
+
 export const fetchPendingReadings = () =>
   axiosInstance
     .get<PendingCategoryListResponse[]>("students/readings/pending")
@@ -119,7 +137,9 @@ export const fetchPendingReadingsCount = () =>
 
 // Parse methods
 
-const parseRecordingsResponse = (res: PaginatedRecordingsResponse): PaginatedRecordings => ({
+const parseRecordingsResponse = (
+  res: PaginatedRecordingsResponse
+): PaginatedRecordings => ({
   page: res.page,
   pageSize: res.page_size,
   recordings: res.Recordings.map(parseReadingResponse),
@@ -131,7 +151,9 @@ const parseReadingResponse = (recording: RecordingResponse): Recording => ({
   ...recording,
 });
 
-const parseReadingDetails = (readingDetails: ReadingDetailsResponse): ReadingDetails => ({
+const parseReadingDetails = (
+  readingDetails: ReadingDetailsResponse
+): ReadingDetails => ({
   category: readingDetails.reading_category,
   content: readingDetails.reading_content,
   evaluationGroupReadingId: readingDetails.evaluation_group_reading_id,
@@ -154,7 +176,10 @@ const parseSubcategoryListResponse = ({
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
-const parseReadingListResponse = ({ reading_id, title }: ReadingListResponse): ReadingMinimalInfo => ({
+const parseReadingListResponse = ({
+  reading_id,
+  title,
+}: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
   title,
 });
@@ -204,3 +229,12 @@ const parseRecordingResponse = ({
   reading_category: category,
   reading_subcategory: subcategory,
 });
+
+const parseAchievementsResponse = (res: AchievementResponse[]): Achievement[] =>
+  res.map((a) => ({
+    achieved: a.achieved,
+    description: a.description,
+    id: a.id,
+    imageUrl: a.image_url,
+    name: a.name,
+  }));
