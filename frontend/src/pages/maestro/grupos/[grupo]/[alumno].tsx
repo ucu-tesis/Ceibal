@@ -165,7 +165,7 @@ export default function Page() {
 
   if (isError) {
     return (
-      <ErrorPage intendedAction={`cargar estadísticas de ${studentFullName}`} />
+      <ErrorPage intendedAction={`cargar estadísticas de alumno`} />
     );
   }
 
