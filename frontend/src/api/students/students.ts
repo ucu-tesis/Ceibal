@@ -61,6 +61,26 @@ interface CategoryListResponse {
   subcategories: SubcategoryListResponse[];
 }
 
+interface AnalysisItem {
+  score: number;
+  status: AnalysisStatus;
+}
+
+interface RecordingResponse {
+  id: number;
+  recording_url: string;
+  created_at: string;
+  Analysis: AnalysisItem[];
+  EvaluationGroupReading: {
+    Reading: {
+      title: string;
+      image_url: string;
+      category: string;
+      subcategory: string;
+    };
+  };
+}
+
 type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
   subcategories: PendingSubcategoryListResponse[];
 };
@@ -85,6 +105,8 @@ export const fetchReadings = () =>
     .get<CategoryListResponse[]>("students/readings/all")
     .then(({ data }) => parseReadingsListResponse(data));
 
+export const fetchRecording = (recordingId: number) =>
+  axiosInstance.get<RecordingResponse>(`recordings/${recordingId}`).then(({ data }) => parseRecordingResponse(data));
 export const fetchPendingReadings = () =>
   axiosInstance
     .get<PendingCategoryListResponse[]>("students/readings/pending")
@@ -97,9 +119,7 @@ export const fetchPendingReadingsCount = () =>
 
 // Parse methods
 
-const parseRecordingsResponse = (
-  res: PaginatedRecordingsResponse
-): PaginatedRecordings => ({
+const parseRecordingsResponse = (res: PaginatedRecordingsResponse): PaginatedRecordings => ({
   page: res.page,
   pageSize: res.page_size,
   recordings: res.Recordings.map(parseReadingResponse),
@@ -111,9 +131,7 @@ const parseReadingResponse = (recording: RecordingResponse): Recording => ({
   ...recording,
 });
 
-const parseReadingDetails = (
-  readingDetails: ReadingDetailsResponse
-): ReadingDetails => ({
+const parseReadingDetails = (readingDetails: ReadingDetailsResponse): ReadingDetails => ({
   category: readingDetails.reading_category,
   content: readingDetails.reading_content,
   evaluationGroupReadingId: readingDetails.evaluation_group_reading_id,
@@ -136,10 +154,7 @@ const parseSubcategoryListResponse = ({
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
-const parseReadingListResponse = ({
-  reading_id,
-  title,
-}: ReadingListResponse): ReadingMinimalInfo => ({
+const parseReadingListResponse = ({ reading_id, title }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
   title,
 });
@@ -168,4 +183,24 @@ const parsePendingReadingListResponse = ({
   id: reading_id,
   title,
   dueDate: new Date(due_date),
+});
+
+const parseRecordingResponse = ({
+  Analysis,
+  id,
+  created_at,
+  EvaluationGroupReading: {
+    Reading: { image_url, title, category, subcategory },
+  },
+  recording_url,
+}: RecordingResponse): Recording => ({
+  analysis_score: Analysis[0].score,
+  analysis_status: Analysis[0].status,
+  id: id,
+  url: recording_url,
+  dateSubmitted: created_at,
+  reading_image: image_url,
+  reading_title: title,
+  reading_category: category,
+  reading_subcategory: subcategory,
 });

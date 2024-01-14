@@ -90,6 +90,11 @@ export class RecordingsController {
       },
       include: {
         Analysis: true,
+        EvaluationGroupReading: {
+          include: {
+            Reading: true,
+          },
+        },
       },
     });
     return recording;
