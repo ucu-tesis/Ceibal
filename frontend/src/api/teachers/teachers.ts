@@ -9,7 +9,7 @@ import { GroupDetails } from "@/models/GroupDetails";
 import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import axiosInstance from "../axiosInstance";
-import { StudentAssignmentDetails } from "@/models/RecordingDetails";
+import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
 
 interface StudentMonthlyAverage {
   month: string;
