@@ -10,6 +10,7 @@ const useFileUpload = (evaluationGroupReadingId: number) => {
         {
           method: "POST",
           body: formData,
+          credentials: "include",
         }
       );
       if (response.ok) {
