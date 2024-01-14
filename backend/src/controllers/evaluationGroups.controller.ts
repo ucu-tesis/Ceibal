@@ -14,6 +14,7 @@ import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { StudentAssignmentDetailsResponse } from 'src/models/student-assignment-details-response';
 import { PrismaService } from 'src/prisma.service';
+import { FileUploadService } from 'src/services/file-upload.service';
 
 class CreateAssignmentsDTO {
   @IsNumber({}, { each: true })
@@ -24,7 +25,10 @@ class CreateAssignmentsDTO {
 
 @Controller('evaluationGroups')
 export class EvaluationGroupsController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private fileUploadService: FileUploadService,
+  ) {}
 
   @Get('/')
   @UseGuards(TeacherGuard)
@@ -617,7 +621,12 @@ export class EvaluationGroupsController {
       silences_count: recording?.Analysis[0]?.silences_count ?? null,
       repetitions_count: recording?.Analysis[0]?.repetitions_count ?? null,
       recording_id: recording?.id,
-      recording_url: recording?.recording_url ?? null,
+      recording_url: recording?.recording_url
+        ? await this.fileUploadService.getSignedUrl(
+            recording.recording_url,
+            3600,
+          )
+        : null,
       status: recording
         ? 'completed'
         : evaluationGroupReading.due_date < new Date()
