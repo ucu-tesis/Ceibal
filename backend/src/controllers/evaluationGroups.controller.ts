@@ -16,7 +16,7 @@ import { StudentAssignmentDetailsResponse } from 'src/models/student-assignment-
 import { PrismaService } from 'src/prisma.service';
 
 class CreateAssignmentsDTO {
-  @IsNumber({}, { each:true })
+  @IsNumber({}, { each: true })
   reading_ids: number[];
   @IsDateString()
   due_date: string;
