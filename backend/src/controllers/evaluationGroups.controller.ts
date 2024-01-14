@@ -15,9 +15,9 @@ import { TeacherGuard } from 'src/guards/teacher.guard';
 import { StudentAssignmentDetailsResponse } from 'src/models/student-assignment-details-response';
 import { PrismaService } from 'src/prisma.service';
 
-class CreateAssignmentDTO {
-  @IsNumber()
-  reading_id: number;
+class CreateAssignmentsDTO {
+  @IsNumber({}, { each:true })
+  reading_ids: number[];
   @IsDateString()
   due_date: string;
 }
@@ -123,7 +123,7 @@ export class EvaluationGroupsController {
   async createAssignment(
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
-    @Body() createDTO: CreateAssignmentDTO,
+    @Body() createDTO: CreateAssignmentsDTO,
   ) {
     const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
       {
@@ -133,21 +133,24 @@ export class EvaluationGroupsController {
     if (!evaluationGroup || evaluationGroup.teacher_id !== userId) {
       throw new UnprocessableEntityException('Evaluation group not found');
     }
-    const reading = await this.prismaService.reading.findUnique({
-      where: { id: createDTO.reading_id },
+    const readings = await this.prismaService.reading.findMany({
+      where: { id: { in: createDTO.reading_ids } },
     });
-    if (!reading) {
-      throw new UnprocessableEntityException('Reading not found');
+    if (readings.length !== createDTO.reading_ids.length) {
+      throw new UnprocessableEntityException('Some reading was not found');
     }
-    const assignment = await this.prismaService.evaluationGroupReading.create({
-      data: {
-        evaluation_group_id: evaluationGroup.id,
-        reading_id: reading.id,
-        due_date: createDTO.due_date,
-        // TODO add created_by column in db, and store `userId` in it
-      },
-    });
-    return assignment;
+    const assignments =
+      await this.prismaService.evaluationGroupReading.createMany({
+        data: readings.map((reading) => {
+          return {
+            evaluation_group_id: evaluationGroup.id,
+            reading_id: reading.id,
+            due_date: createDTO.due_date,
+            // TODO add created_by column in db, and store `userId` in it
+          };
+        }),
+      });
+    return assignments;
   }
 
   @Get('/:evaluationGroupId/stats')

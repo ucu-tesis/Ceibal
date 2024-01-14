@@ -8,6 +8,7 @@ import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
 import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
+import { Reading } from "@/models/Reading";
 import axiosInstance from "../axiosInstance";
 import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
 
@@ -108,6 +109,13 @@ interface AssignmentStatsResponse {
   most_repeated_words: RepeatedWords[];
 }
 
+interface ReadingsResponse {
+  Readings: Reading[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
 interface StudentAssignmentDetailsResponse {
   analysis_id: number | null;
   student_id: number;
@@ -156,6 +164,18 @@ export const fetchAssignmentStats = (
       `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
     )
     .then(({ data }) => parseAssignmentStatsResponse(data));
+
+export const fetchAllReadings = () =>
+  axiosInstance
+    .get<ReadingsResponse>('/readings')
+    .then(({ data }) => data);
+
+export const createAssignment = (evaluationGroupId: number, readings: Reading[], dueDate: string) => {
+  return axiosInstance.post(`/evaluationGroups/${evaluationGroupId}/assignments`, {
+    reading_ids: readings.map(reading => reading.id),
+    due_date: dueDate,
+  })
+};
 
 export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
   axiosInstance

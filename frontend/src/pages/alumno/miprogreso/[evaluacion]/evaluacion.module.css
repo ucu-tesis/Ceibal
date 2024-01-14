@@ -37,7 +37,7 @@
 .container button {
   margin-top: 8px;
   font-weight: 600;
-  padding-inline: 120px !important;
+  padding: 12px 120px !important;
   font-size: 24px !important;
 }
 

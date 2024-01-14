@@ -1,7 +1,7 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import AssignmentModal from "@/components/modals/AssignmentModal";
+import AssignmentCreationModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
 import ChakraTable, {
@@ -60,21 +60,7 @@ const assignmentColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const assignmentColumnsModal: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Categoría" },
-  { label: "Subcategoría" },
-  { label: "Lectura" },
-];
-
-const studentColumnsModal: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Correo" },
-];
-
-const toTableList = (students: Student[], evaluationGroupId: number) =>
+const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
   students.map(
     ({
       fullName,
@@ -224,7 +210,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
     useAssignmentFilterOptions(assignments);
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const assignmentModalDisclosure = useDisclosure();
   const {
     isOpen: isOpenReadingModal,
     onClose: onCloseReadingModal,
@@ -257,7 +243,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={onOpen}
+              onClick={assignmentModalDisclosure.onOpen}
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
@@ -393,17 +379,13 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      <AssignmentModal
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        assignmentColumnsModal={assignmentColumnsModal}
-        assignments={assignments}
-        studentColumnsModal={studentColumnsModal}
-        students={students}
-        evaluationGroupId={evaluationGroupId}
-        styles={styles}
-      />
+      {assignmentModalDisclosure.isOpen && (
+        <AssignmentCreationModal
+          onClose={assignmentModalDisclosure.onClose}
+          evaluationGroupId={evaluationGroupId}
+          styles={styles}
+        />
+      )}      
       <CreateReadingModal
         isOpen={isOpenReadingModal}
         onClose={onCloseReadingModal}

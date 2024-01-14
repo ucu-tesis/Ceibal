@@ -25,7 +25,7 @@ interface TableProps {
 
 const ChakraTable: React.FC<TableProps> = ({ columns, data, variant, maxHeight }) => (
   <TableContainer maxHeight={maxHeight} overflowY="auto" className={`${styles["table-border"]} ${variant ? styles[variant] : ""}`}>
-    <Table  className={`${styles["main-table"]}`}>
+    <Table className={`${styles["main-table"]}`}>
       <Thead>
         <Tr>
           {columns.map(({ label, reactKey, width }) => (
@@ -40,8 +40,8 @@ const ChakraTable: React.FC<TableProps> = ({ columns, data, variant, maxHeight }
           const rowKeys = Object.keys(row);
           return (
             <Tr key={index}>
-              {rowKeys.map((key: any, index) => (
-                <Td tabIndex={0} key={index}>
+              {rowKeys.map((key) => (
+                <Td tabIndex={0} key={key}>
                   {row[key]}
                 </Td>
               ))}

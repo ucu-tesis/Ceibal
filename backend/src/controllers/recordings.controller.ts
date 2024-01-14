@@ -15,12 +15,14 @@ import { PrismaService } from 'src/prisma.service';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { UserData } from 'src/decorators/userData.decorator';
+import { AchievementService } from 'src/services/achievement.service';
 
 @Controller('recordings')
 export class RecordingsController {
   constructor(
     private readonly fileUploadService: FileUploadService,
     private prismaService: PrismaService,
+    private achievementService: AchievementService,
   ) {}
 
   // TODO consider moving this to a "student" controller with all other student-facing logic
@@ -50,6 +52,8 @@ export class RecordingsController {
         Analysis: true,
       },
     });
+
+    await this.achievementService.processReadingAmountAchievements(userId);
 
     return { recordingId: recording.id, analysisId: recording.Analysis[0].id };
   }
@@ -86,6 +90,11 @@ export class RecordingsController {
       },
       include: {
         Analysis: true,
+        EvaluationGroupReading: {
+          include: {
+            Reading: true,
+          },
+        },
       },
     });
     return recording;
