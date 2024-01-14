@@ -23,14 +23,15 @@ model User {
 }
 
 model Student {
-  id               Int               @id @default(autoincrement())
-  cedula           String            @unique
+  id               Int                  @id @default(autoincrement())
+  cedula           String               @unique
   email            String
   first_name       String
   last_name        String
   password_hash    String?
   EvaluationGroups EvaluationGroup[]
   Recording        Recording[]
+  Achievements     StudentAchievement[]
 }
 
 model EvaluationGroup {
@@ -114,4 +115,22 @@ enum AnalysisStatus {
   WORKING
   COMPLETED
   FAILED
+}
+
+model Achievement {
+  id                 Int                  @id @default(autoincrement())
+  trigger_id         String               @unique
+  name               String
+  description        String
+  image_url          String?
+  StudentAchievement StudentAchievement[]
+}
+
+model StudentAchievement {
+  id             Int         @id @default(autoincrement())
+  student_id     Int
+  achievement_id Int
+  created_at     DateTime    @default(now())
+  achievement    Achievement @relation(fields: [achievement_id], references: [id])
+  Student        Student     @relation(fields: [student_id], references: [id])
 }

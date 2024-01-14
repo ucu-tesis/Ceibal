@@ -39,6 +39,26 @@
   gap: 36px;
 }
 
+.pending-amount-container {
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  border: 2px solid var(--ceibal-green);
+  border-radius: 50%;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--ceibal-green);
+  color: var(--ceibal-white);
+}
+
+.pending-amount-container > span {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 @media (max-width: 500px) {
   .background {
     padding: 24px 0px;

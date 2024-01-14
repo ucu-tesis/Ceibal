@@ -1,12 +1,12 @@
 import { Category } from "@/models/Category";
 import { PaginatedRecordings } from "@/models/CompletedReadings";
-import { Recording, AnalysisStatus } from "@/models/Recording";
+import { ReadingMinimalInfo } from "@/models/Reading";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { AnalysisStatus, Recording } from "@/models/Recording";
 import { Subcategory } from "@/models/Subcategory";
 import axiosInstance from "../axiosInstance";
-import { ReadingMinimalInfo } from "@/models/Reading";
 
-export interface RecordingsRequest {
+interface RecordingsRequest {
   page: number;
   pageSize: number;
 }
@@ -38,16 +38,26 @@ interface ReadingDetailsResponse {
 
 interface ReadingListResponse {
   reading_id: number;
-  title?: string;
+  title: string;
 }
+
+type PendingReadingListResponse = Pick<
+  ReadingListResponse,
+  "reading_id" | "title"
+> & { due_date: string };
 
 interface SubcategoryListResponse {
   subcategory?: string;
   readings: ReadingListResponse[];
 }
 
+type PendingSubcategoryListResponse = Pick<
+  SubcategoryListResponse,
+  "subcategory"
+> & { readings: PendingReadingListResponse[] };
+
 interface CategoryListResponse {
-  category?: string;
+  category: string;
   subcategories: SubcategoryListResponse[];
 }
 
@@ -71,6 +81,13 @@ interface RecordingResponse {
   };
 }
 
+type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
+  subcategories: PendingSubcategoryListResponse[];
+};
+interface PendingReadingsCountResponse {
+  assignments_pending: number;
+}
+
 export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
   axiosInstance
     .get<PaginatedRecordingsResponse>(`/students/readings/completed`, {
@@ -90,6 +107,15 @@ export const fetchReadings = () =>
 
 export const fetchRecording = (recordingId: number) =>
   axiosInstance.get<RecordingResponse>(`recordings/${recordingId}`).then(({ data }) => parseRecordingResponse(data));
+export const fetchPendingReadings = () =>
+  axiosInstance
+    .get<PendingCategoryListResponse[]>("students/readings/pending")
+    .then(({ data }) => parsePendingReadingsListResponse(data));
+
+export const fetchPendingReadingsCount = () =>
+  axiosInstance
+    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
@@ -115,21 +141,48 @@ const parseReadingDetails = (readingDetails: ReadingDetailsResponse): ReadingDet
 });
 
 const parseReadingsListResponse = (res: CategoryListResponse[]): Category[] =>
-  res
-    .map(({ category, subcategories }) => ({
-      name: category ?? "",
-      subcategories: subcategories.map(parseSubcategoryListResponse).filter((s) => !!s.name), // Remove subcategories without name
-    }))
-    .filter((c) => !!c.name); // Remove categories without name
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parseSubcategoryListResponse),
+  }));
 
-const parseSubcategoryListResponse = ({ readings, subcategory }: SubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "",
+const parseSubcategoryListResponse = ({
+  readings,
+  subcategory,
+}: SubcategoryListResponse): Subcategory => ({
+  name: subcategory ?? "Otros",
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
 const parseReadingListResponse = ({ reading_id, title }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
-  title: title ?? "",
+  title,
+});
+
+const parsePendingReadingsListResponse = (
+  res: PendingCategoryListResponse[]
+): Category[] =>
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parsePendingSubcategoryListResponse),
+  }));
+
+const parsePendingSubcategoryListResponse = ({
+  readings,
+  subcategory,
+}: PendingSubcategoryListResponse): Subcategory => ({
+  name: subcategory ?? "Otros",
+  readings: readings.map(parsePendingReadingListResponse),
+});
+
+const parsePendingReadingListResponse = ({
+  reading_id,
+  title,
+  due_date,
+}: PendingReadingListResponse): ReadingMinimalInfo & { dueDate: Date } => ({
+  id: reading_id,
+  title,
+  dueDate: new Date(due_date),
 });
 
 const parseRecordingResponse = ({

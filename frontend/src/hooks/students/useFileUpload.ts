@@ -1,9 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type OnSuccess = ((data: Response, variables: FormData, context: unknown) => void | Promise<unknown>) | undefined;
-type OnError = ((error: unknown, variables: FormData, context: unknown) => void | Promise<unknown>) | undefined;
+const useFileUpload = (evaluationGroupReadingId: number) => {
+  const queryClient = useQueryClient();
 
-const useFileUpload = (evaluationGroupReadingId: number, onSuccess: OnSuccess, onError: OnError) => {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch(
@@ -19,8 +18,12 @@ const useFileUpload = (evaluationGroupReadingId: number, onSuccess: OnSuccess, o
         throw new Error("Error uploading file: " + response.status);
       }
     },
-    onSuccess,
-    onError,
+    // Invalidate cache for list of pending assignments after sending a new reading
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["student", "readings", "pending"],
+      });
+    },
   });
 };
 
