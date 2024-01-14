@@ -15,38 +15,42 @@
   font-weight: 400;
 }
 
-.awards {
+.spacer {
+  height: 40px;
+}
+
+.achievements {
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 16px;
 }
 
-.award-modal {
+.achievement-modal {
   width: 100%;
   gap: 32px;
 }
 
-.award-modal button {
+.achievement-modal button {
   align-self: center;
   width: 220px !important;
 }
 
-.award-modal > div {
+.achievement-modal > div {
   gap: 24px;
   align-items: center;
 }
 
-.award-modal > div > div {
+.achievement-modal > div > div {
   gap: 16px;
   justify-content: center;
 }
 
-.award-modal strong {
+.achievement-modal strong {
   font-size: 16px;
   font-weight: 600;
 }
 
-.award-modal span {
+.achievement-modal span {
   font-size: 12px;
   text-transform: uppercase;
 }
