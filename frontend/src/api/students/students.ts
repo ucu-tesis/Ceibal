@@ -15,7 +15,7 @@ interface AchievementResponse {
   name: string;
 }
 
-export interface RecordingsRequest {
+interface RecordingsRequest {
   page: number;
   pageSize: number;
 }
@@ -47,17 +47,55 @@ interface ReadingDetailsResponse {
 
 interface ReadingListResponse {
   reading_id: number;
-  title?: string;
+  title: string;
 }
+
+type PendingReadingListResponse = Pick<
+  ReadingListResponse,
+  "reading_id" | "title"
+> & { due_date: string };
 
 interface SubcategoryListResponse {
   subcategory?: string;
   readings: ReadingListResponse[];
 }
 
+type PendingSubcategoryListResponse = Pick<
+  SubcategoryListResponse,
+  "subcategory"
+> & { readings: PendingReadingListResponse[] };
+
 interface CategoryListResponse {
-  category?: string;
+  category: string;
   subcategories: SubcategoryListResponse[];
+}
+
+interface AnalysisItem {
+  score: number;
+  status: AnalysisStatus;
+}
+
+interface RecordingResponse {
+  id: number;
+  recording_url: string;
+  created_at: string;
+  Analysis: AnalysisItem[];
+  EvaluationGroupReading: {
+    Reading: {
+      title: string;
+      image_url: string;
+      category: string;
+      subcategory: string;
+    };
+  };
+}
+
+type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
+  subcategories: PendingSubcategoryListResponse[];
+};
+
+interface PendingReadingsCountResponse {
+  assignments_pending: number;
 }
 
 export const fetchCompletedReadings = ({ page, pageSize }: RecordingsRequest) =>
@@ -81,6 +119,21 @@ export const fetchAchievements = () =>
   axiosInstance
     .get<AchievementResponse[]>("students/achievements")
     .then(({ data }) => parseAchievementsResponse(data));
+
+export const fetchRecording = (recordingId: number) =>
+  axiosInstance
+    .get<RecordingResponse>(`recordings/${recordingId}`)
+    .then(({ data }) => parseRecordingResponse(data));
+
+export const fetchPendingReadings = () =>
+  axiosInstance
+    .get<PendingCategoryListResponse[]>("students/readings/pending")
+    .then(({ data }) => parsePendingReadingsListResponse(data));
+
+export const fetchPendingReadingsCount = () =>
+  axiosInstance
+    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
@@ -110,20 +163,16 @@ const parseReadingDetails = (
 });
 
 const parseReadingsListResponse = (res: CategoryListResponse[]): Category[] =>
-  res
-    .map(({ category, subcategories }) => ({
-      name: category ?? "",
-      subcategories: subcategories
-        .map(parseSubcategoryListResponse)
-        .filter((s) => !!s.name), // Remove subcategories without name
-    }))
-    .filter((c) => !!c.name); // Remove categories without name
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parseSubcategoryListResponse),
+  }));
 
 const parseSubcategoryListResponse = ({
   readings,
   subcategory,
 }: SubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "",
+  name: subcategory ?? "Otros",
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
@@ -132,7 +181,53 @@ const parseReadingListResponse = ({
   title,
 }: ReadingListResponse): ReadingMinimalInfo => ({
   id: reading_id,
-  title: title ?? "",
+  title,
+});
+
+const parsePendingReadingsListResponse = (
+  res: PendingCategoryListResponse[]
+): Category[] =>
+  res.map(({ category, subcategories }) => ({
+    name: category,
+    subcategories: subcategories.map(parsePendingSubcategoryListResponse),
+  }));
+
+const parsePendingSubcategoryListResponse = ({
+  readings,
+  subcategory,
+}: PendingSubcategoryListResponse): Subcategory => ({
+  name: subcategory ?? "Otros",
+  readings: readings.map(parsePendingReadingListResponse),
+});
+
+const parsePendingReadingListResponse = ({
+  reading_id,
+  title,
+  due_date,
+}: PendingReadingListResponse): ReadingMinimalInfo & { dueDate: Date } => ({
+  id: reading_id,
+  title,
+  dueDate: new Date(due_date),
+});
+
+const parseRecordingResponse = ({
+  Analysis,
+  id,
+  created_at,
+  EvaluationGroupReading: {
+    Reading: { image_url, title, category, subcategory },
+  },
+  recording_url,
+}: RecordingResponse): Recording => ({
+  analysis_score: Analysis[0].score,
+  analysis_status: Analysis[0].status,
+  id: id,
+  url: recording_url,
+  dateSubmitted: created_at,
+  reading_image: image_url,
+  reading_title: title,
+  reading_category: category,
+  reading_subcategory: subcategory,
 });
 
 const parseAchievementsResponse = (res: AchievementResponse[]): Achievement[] =>

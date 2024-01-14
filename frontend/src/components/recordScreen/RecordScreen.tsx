@@ -6,12 +6,12 @@ import ModalDialog from "@/components/modals/ModalDialog";
 import Spinner from "@/components/spinners/Spinner";
 import useFileUpload from "@/hooks/students/useFileUpload";
 import { ReadingDetails } from "@/models/ReadingDetails";
+import { Text } from "@chakra-ui/react";
 import Head from "next/head";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
 import SendIcon from "../../assets/images/send_icon.svg";
 import styles from "./RecordScreen.module.css";
-import { Text } from "@chakra-ui/react";
 
 export interface RecordScreenProps {
   readingDetails: ReadingDetails;
@@ -34,7 +34,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const errorModalRef = useRef<HTMLDivElement | null>(null);
 
   // Usar data que devuelve el hook
-  const onSuccess = async () => {
+  const onSuccess = () => {
     setOpenModal(true);
   };
 
@@ -44,7 +44,9 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
     setErrorModal(true);
   };
 
-  const { mutate, isLoading, error } = useFileUpload(readingDetails.evaluationGroupReadingId, onSuccess, onError);
+  const { mutate, isLoading, error } = useFileUpload(
+    readingDetails.evaluationGroupReadingId
+  );
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
     const fileExtension = getFileExtension(mimeType);
@@ -56,7 +58,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
     formData.append("file", file);
 
     try {
-      mutate(formData);
+      mutate(formData, { onSuccess, onError });
     } catch (error) {
       console.error("Error uploading file:", error);
       setErrorModal(true);
@@ -137,10 +139,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
       <main>
         <div className="container col">
           {openModal && (
-            <ModalDialog
-              componentRef={modalRef}
-              title="¡Genial!"
-            >
+            <ModalDialog componentRef={modalRef} title="¡Genial!">
               <div className="progress col">
                 <Text fontSize={16} lineHeight={2}>
                   Tu lectura se ha enviado correctamente. ¡Felicidades!
