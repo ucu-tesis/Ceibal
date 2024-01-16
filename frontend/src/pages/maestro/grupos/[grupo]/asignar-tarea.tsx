@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
-import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
+import { StepSeparator, Input, InputGroup, InputRightAddon, ChakraProvider } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
 import Select, { Option } from "@/components/selects/Select";
 import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
@@ -10,16 +10,12 @@ import { SearchIcon } from "@chakra-ui/icons";
 import InputDateTimeLocal from "@/components/inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
-import styles from "./grupos.module.css";
-
-interface AssignmentCreationModalProps {
-  onClose: () => void;
-  evaluationGroupId: number;
-  styles: any;
-}
+import styles from "./asignar-tarea.module.css";
+import Head from "next/head";
 
 const READINGS_STEP = "Agregar Tareas";
 const SUMMARY_STEP = "Resumen";
@@ -48,7 +44,10 @@ const defaultOption: Option = {
   value: undefined,
 };
 
-const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({ onClose, evaluationGroupId }) => {
+const AssignmentCreationModal: React.FC = () => {
+
+  const { evaluationGroupId } = useRouter().query;
+
   const [readingSearch, setReadingSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>();
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>();
@@ -83,11 +82,10 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({ onClo
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (readings: Reading[]) => {
-      await createAssignment(evaluationGroupId, readings, selectedDueDate);
+      await createAssignment(Number(evaluationGroupId), readings, selectedDueDate);
     },
     onSuccess: () => {
       setActiveStep(0);
-      onClose();
       toast({
         title: "Tarea creada",
         status: "success",
@@ -238,54 +236,58 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({ onClo
   }
 
   return (
-    <div>
-      <h1 tabIndex={0}>Asignar Tarea</h1>
+    <ChakraProvider>
+      <Head>
+        <title>Asignar Tarea</title>
+      </Head>
+      <div className={`${styles.container}`}>
+        <h1 tabIndex={0}>Asignar Tarea</h1>
+        <Stepper index={activeStep}>
+          {steps.map((step, index) => (
+            <Step key={index}>
+              <StepIndicator>
+                <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
+              </StepIndicator>
 
-      <Stepper index={activeStep}>
-        {steps.map((step, index) => (
-          <Step key={index}>
-            <StepIndicator>
-              <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
-            </StepIndicator>
+              <Stack flexShrink="0">
+                <StepTitle>{step}</StepTitle>
+              </Stack>
 
-            <Stack flexShrink="0">
-              <StepTitle>{step}</StepTitle>
-            </Stack>
+              <StepSeparator />
+            </Step>
+          ))}
+        </Stepper>
 
-            <StepSeparator />
-          </Step>
-        ))}
-      </Stepper>
-
-      {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
-      {steps[activeStep] === SUMMARY_STEP && renderSummary()}
-      <Box>
-        {createAssignmentMutation.isError && (
-          <Box textColor="red">
-            Ha ocurrido un error al asignar la tarea: {(createAssignmentMutation.error as Error)?.message}
-          </Box>
-        )}
-      </Box>
-      <div>
-        {createAssignmentMutation.isLoading ? (
-          <Flex align="center" gap={2}>
-            <Spinner />
-            Creando tarea...
-          </Flex>
-        ) : (
-          <Flex align="center" gap={2}>
-            {activeStep > 0 && (
-              <Button onClick={undoStep} className={styles.secondary} variant="outline">
-                Volver
+        {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
+        {steps[activeStep] === SUMMARY_STEP && renderSummary()}
+        <Box>
+          {createAssignmentMutation.isError && (
+            <Box textColor="red">
+              Ha ocurrido un error al asignar la tarea: {(createAssignmentMutation.error as Error)?.message}
+            </Box>
+          )}
+        </Box>
+        <Flex marginTop={8}>
+          {createAssignmentMutation.isLoading ? (
+            <Flex align="center" gap={2}>
+              <Spinner />
+              Creando tarea...
+            </Flex>
+          ) : (
+            <Flex align="center" gap={2}>
+              {activeStep > 0 && (
+                <Button onClick={undoStep} className={styles.secondary} variant="outline">
+                  Volver
+                </Button>
+              )}
+              <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+                {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
               </Button>
-            )}
-            <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
-              {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
-            </Button>
-          </Flex>
-        )}
+            </Flex>
+          )}
+        </Flex>
       </div>
-    </div>
+    </ChakraProvider>
   );
 };
 
