@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
-import { Box, Flex, Spinner } from "@chakra-ui/react";
+import { Box, Flex, ModalHeader, Spinner } from "@chakra-ui/react";
 import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
 import { StepSeparator, Input, InputGroup, InputRightAddon, ChakraProvider } from "@chakra-ui/react";
+import { Modal, ModalOverlay, ModalBody, ModalContent, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
 import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
 import Select, { Option } from "@/components/selects/Select";
 import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
@@ -16,6 +17,7 @@ import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
 import styles from "./asignar-tarea.module.css";
 import Head from "next/head";
+import Link from "next/link";
 
 const READINGS_STEP = "Agregar Tareas";
 const SUMMARY_STEP = "Resumen";
@@ -27,6 +29,7 @@ const readingSelectionColumns: ChakraTableColumn[] = [
   { label: "Categoría" },
   { label: "Subcategoría" },
   { label: "Lectura" },
+  { label: "" },
 ];
 
 const filterReadings = (readings: Reading[], search: string, category?: string, subcategory?: string) => {
@@ -44,9 +47,11 @@ const defaultOption: Option = {
   value: undefined,
 };
 
-const AssignmentCreationModal: React.FC = () => {
+const DURATION_OFFSET = 2000;
 
-  const { evaluationGroupId } = useRouter().query;
+const AssignmentCreationModal: React.FC = () => {
+  const { grupo: evaluationGroupId } = useRouter().query;
+  const router = useRouter();
 
   const [readingSearch, setReadingSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>();
@@ -54,6 +59,8 @@ const AssignmentCreationModal: React.FC = () => {
 
   const [selectedDueDate, setSelectedDueDate] = useState<string>(dayjs().toISOString());
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
+
+  const [activeContent, setActiveContent] = useState<string>();
 
   // TODO pagination
   const readingsQueryData = useQuery({
@@ -85,12 +92,14 @@ const AssignmentCreationModal: React.FC = () => {
       await createAssignment(Number(evaluationGroupId), readings, selectedDueDate);
     },
     onSuccess: () => {
-      setActiveStep(0);
       toast({
         title: "Tarea creada",
         status: "success",
-        duration: toastDuration,
+        duration: toastDuration - DURATION_OFFSET,
         isClosable: true,
+        onCloseComplete: () => {
+          router.push(`/maestro/grupos/${evaluationGroupId}`);
+        },
       });
     },
   });
@@ -116,6 +125,13 @@ const AssignmentCreationModal: React.FC = () => {
     } else {
       return false;
     }
+  };
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const onClickReading = (readingContent: string) => {
+    setActiveContent(readingContent);
+    onOpen();
   };
 
   function renderReadingsSelection(): React.ReactNode {
@@ -194,7 +210,6 @@ const AssignmentCreationModal: React.FC = () => {
           </div>
         </div>
         <ChakraTable
-          variant="simple"
           maxHeight={tableMaxHeightModal}
           columns={readingSelectionColumns}
           data={filteredReadings.map((reading) => ({
@@ -210,6 +225,11 @@ const AssignmentCreationModal: React.FC = () => {
             category: reading.category,
             subcategory: reading.subcategory,
             title: reading.title,
+            action: (
+              <Link href="#" onClick={() => onClickReading(reading.content)}>
+                Ver lectura
+              </Link>
+            ),
           }))}
         ></ChakraTable>
       </>
@@ -232,6 +252,19 @@ const AssignmentCreationModal: React.FC = () => {
           </ul>
         </div>
       </>
+    );
+  }
+
+  function renderModal(): React.ReactNode {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent className={styles["modal-content"]}>
+          <ModalHeader>Lectura</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>{activeContent}</ModalBody>
+        </ModalContent>
+      </Modal>
     );
   }
 
@@ -287,6 +320,7 @@ const AssignmentCreationModal: React.FC = () => {
           )}
         </Flex>
       </div>
+      {renderModal()}
     </ChakraProvider>
   );
 };
