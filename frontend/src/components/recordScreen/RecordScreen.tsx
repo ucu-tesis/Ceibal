@@ -43,7 +43,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const onError = (data: any) => {
     console.log(`error: ${JSON.stringify(error)}`); // TODO check why this is printing null
     console.error(data);
-    setOpenModal(true);
+    setErrorModal(true);
   };
 
   const { mutate, isLoading, error } = useFileUpload(
