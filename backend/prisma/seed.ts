@@ -93,6 +93,8 @@ async function load() {
       image_url: 'https://picsum.photos/300/400',
       content:
         'Había una vez un niño llamado Martín que soñaba con convertirse en un gran goleador como su héroe, Luis Suárez. Martín vivía en un pequeño pueblo donde cada tarde, después de la escuela, corría al campo de fútbol con su viejo balón desgastado. Martín admiraba a Suárez no solo por sus increíbles goles, sino también por su valentía y espíritu de equipo. Decidió que algún día, él también sería un delantero formidable, igual que su ídolo.',
+      category: 'Básico',
+      subcategory: 'Fútbol',
     },
   });
 
@@ -202,15 +204,15 @@ async function load() {
   const decemberDate = new Date('2023-12-22');
 
   await addStudentReading(1, groupReading1.id, octoberDate);
-  await addStudentReading(1, groupReading1.id, octoberDate);
-  await addStudentReading(1, groupReading1.id, novemberDate);
+  await addStudentReading(1, groupReading2.id, octoberDate);
+  await addStudentReading(1, groupReading3.id, novemberDate);
   await addStudentReading(1, groupReading1.id, novemberDate);
   await addStudentReading(1, groupReading1.id, decemberDate);
   await addStudentReading(1, groupReading1.id, decemberDate);
 
   await addStudentReading(2, groupReading1.id, octoberDate);
-  await addStudentReading(2, groupReading1.id, octoberDate);
-  await addStudentReading(2, groupReading1.id, novemberDate);
+  await addStudentReading(2, groupReading2.id, octoberDate);
+  await addStudentReading(2, groupReading3.id, novemberDate);
   await addStudentReading(2, groupReading1.id, novemberDate);
   await addStudentReading(2, groupReading1.id, decemberDate);
   await addStudentReading(2, groupReading1.id, decemberDate);
@@ -334,7 +336,7 @@ async function addStudentReading(
   const analysisRawData = {
     cantidad_de_repeticiones: randomInt(0, 4),
     cantidad_de_silencios: randomInt(0, 4),
-    cantidad_palabras_con_error: 4,
+    cantidad_palabras_con_error: randomInt(0, 10),
     error_general_allosaurus: 44,
     error_similitud: 15,
     fonemas_repetidos: [],
@@ -343,8 +345,8 @@ async function addStudentReading(
     puntaje: randomInt(50, 100),
     tiempo_errores: [1.38, 2.08, 1.38, 2.08],
     tiempo_repeticiones: [],
-    velocidad_fonemas: 198,
-    velocidad_palabras: 57,
+    velocidad_fonemas: randomInt(50, 200),
+    velocidad_palabras: randomInt(50, 200),
   };
 
   await prisma.analysis.create({

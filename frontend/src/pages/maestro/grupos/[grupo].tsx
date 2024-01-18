@@ -60,7 +60,7 @@ const assignmentColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
+const toTableList = (students: Student[], evaluationGroupId: number) =>
   students.map(
     ({
       fullName,
@@ -82,9 +82,7 @@ const toTableList = (students: Student[], evaluationGroupId: number, groupName: 
             pathname: "/maestro/grupos/[grupo]/[alumno]",
             query: {
               grupo: evaluationGroupId,
-              alumno: fullName,
-              groupName,
-              studentId: id,
+              alumno: id,
             },
           }}
         >
@@ -97,7 +95,6 @@ const toTableList = (students: Student[], evaluationGroupId: number, groupName: 
 const toAssignmentTableList = (
   assignments: Assignment[],
   evaluationGroupId: number,
-  groupName: string
 ) =>
   assignments.map(
     ({
@@ -118,10 +115,6 @@ const toAssignmentTableList = (
             query: {
               grupo: evaluationGroupId,
               tarea: evaluationGroupReadingId,
-              groupName,
-              readingCategory,
-              readingSubcategory,
-              readingTitle,
             },
           }}
         >
@@ -234,15 +227,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos">Inicio</BreadcrumbLink>
-          </BreadcrumbItem>
-
-          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{groupName}</BreadcrumbLink>
+          <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>{groupName}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
@@ -296,7 +285,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={columns}
-                data={toTableList(filteredStudents, evaluationGroupId, groupName)}
+                data={toTableList(filteredStudents, evaluationGroupId)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -342,7 +331,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, evaluationGroupId, groupName)}
+                data={toAssignmentTableList(filteredAssignments, evaluationGroupId)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>

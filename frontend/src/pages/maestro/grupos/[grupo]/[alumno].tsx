@@ -9,7 +9,7 @@ import ChakraTable, {
 import { inputRegex } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
-import { Assignment } from "@/models/Assignment";
+import { Assignment, StudentAssignment } from "@/models/Assignment";
 import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
 import { getOptionsFromArray } from "@/util/select";
 import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
@@ -34,12 +34,6 @@ import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.sv
 import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../../assets/images/lecturas_pendientes.svg";
 import styles from "./alumno.module.css";
-
-interface Params {
-  alumno: string;
-  grupo: number;
-  groupName: string;
-}
 
 type Option = {
   value?: string;
@@ -86,40 +80,39 @@ const defaultOption: Option = {
 const toTableListAssignment = (
   assignments: Assignment[],
   groupId: string,
-  groupName: string,
-  studentFullName: string
+  studentId: string
 ) =>
-  assignments.map(
+  (assignments as StudentAssignment[]).map(
     ({
       readingCategory,
       readingSubcategory,
       readingTitle,
       dueDate,
       evaluationGroupReadingId,
+      status
     }) => ({
       readingCategory,
       readingSubcategory,
       readingTitle,
       dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-      link: (
+      link: ( status === 'completed' ?
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
+            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]",
             query: {
               grupo: groupId,
-              groupName,
-              alumno: studentFullName,
-              evaluacion: evaluationGroupReadingId,
+              alumno: studentId,
+              tarea: evaluationGroupReadingId,
             },
           }}
         >
           Ver detalles
-        </Link>
+        </Link> : null
       ),
     })
   );
 
-export default function Page({ params }: { params: Params }) {
+export default function Page() {
   const router = useRouter();
   useChartJSInitializer();
   const [startDate, setStartDate] = useState(new Date());
@@ -128,16 +121,11 @@ export default function Page({ params }: { params: Params }) {
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
 
-  const {
-    studentId,
-    alumno: studentFullName,
-    groupName,
-    grupo: groupId,
-  } = router.query;
+  const { grupo, alumno } = router.query;
 
   const { data, isLoading, isError } = useFetchStudentStats(
-    Number(groupId),
-    Number(studentId)
+    Number(grupo),
+    Number(alumno)
   );
 
   const categoryOptions = useMemo(
@@ -177,7 +165,7 @@ export default function Page({ params }: { params: Params }) {
 
   if (isError) {
     return (
-      <ErrorPage intendedAction={`cargar estadísticas de ${studentFullName}`} />
+      <ErrorPage intendedAction={`cargar estadísticas de alumno`} />
     );
   }
 
@@ -202,7 +190,7 @@ export default function Page({ params }: { params: Params }) {
   };
   const studentDataset = {
     id: 2,
-    label: typeof studentFullName === "string" ? studentFullName : "Alumno",
+    label: data.studentName,
     data: monthlyAverages.map(({ studentAverageScore }) => studentAverageScore),
     backgroundColor: "#FBE38E",
     borderColor: "#FBE38E",
@@ -222,22 +210,18 @@ export default function Page({ params }: { params: Params }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>{data.groupName}</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{groupName}</BreadcrumbLink>
-          </BreadcrumbItem>
-
-          <BreadcrumbItem>
-            <BreadcrumbLink href="#">{studentFullName}</BreadcrumbLink>
+            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}>{data.studentName}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>{studentFullName}</h1>
+        <h1 tabIndex={0}>{data.studentName}</h1>
         <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
           <div className={styles["stats-box"]}>
             <div className={`row ${styles["mob-col"]}`}>
@@ -321,9 +305,8 @@ export default function Page({ params }: { params: Params }) {
           columns={taskColumns}
           data={toTableListAssignment(
             filteredAssignments,
-            `${groupId}`,
-            `${groupName}`,
-            `${studentFullName}`
+            `${data.groupId}`,
+            `${data.studentId}`
           )}
         ></ChakraTable>
       </div>

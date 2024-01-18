@@ -1,6 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   MulterModuleOptions,
   MulterOptionsFactory,
@@ -54,6 +59,28 @@ export class FileUploadService implements MulterOptionsFactory {
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Error uploading file to S3');
+    }
+  }
+
+  async getSignedUrl(
+    s3ObjectKey: string,
+    durationInSeconds = 3600,
+  ): Promise<string> {
+    const bucket = this.configService.get('AWS_BUCKET');
+    const getObjectParams = {
+      Bucket: bucket,
+      Key: s3ObjectKey,
+    };
+
+    try {
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(this.s3, command, {
+        expiresIn: durationInSeconds,
+      });
+      return url;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Error generating signed URL');
     }
   }
 }

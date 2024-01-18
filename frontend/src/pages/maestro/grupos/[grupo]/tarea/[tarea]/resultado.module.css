@@ -35,6 +35,10 @@
   padding: 24px;
 }
 
+.audio {
+  margin: auto;
+}
+
 @media (max-width: 500px) {
   .container {
     padding: 8px;
