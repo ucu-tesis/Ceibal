@@ -60,7 +60,7 @@ const assignmentColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
+const toTableList = (students: Student[], evaluationGroupId: number) =>
   students.map(
     ({
       fullName,
@@ -95,7 +95,6 @@ const toTableList = (students: Student[], evaluationGroupId: number, groupName: 
 const toAssignmentTableList = (
   assignments: Assignment[],
   evaluationGroupId: number,
-  groupName: string
 ) =>
   assignments.map(
     ({
@@ -116,10 +115,6 @@ const toAssignmentTableList = (
             query: {
               grupo: evaluationGroupId,
               tarea: evaluationGroupReadingId,
-              groupName,
-              readingCategory,
-              readingSubcategory,
-              readingTitle,
             },
           }}
         >
@@ -336,7 +331,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, evaluationGroupId, groupName)}
+                data={toAssignmentTableList(filteredAssignments, evaluationGroupId)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
