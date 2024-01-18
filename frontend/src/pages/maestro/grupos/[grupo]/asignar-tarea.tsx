@@ -49,9 +49,46 @@ const defaultOption: Option = {
 
 const DURATION_OFFSET = 2000;
 
-const AssignmentCreationModal: React.FC = () => {
-  const { grupo: evaluationGroupId } = useRouter().query;
+function renderSummary(selectedDueDate: string, selectedReadings: Reading[]): React.ReactNode {
+  return (
+    <>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Fecha límite:</span>
+        <span tabIndex={0}>{selectedDueDate}</span>
+      </div>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Lecturas:</span>
+        <ul>
+          {selectedReadings.map((reading, index) => {
+            return <li key={index}>{reading.title}</li>;
+          })}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+function renderModal(
+  isOpen: boolean,
+  onClose: () => void,
+  activeContent?: string,
+  readingTitle?: string
+): React.ReactNode {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent className={styles["modal-content"]}>
+        <ModalHeader>{readingTitle}</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>{activeContent}</ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+const Page: React.FC = () => {
   const router = useRouter();
+  const { grupo: evaluationGroupId } = router.query;
 
   const [readingSearch, setReadingSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>();
@@ -61,6 +98,7 @@ const AssignmentCreationModal: React.FC = () => {
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
 
   const [activeContent, setActiveContent] = useState<string>();
+  const [activeTitle, setActiveTitle] = useState<string>();
 
   // TODO pagination
   const readingsQueryData = useQuery({
@@ -129,17 +167,18 @@ const AssignmentCreationModal: React.FC = () => {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const onClickReading = (readingContent: string) => {
+  const onClickReading = (readingContent: string, readingTitle: string) => {
     setActiveContent(readingContent);
+    setActiveTitle(readingTitle);
     onOpen();
   };
 
   function renderReadingsSelection(): React.ReactNode {
     if (readingsQueryData.isLoading) {
-      return "Loading readings...";
+      return "Cargando lecturas...";
     }
     if (readingsQueryData.isError) {
-      return `Error loading readings: ${readingsQueryData.error}`;
+      return `Error obteniendo: ${readingsQueryData.error}`;
     }
     const filteredReadings = filterReadings(
       readingsQueryData.data.Readings, // TODO pagination
@@ -226,45 +265,13 @@ const AssignmentCreationModal: React.FC = () => {
             subcategory: reading.subcategory,
             title: reading.title,
             action: (
-              <Link href="#" onClick={() => onClickReading(reading.content)}>
+              <Link href="#" onClick={() => onClickReading(reading.content, reading.title)}>
                 Ver lectura
               </Link>
             ),
           }))}
         ></ChakraTable>
       </>
-    );
-  }
-
-  function renderSummary(): React.ReactNode {
-    return (
-      <>
-        <div className={`${styles.desc} row`}>
-          <span tabIndex={0}>Fecha límite:</span>
-          <span tabIndex={0}>{selectedDueDate}</span>
-        </div>
-        <div className={`${styles.desc} row`}>
-          <span tabIndex={0}>Lecturas:</span>
-          <ul>
-            {selectedReadings.map((reading, index) => {
-              return <li key={index}>{reading.title}</li>;
-            })}
-          </ul>
-        </div>
-      </>
-    );
-  }
-
-  function renderModal(): React.ReactNode {
-    return (
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent className={styles["modal-content"]}>
-          <ModalHeader>Lectura</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>{activeContent}</ModalBody>
-        </ModalContent>
-      </Modal>
     );
   }
 
@@ -292,7 +299,7 @@ const AssignmentCreationModal: React.FC = () => {
         </Stepper>
 
         {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
-        {steps[activeStep] === SUMMARY_STEP && renderSummary()}
+        {steps[activeStep] === SUMMARY_STEP && renderSummary(selectedDueDate, selectedReadings)}
         <Box>
           {createAssignmentMutation.isError && (
             <Box textColor="red">
@@ -320,9 +327,9 @@ const AssignmentCreationModal: React.FC = () => {
           )}
         </Flex>
       </div>
-      {renderModal()}
+      {renderModal(isOpen, onClose, activeContent, activeTitle)}
     </ChakraProvider>
   );
 };
 
-export default AssignmentCreationModal;
+export default Page;
