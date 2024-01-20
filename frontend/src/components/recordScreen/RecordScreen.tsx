@@ -9,6 +9,7 @@ import { ReadingDetails } from "@/models/ReadingDetails";
 import { Text } from "@chakra-ui/react";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import SendIcon from "../../assets/images/send_icon.svg";
 import styles from "./RecordScreen.module.css";
@@ -18,6 +19,7 @@ export interface RecordScreenProps {
 }
 
 const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
+  const router = useRouter();
   const [sendActive, setSendActive] = useState(false);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [bufferSource, setBufferSource] =
@@ -108,13 +110,14 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
     setNewRecord(false);
   };
 
-  const closeModal = () => {
+  const closeModalAndPushReadingsListScreen = () => {
     const modal = modalRef.current;
     if (modal) {
       modal.style.transform = "scale(0.5)";
     }
     setTimeout(() => {
       setOpenModal(false);
+      router.push("/alumno/lecturas");
     }, 300);
   };
 
@@ -147,7 +150,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
                   Ahora puedes continuar explorando y aprendiendo.
                 </Text>
                 <SecondaryButton
-                  onClick={closeModal}
+                  onClick={closeModalAndPushReadingsListScreen}
                   variant={"blueFill" as keyof Object}
                 >
                   Continuar
