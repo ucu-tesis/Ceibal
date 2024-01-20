@@ -58,53 +58,69 @@ const assignmentColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const toTableList = (students: Student[], evaluationGroupId: number, groupName: string) =>
-  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0, id }) => ({
-    fullName,
-    cedula,
-    email,
-    assignmentsCompleted: `${assignmentsDone}/${assignmentsDone + assignmentsPending}`,
-    link: (
-      <Link
-        href={{
-          pathname: "/maestro/grupos/[grupo]/[alumno]",
-          query: {
-            grupo: evaluationGroupId,
-            alumno: fullName,
-            groupName,
-            studentId: id,
-          },
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+const toTableList = (students: Student[], evaluationGroupId: number) =>
+  students.map(
+    ({
+      fullName,
+      cedula,
+      email,
+      assignmentsDone = 0,
+      assignmentsPending = 0,
+      id,
+    }) => ({
+      fullName,
+      cedula,
+      email,
+      assignmentsCompleted: `${assignmentsDone}/${
+        assignmentsDone + assignmentsPending
+      }`,
+      link: (
+        <Link
+          href={{
+            pathname: "/maestro/grupos/[grupo]/[alumno]",
+            query: {
+              grupo: evaluationGroupId,
+              alumno: id,
+            },
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
-const toAssignmentTableList = (assignments: Assignment[], evaluationGroupId: number, groupName: string) =>
-  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
-    readingCategory,
-    readingSubcategory,
-    readingTitle,
-    dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-    link: (
-      <Link
-        href={{
-          pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
-          query: {
-            grupo: evaluationGroupId,
-            tarea: evaluationGroupReadingId,
-            groupName,
-            readingCategory,
-            readingSubcategory,
-            readingTitle,
-          },
-        }}
-      >
-        Ver detalles
-      </Link>
-    ),
-  }));
+const toAssignmentTableList = (
+  assignments: Assignment[],
+  evaluationGroupId: number,
+) =>
+  assignments.map(
+    ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate,
+      evaluationGroupReadingId,
+    }) => ({
+      readingCategory,
+      readingSubcategory,
+      readingTitle,
+      dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
+      link: (
+        <Link
+          href={{
+            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+            query: {
+              grupo: evaluationGroupId,
+              tarea: evaluationGroupReadingId,
+            },
+          }}
+        >
+          Ver detalles
+        </Link>
+      ),
+    })
+  );
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 
@@ -206,15 +222,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos">Inicio</BreadcrumbLink>
-          </BreadcrumbItem>
-
-          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{groupName}</BreadcrumbLink>
+          <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>{groupName}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
@@ -263,7 +275,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={columns}
-                data={toTableList(filteredStudents, evaluationGroupId, groupName)}
+                data={toTableList(filteredStudents, evaluationGroupId)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -309,7 +321,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, evaluationGroupId, groupName)}
+                data={toAssignmentTableList(filteredAssignments, evaluationGroupId)}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>

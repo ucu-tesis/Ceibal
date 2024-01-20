@@ -14,6 +14,10 @@ export interface StudentStats {
   averageScore: number;
   assignments: StudentAssignment[];
   monthlyAverages: MonthlyAverage[];
+  studentName: string;
+  studentId: number;
+  groupName: string;
+  groupId: number;
 }
 
 export interface RepeatedWords {

@@ -64,11 +64,7 @@ const EvaluationList: React.FC = () => {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Inicio</BreadcrumbLink>
-          </BreadcrumbItem>
-
-          <BreadcrumbItem>
-            <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>Grupos</h1>

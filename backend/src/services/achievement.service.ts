@@ -23,20 +23,21 @@ export class AchievementService {
   }
 
   async processReadingAmountAchievements(studentId: number) {
-    const completedReadingsCount = await this.prismaService.recording.count({
-      where: {
-        student_id: studentId,
-      },
-      distinct: ['evaluation_group_reading_id'],
-    });
+    const completedReadings = (await this.prismaService.$queryRaw`
+      SELECT COUNT(DISTINCT evaluation_group_reading_id) as count
+      FROM "Recording" 
+      WHERE student_id = ${studentId}
+    `) as { count: number }[];
 
-    if (completedReadingsCount === 1) {
+    const count = Number(completedReadings[0].count);
+
+    if (count === 1) {
       await this.assign(studentId, 'completed:1');
-    } else if (completedReadingsCount === 5) {
+    } else if (count === 5) {
       await this.assign(studentId, 'completed:5');
-    } else if (completedReadingsCount === 10) {
+    } else if (count === 10) {
       await this.assign(studentId, 'completed:10');
-    } else if (completedReadingsCount === 20) {
+    } else if (count === 20) {
       await this.assign(studentId, 'completed:20');
     }
   }

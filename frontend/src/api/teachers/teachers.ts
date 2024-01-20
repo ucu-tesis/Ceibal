@@ -10,6 +10,7 @@ import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import { Reading } from "@/models/Reading";
 import axiosInstance from "../axiosInstance";
+import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
 
 interface StudentMonthlyAverage {
   month: string;
@@ -35,6 +36,10 @@ interface StudentStatsResponse {
   assignments_done: number;
   assignments_pending: number;
   monthly_averages: StudentMonthlyAverage[];
+  student_name: string;
+  student_id: number;
+  group_name: string;
+  group_id: number;
 }
 
 interface GroupsResponse {
@@ -111,6 +116,26 @@ interface ReadingsResponse {
   total: number;
 }
 
+interface StudentAssignmentDetailsResponse {
+  analysis_id: number | null;
+  student_id: number;
+  student_name: string;
+  evaluation_group_reading_id: number;
+  reading_id: number;
+  reading_title: string;
+  category: string;
+  subcategory: string;
+  group_id: number;
+  group_name: string;
+  score: number | null;
+  words_velocity: number | null;
+  silences_count: number | null;
+  repetitions_count: number | null;
+  recording_id: number | null;
+  recording_url: string | null;
+  status: string;
+}
+
 export const fetchGroupDetails = (groupId: number) =>
   axiosInstance
     .get<GroupDetailsResponse>(`/evaluationGroups/${groupId}`)
@@ -151,6 +176,12 @@ export const createAssignment = (evaluationGroupId: number, readings: Reading[],
     due_date: dueDate,
   })
 };
+
+export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
+  axiosInstance
+    .get<StudentAssignmentDetailsResponse>(`/evaluationGroups/assignments/${assignmentId}/${studentId}`)
+    .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
+      
 
 // Parse methods
 
@@ -231,6 +262,10 @@ const parseStudentStatsResponse = (
   assignmentsUncompleted: stats.assignments_delayed,
   averageScore: stats.average_score,
   monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
+  studentName: stats.student_name,
+  studentId: stats.student_id,
+  groupName: stats.group_name,
+  groupId: stats.group_id,
 });
 
 const parseAssignmentStatsResponse = (
@@ -274,3 +309,25 @@ const parseAssignmentStatsResponse = (
     ),
   };
 };
+
+const parseStudentAssignmentDetailsResponse = (
+  recording: StudentAssignmentDetailsResponse
+): StudentAssignmentDetails => ({
+  analysisId: recording.analysis_id,
+  studentId: recording.student_id,
+  studentName: recording.student_name,
+  evaluationGroupReadingId: recording.evaluation_group_reading_id,
+  readingId: recording.reading_id,
+  readingTitle: recording.reading_title,
+  category: recording.category,
+  subcategory: recording.subcategory,
+  groupId: recording.group_id,
+  groupName: recording.group_name,
+  score: recording.score,
+  wordsVelocity: recording.words_velocity,
+  silencesCount: recording.silences_count,
+  repetitionsCount: recording.repetitions_count,
+  recordingId: recording.recording_id,
+  recordingUrl: recording.recording_url,
+  status: recording.status,
+});
