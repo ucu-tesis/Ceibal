@@ -10,7 +10,7 @@ import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable"
 import { SearchIcon } from "@chakra-ui/icons";
 import InputDateTimeLocal from "@/components/inputs/InputDateTimeLocal";
 import dayjs from "dayjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
@@ -29,7 +29,7 @@ const readingSelectionColumns: ChakraTableColumn[] = [
   { label: "Categoría" },
   { label: "Subcategoría" },
   { label: "Lectura" },
-  { label: "" },
+  { label: " " },
 ];
 
 const filterReadings = (readings: Reading[], search: string, category?: string, subcategory?: string) => {
@@ -83,6 +83,114 @@ function renderModal(
         <ModalBody>{activeContent}</ModalBody>
       </ModalContent>
     </Modal>
+  );
+}
+
+function renderReadingsSelection(
+  baseReadings: Reading[],
+  filteredReadings: Reading[],
+  readingsQueryData: UseQueryResult,
+  selectedDueDate: string,
+  setSelectedDueDate: React.Dispatch<React.SetStateAction<string>>,
+  readingSearch: string,
+  setReadingSearch: React.Dispatch<React.SetStateAction<string>>,
+  categoryFilter: string,
+  setCategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>,
+  subcategoryFilter: string,
+  setSubcategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>,
+  isReadingSelected: (readingId: number) => boolean,
+  toggleReading: (reading: Reading) => void,
+  onClickReading: (readingContent: string, readingTitle: string) => void
+): React.ReactNode {
+  if (readingsQueryData.isLoading) {
+    return "Cargando lecturas...";
+  }
+  if (readingsQueryData.isError) {
+    return `Error obteniendo: ${readingsQueryData.error}`;
+  }
+  return (
+    <>
+      <div className={`${styles.desc} row`}>
+        <span tabIndex={0}>Fecha límite:</span>
+        <InputDateTimeLocal
+          value={selectedDueDate}
+          onChange={(event: ChangeEvent) => {
+            const { value } = event.target as HTMLInputElement;
+            setSelectedDueDate(dayjs(value).toISOString());
+          }}
+        ></InputDateTimeLocal>
+      </div>
+      <span>
+        <strong tabIndex={0}>Lecturas:</strong>
+      </span>
+      <div className={`${styles.filters} row`}>
+        <InputGroup className={styles.small}>
+          <Input
+            width="auto"
+            onKeyDown={(e) => {
+              if (!e.key.match(inputRegex)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={({ target: { value } }) => {
+              setReadingSearch(value.toLowerCase());
+            }}
+            maxLength={30}
+            placeholder="Lectura"
+            value={readingSearch}
+          />
+          <InputRightAddon>
+            <SearchIcon />
+          </InputRightAddon>
+        </InputGroup>
+        <div className="col">
+          <label>Categoría</label>
+          <Select
+            defaultValue={{ label: categoryFilter || "Todas", value: categoryFilter }}
+            options={getOptionsFromArray(
+              baseReadings.map((r) => r.category),
+              defaultOption
+            )}
+            onChange={(option) => {
+              setCategoryFilter(option.value);
+            }}
+          ></Select>
+        </div>
+        <div className="col">
+          <label>Subcategoría</label>
+          <Select
+            defaultValue={{ label: subcategoryFilter || "Todas", value: subcategoryFilter }}
+            options={getOptionsFromArray(baseReadings.map((r) => r.subcategory).filter(Boolean), defaultOption)}
+            onChange={(option) => {
+              setSubcategoryFilter(option.value);
+            }}
+          ></Select>
+        </div>
+      </div>
+      <ChakraTable
+        maxHeight={tableMaxHeightModal}
+        columns={readingSelectionColumns}
+        data={filteredReadings.map((reading) => ({
+          checkbox: (
+            <Checkbox
+              key={reading.id}
+              isChecked={isReadingSelected(reading.id)}
+              onChange={() => {
+                toggleReading(reading);
+              }}
+            />
+          ),
+          category: reading.category,
+          subcategory: reading.subcategory,
+          title: reading.title,
+          action: (
+            <Link href="#" onClick={() => onClickReading(reading.content, reading.title)}>
+              Ver lectura
+            </Link>
+          ),
+        }))}
+      ></ChakraTable>
+    </>
   );
 }
 
@@ -173,107 +281,14 @@ const Page: React.FC = () => {
     onOpen();
   };
 
-  function renderReadingsSelection(): React.ReactNode {
-    if (readingsQueryData.isLoading) {
-      return "Cargando lecturas...";
-    }
-    if (readingsQueryData.isError) {
-      return `Error obteniendo: ${readingsQueryData.error}`;
-    }
-    const filteredReadings = filterReadings(
-      readingsQueryData.data.Readings, // TODO pagination
-      readingSearch,
-      categoryFilter,
-      subcategoryFilter
-    );
-    return (
-      <>
-        <div className={`${styles.desc} row`}>
-          <span tabIndex={0}>Fecha límite:</span>
-          <InputDateTimeLocal
-            value={selectedDueDate}
-            onChange={(event: ChangeEvent) => {
-              const { value } = event.target as HTMLInputElement;
-              setSelectedDueDate(dayjs(value).toISOString());
-            }}
-          ></InputDateTimeLocal>
-        </div>
-        <span>
-          <strong tabIndex={0}>Lecturas:</strong>
-        </span>
-        <div className={`${styles.filters} row`}>
-          <InputGroup className={styles.small}>
-            <Input
-              width="auto"
-              onKeyDown={(e) => {
-                if (!e.key.match(inputRegex)) {
-                  e.preventDefault();
-                }
-              }}
-              onChange={({ target: { value } }) => {
-                setReadingSearch(value.toLowerCase());
-              }}
-              maxLength={30}
-              placeholder="Lectura"
-              value={readingSearch}
-            />
-            <InputRightAddon>
-              <SearchIcon />
-            </InputRightAddon>
-          </InputGroup>
-          <div className="col">
-            <label>Categoría</label>
-            <Select
-              defaultValue={{ label: categoryFilter || "Todas", value: categoryFilter }}
-              options={getOptionsFromArray(
-                readingsQueryData.data.Readings.map((r) => r.category),
-                defaultOption
-              )}
-              onChange={(option) => {
-                setCategoryFilter(option.value);
-              }}
-            ></Select>
-          </div>
-          <div className="col">
-            <label>Subcategoría</label>
-            <Select
-              defaultValue={{ label: subcategoryFilter || "Todas", value: subcategoryFilter }}
-              options={getOptionsFromArray(
-                readingsQueryData.data.Readings.map((r) => r.subcategory).filter(Boolean),
-                defaultOption
-              )}
-              onChange={(option) => {
-                setSubcategoryFilter(option.value);
-              }}
-            ></Select>
-          </div>
-        </div>
-        <ChakraTable
-          maxHeight={tableMaxHeightModal}
-          columns={readingSelectionColumns}
-          data={filteredReadings.map((reading) => ({
-            checkbox: (
-              <Checkbox
-                key={reading.id}
-                isChecked={isReadingSelected(reading.id)}
-                onChange={() => {
-                  toggleReading(reading);
-                }}
-              />
-            ),
-            category: reading.category,
-            subcategory: reading.subcategory,
-            title: reading.title,
-            action: (
-              <Link href="#" onClick={() => onClickReading(reading.content, reading.title)}>
-                Ver lectura
-              </Link>
-            ),
-          }))}
-        ></ChakraTable>
-      </>
-    );
-  }
+  const baseReadings = readingsQueryData?.data ? readingsQueryData.data.Readings : [];
+
+  const filteredReadings = filterReadings(
+    baseReadings, // TODO pagination
+    readingSearch,
+    categoryFilter,
+    subcategoryFilter
+  );
 
   return (
     <ChakraProvider>
@@ -298,7 +313,23 @@ const Page: React.FC = () => {
           ))}
         </Stepper>
 
-        {steps[activeStep] === READINGS_STEP && renderReadingsSelection()}
+        {steps[activeStep] === READINGS_STEP &&
+          renderReadingsSelection(
+            baseReadings,
+            filteredReadings,
+            readingsQueryData,
+            selectedDueDate,
+            setSelectedDueDate,
+            readingSearch,
+            setReadingSearch,
+            categoryFilter ?? "",
+            setCategoryFilter,
+            subcategoryFilter ?? "",
+            setSubcategoryFilter,
+            isReadingSelected,
+            toggleReading,
+            onClickReading
+          )}
         {steps[activeStep] === SUMMARY_STEP && renderSummary(selectedDueDate, selectedReadings)}
         <Box>
           {createAssignmentMutation.isError && (
