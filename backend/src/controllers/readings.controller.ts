@@ -60,7 +60,7 @@ export class ReadingsController {
     `;
     return {
       categories: categories.map(c => c.category),
-      subcategories: subcategories.map(sc => sc.subcategory),
+      subcategories: subcategories.map(sc => sc.subcategory).filter(sc => sc !== null),
     };
   }
 
