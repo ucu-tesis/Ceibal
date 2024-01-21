@@ -72,6 +72,15 @@ export class FileUploadService implements MulterOptionsFactory {
       Key: s3ObjectKey,
     };
 
+    // If the key is an URL, that means it's already a signed URL
+    // or it's not an S3 upload, skip signing and return the URL.
+    if (
+      s3ObjectKey.startsWith('http://') ||
+      s3ObjectKey.startsWith('https://')
+    ) {
+      return s3ObjectKey;
+    }
+
     try {
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(this.s3, command, {
