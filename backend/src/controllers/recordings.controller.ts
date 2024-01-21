@@ -97,6 +97,12 @@ export class RecordingsController {
         },
       },
     });
-    return recording;
+
+    return {
+      ...recording,
+      recording_url: await this.fileUploadService.getSignedUrl(
+        recording.recording_url,
+      ),
+    };
   }
 }
