@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
 import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
-import styles from "./asignar-tarea.module.css";
+import styles from "./asignartarea.module.css";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -49,7 +49,12 @@ const defaultOption: Option = {
 
 const DURATION_OFFSET = 2000;
 
-function renderSummary(selectedDueDate: string, selectedReadings: Reading[]): React.ReactNode {
+interface SummaryProps {
+  selectedDueDate: string;
+  selectedReadings: Reading[];
+}
+
+const Summary: React.FC<SummaryProps> = ({ selectedDueDate, selectedReadings }) => {
   return (
     <>
       <div className={`${styles.desc} row`}>
@@ -66,14 +71,16 @@ function renderSummary(selectedDueDate: string, selectedReadings: Reading[]): Re
       </div>
     </>
   );
+};
+
+interface ReadingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  activeContent?: string;
+  readingTitle?: string;
 }
 
-function renderModal(
-  isOpen: boolean,
-  onClose: () => void,
-  activeContent?: string,
-  readingTitle?: string
-): React.ReactNode {
+const ReadingModal: React.FC<ReadingModalProps> = ({ isOpen, onClose, activeContent, readingTitle }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -84,29 +91,46 @@ function renderModal(
       </ModalContent>
     </Modal>
   );
+};
+
+interface ReadingSectionProps {
+  baseReadings: Reading[];
+  filteredReadings: Reading[];
+  readingsQueryData: UseQueryResult;
+  selectedDueDate: string;
+  setSelectedDueDate: React.Dispatch<React.SetStateAction<string>>;
+  readingSearch: string;
+  setReadingSearch: React.Dispatch<React.SetStateAction<string>>;
+  categoryFilter: string;
+  setCategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  subcategoryFilter: string;
+  setSubcategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  isReadingSelected: (readingId: number) => boolean;
+  toggleReading: (reading: Reading) => void;
+  onClickReading: (readingContent: string, readingTitle: string) => void;
 }
 
-function renderReadingsSelection(
-  baseReadings: Reading[],
-  filteredReadings: Reading[],
-  readingsQueryData: UseQueryResult,
-  selectedDueDate: string,
-  setSelectedDueDate: React.Dispatch<React.SetStateAction<string>>,
-  readingSearch: string,
-  setReadingSearch: React.Dispatch<React.SetStateAction<string>>,
-  categoryFilter: string,
-  setCategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>,
-  subcategoryFilter: string,
-  setSubcategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>,
-  isReadingSelected: (readingId: number) => boolean,
-  toggleReading: (reading: Reading) => void,
-  onClickReading: (readingContent: string, readingTitle: string) => void
-): React.ReactNode {
+const ReadingsSection: React.FC<ReadingSectionProps> = ({
+  baseReadings,
+  filteredReadings,
+  readingsQueryData,
+  selectedDueDate,
+  setSelectedDueDate,
+  readingSearch,
+  setReadingSearch,
+  categoryFilter,
+  setCategoryFilter,
+  subcategoryFilter,
+  setSubcategoryFilter,
+  isReadingSelected,
+  toggleReading,
+  onClickReading,
+}) => {
   if (readingsQueryData.isLoading) {
-    return "Cargando lecturas...";
+    return <>Cargando lecturas...</>;
   }
   if (readingsQueryData.isError) {
-    return `Error obteniendo: ${readingsQueryData.error}`;
+    return <>Error obteniendo: ${readingsQueryData.error}</>;
   }
   return (
     <>
@@ -192,7 +216,7 @@ function renderReadingsSelection(
       ></ChakraTable>
     </>
   );
-}
+};
 
 const Page: React.FC = () => {
   const router = useRouter();
@@ -313,24 +337,27 @@ const Page: React.FC = () => {
           ))}
         </Stepper>
 
-        {steps[activeStep] === READINGS_STEP &&
-          renderReadingsSelection(
-            baseReadings,
-            filteredReadings,
-            readingsQueryData,
-            selectedDueDate,
-            setSelectedDueDate,
-            readingSearch,
-            setReadingSearch,
-            categoryFilter ?? "",
-            setCategoryFilter,
-            subcategoryFilter ?? "",
-            setSubcategoryFilter,
-            isReadingSelected,
-            toggleReading,
-            onClickReading
-          )}
-        {steps[activeStep] === SUMMARY_STEP && renderSummary(selectedDueDate, selectedReadings)}
+        {steps[activeStep] === READINGS_STEP && (
+          <ReadingsSection
+            baseReadings={baseReadings}
+            filteredReadings={filteredReadings}
+            readingsQueryData={readingsQueryData}
+            selectedDueDate={selectedDueDate}
+            categoryFilter={categoryFilter ?? ""}
+            isReadingSelected={isReadingSelected}
+            onClickReading={onClickReading}
+            readingSearch={readingSearch}
+            setCategoryFilter={setCategoryFilter}
+            setReadingSearch={setReadingSearch}
+            setSelectedDueDate={setSelectedDueDate}
+            setSubcategoryFilter={setSubcategoryFilter}
+            subcategoryFilter={subcategoryFilter ?? ""}
+            toggleReading={toggleReading}
+          ></ReadingsSection>
+        )}
+        {steps[activeStep] === SUMMARY_STEP && (
+          <Summary selectedDueDate={selectedDueDate} selectedReadings={selectedReadings}></Summary>
+        )}
         <Box>
           {createAssignmentMutation.isError && (
             <Box textColor="red">
@@ -358,7 +385,12 @@ const Page: React.FC = () => {
           )}
         </Flex>
       </div>
-      {renderModal(isOpen, onClose, activeContent, activeTitle)}
+      <ReadingModal
+        isOpen={isOpen}
+        onClose={onClose}
+        activeContent={activeContent}
+        readingTitle={activeTitle}
+      ></ReadingModal>
     </ChakraProvider>
   );
 };

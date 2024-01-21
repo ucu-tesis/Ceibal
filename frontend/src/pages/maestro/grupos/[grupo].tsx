@@ -233,7 +233,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={() => router.push(`/maestro/grupos/${evaluationGroupId}/asignar-tarea`)}
+              onClick={() => router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)}
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
