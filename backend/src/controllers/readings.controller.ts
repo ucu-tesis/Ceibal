@@ -47,6 +47,23 @@ export class ReadingsController {
     };
   }
 
+  @Get('/categories')
+  @UseGuards(TeacherGuard)
+  async getAllCategories(@UserData('id') userId: number) {
+    const categories : Array<{ category: string }> = await this.prismaService.$queryRaw`
+      Select DISTINCT category from "Reading"
+      where is_public = true or created_by = ${userId}
+    `;
+    const subcategories: Array<{ subcategory: string }> = await this.prismaService.$queryRaw`
+      Select DISTINCT subcategory from "Reading"
+      where is_public = true or created_by = ${userId}
+    `;
+    return {
+      categories: categories.map(c => c.category),
+      subcategories: subcategories.map(sc => sc.subcategory).filter(sc => sc !== null),
+    };
+  }
+
   @Post('/')
   @UseGuards(TeacherGuard)
   async createReading(
