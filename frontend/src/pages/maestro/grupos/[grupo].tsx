@@ -4,9 +4,7 @@ import LoadingPage from "@/components/loadingPage/LoadingPage";
 import AssignmentCreationModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
-import ChakraTable, {
-  ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
+import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
 import { inputRegex } from "@/constants/constants";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
@@ -195,6 +193,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   useChartJSInitializer();
 
+  const router = useRouter();
+
   const { filteredAssignments } = useFilteredAssignments(
     assignments,
     assignmentSearchQuery,
@@ -202,15 +202,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
     subcategoryOption
   );
 
-  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
-    useAssignmentFilterOptions(assignments);
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
 
   const assignmentModalDisclosure = useDisclosure();
-  const {
-    isOpen: isOpenReadingModal,
-    onClose: onCloseReadingModal,
-    onOpen: onOpenReadingModal,
-  } = useDisclosure();
+  const { isOpen: isOpenReadingModal, onClose: onCloseReadingModal, onOpen: onOpenReadingModal } = useDisclosure();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -238,19 +233,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={assignmentModalDisclosure.onOpen}
+              onClick={() => router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)}
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
             >
               Asignar Tarea
             </Button>
-            <Button
-              onClick={onOpenReadingModal}
-              leftIcon={<AddIcon />}
-              className={styles.secondary}
-              variant="outline"
-            >
+            <Button onClick={onOpenReadingModal} leftIcon={<AddIcon />} className={styles.secondary} variant="outline">
               Crear Lectura
             </Button>
           </div>
@@ -347,10 +337,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       <span>Pendientes: 25</span>
                     </div>
                     <div className="row">
-                      <Image
-                        alt="lecturas atrasadas"
-                        src={IncompleteTasksIcon}
-                      />
+                      <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
                       <span>Atrasadas: 25</span>
                     </div>
                   </div>
@@ -380,12 +367,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
           evaluationGroupId={evaluationGroupId}
           styles={styles}
         />
-      )}      
-      <CreateReadingModal
-        isOpen={isOpenReadingModal}
-        onClose={onCloseReadingModal}
-        styles={styles}
-      />
+      )}
+      <CreateReadingModal isOpen={isOpenReadingModal} onClose={onCloseReadingModal} styles={styles} />
     </ChakraProvider>
   );
 }

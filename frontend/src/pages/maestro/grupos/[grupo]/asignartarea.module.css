@@ -1,0 +1,84 @@
+.container {
+  padding: 24px;
+}
+
+.container h1 {
+  margin-bottom: 16px;
+}
+
+.container [aria-label="Progress"] {
+  width: 40%;
+}
+
+.desc {
+  gap: 32px;
+  margin-bottom: 16px;
+}
+
+.desc:nth-child(3) {
+  align-items: center;
+  margin-top: 16px;
+}
+
+.desc ul {
+  padding: 0px 32px;
+}
+
+.filters {
+  justify-content: left;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  align-items: end;
+  gap: 40px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.filters label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+.primary {
+  background-color: var(--ceibal-green) !important;
+  border-radius: 24px !important;
+  color: white !important;
+}
+
+.secondary {
+  border-radius: 24px !important;
+}
+
+.space {
+  justify-content: space-between;
+}
+
+.space div {
+  gap: 16px;
+}
+
+.modal-content {
+  padding-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .modal-content {
+    min-width: auto;
+  }
+  .mob-col {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tablet-col {
+    flex-direction: column;
+  }
+}
