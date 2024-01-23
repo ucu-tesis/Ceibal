@@ -109,6 +109,36 @@ interface AssignmentStatsResponse {
   most_repeated_words: RepeatedWords[];
 }
 
+interface MonthlyScoreAverage {
+  month: string;
+  average_score: number;
+}
+
+interface MonthlyAssignmentsDone {
+  month: string;
+  assignments_done: number;
+}
+
+interface MonthlyAssignmentsPending {
+  month: string;
+  assignments_pending: number;
+}
+
+interface MonthlyAssignmentsDelayed {
+  month: string;
+  assignments_delayed: number;
+}
+
+interface GroupStatsResponse {
+  assignments_done: number;
+  assignments_pending: number;
+  assignments_delayed: number;
+  monthly_score_averages: MonthlyScoreAverage[];
+  monthly_assignments_done: MonthlyAssignmentsDone[];
+  monthly_assignments_pending: MonthlyAssignmentsPending[];
+  monthly_assignments_delayed: MonthlyAssignmentsDelayed[];
+}
+
 interface ReadingsResponse {
   Readings: Reading[];
   page: number;
