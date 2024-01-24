@@ -42,6 +42,7 @@ import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
 import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
 import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
 import styles from "./grupos.module.css";
+import useFetchGroupStats from "@/api/teachers/hooks/useFetchGroupStats";
 
 const columns: ChakraTableColumn[] = [
   { label: "Nombre" },
@@ -59,68 +60,46 @@ const assignmentColumns: ChakraTableColumn[] = [
 ];
 
 const toTableList = (students: Student[], evaluationGroupId: number) =>
-  students.map(
-    ({
-      fullName,
-      cedula,
-      email,
-      assignmentsDone = 0,
-      assignmentsPending = 0,
-      id,
-    }) => ({
-      fullName,
-      cedula,
-      email,
-      assignmentsCompleted: `${assignmentsDone}/${
-        assignmentsDone + assignmentsPending
-      }`,
-      link: (
-        <Link
-          href={{
-            pathname: "/maestro/grupos/[grupo]/[alumno]",
-            query: {
-              grupo: evaluationGroupId,
-              alumno: id,
-            },
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    })
-  );
+  students.map(({ fullName, cedula, email, assignmentsDone = 0, assignmentsPending = 0, id }) => ({
+    fullName,
+    cedula,
+    email,
+    assignmentsCompleted: `${assignmentsDone}/${assignmentsDone + assignmentsPending}`,
+    link: (
+      <Link
+        href={{
+          pathname: "/maestro/grupos/[grupo]/[alumno]",
+          query: {
+            grupo: evaluationGroupId,
+            alumno: id,
+          },
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
-const toAssignmentTableList = (
-  assignments: Assignment[],
-  evaluationGroupId: number,
-) =>
-  assignments.map(
-    ({
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-      dueDate,
-      evaluationGroupReadingId,
-    }) => ({
-      readingCategory,
-      readingSubcategory,
-      readingTitle,
-      dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
-      link: (
-        <Link
-          href={{
-            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
-            query: {
-              grupo: evaluationGroupId,
-              tarea: evaluationGroupReadingId,
-            },
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    })
-  );
+const toAssignmentTableList = (assignments: Assignment[], evaluationGroupId: number) =>
+  assignments.map(({ readingCategory, readingSubcategory, readingTitle, dueDate, evaluationGroupReadingId }) => ({
+    readingCategory,
+    readingSubcategory,
+    readingTitle,
+    dueDate: dayjs(dueDate).format(dateFormats.assignmentDueDate),
+    link: (
+      <Link
+        href={{
+          pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+          query: {
+            grupo: evaluationGroupId,
+            tarea: evaluationGroupReadingId,
+          },
+        }}
+      >
+        Ver detalles
+      </Link>
+    ),
+  }));
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
 
@@ -168,6 +147,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useFetchGroupStats(evaluationGroupId);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -180,6 +160,15 @@ export default function Page({ params }: { params: { grupo: number } }) {
     students: [],
     assignments: [],
   };
+  const {
+    assignmentsDone,
+    assignmentsPending,
+    assignmentsDelayed,
+    monthlyAssignmentsDelayed,
+    monthlyAssignmentsDone,
+    monthlyScoreAverages,
+  } = statsData ?? { assignmentsDone: 0 };
+
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
 
   const [startDate, setStartDate] = useState(new Date());
@@ -226,7 +215,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-          <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>{groupName}</BreadcrumbLink>
+            <BreadcrumbLink href={"/maestro/grupos/" + evaluationGroupId}>{groupName}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
@@ -273,10 +262,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   </InputRightAddon>
                 </InputGroup>
               </div>
-              <ChakraTable
-                columns={columns}
-                data={toTableList(filteredStudents, evaluationGroupId)}
-              ></ChakraTable>
+              <ChakraTable columns={columns} data={toTableList(filteredStudents, evaluationGroupId)}></ChakraTable>
             </TabPanel>
             <TabPanel>
               <div className={`${styles.filters} row`}>
@@ -330,15 +316,15 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <div className={`row ${styles["mob-col"]}`}>
                     <div className="row">
                       <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                      <span>Enviadas: 25</span>
+                      <span>Enviadas: {assignmentsDone}</span>
                     </div>
                     <div className="row">
                       <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                      <span>Pendientes: 25</span>
+                      <span>Pendientes: {assignmentsPending}</span>
                     </div>
                     <div className="row">
                       <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                      <span>Atrasadas: 25</span>
+                      <span>Atrasadas: {assignmentsDelayed}</span>
                     </div>
                   </div>
                 </div>

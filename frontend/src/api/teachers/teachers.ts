@@ -180,9 +180,9 @@ export const fetchStudentStats = (groupId: number, studentId: number) =>
     .then(({ data }) => parseStudentStatsResponse(data));
 
 export const fetchGroupStats = (groupId: number) =>
-  axiosInstance.get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`).then(({ data }) => {
-    parseGroupStatsResponse(data);
-  });
+  axiosInstance
+    .get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`)
+    .then(({ data }) => parseGroupStatsResponse(data));
 
 export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) =>
   axiosInstance
@@ -288,7 +288,7 @@ const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
 const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({
   assignmentsDone: stats.assignments_done,
   assignmentsDelayed: stats.assignments_delayed,
-  assignmentsPending: stats.assignments_delayed,
+  assignmentsPending: stats.assignments_pending,
   monthlyScoreAverages: parseMonthData(stats.monthly_score_averages),
   monthlyAssignmentsDone: parseMonthData(stats.monthly_assignments_done),
   monthlyAssignmentsDelayed: parseMonthData(stats.monthly_assignments_delayed),
