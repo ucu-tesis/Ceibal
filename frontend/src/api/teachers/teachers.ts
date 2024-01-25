@@ -7,6 +7,8 @@ import { Student } from "@/models/Student";
 import { Reading } from "@/models/Reading";
 import axiosInstance from "../axiosInstance";
 import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
+import dayjs from "dayjs";
+import { dateFormats } from "@/util/dates";
 
 interface StudentMonthlyAverage {
   month: string;
@@ -279,10 +281,12 @@ const parseStudentStatsResponse = (stats: StudentStatsResponse): StudentStats =>
 
 const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
   const valueKey = Object.keys(monthAverages[0]).find((key) => key !== "month") as keyof MonthItem;
-  return monthAverages.map((monthItem) => ({
-    month: monthItem.month,
-    value: Number(monthItem[valueKey]),
-  }));
+  return monthAverages
+    .filter(({ month }) => !!month)
+    .map((monthItem) => ({
+      month: new Date(monthItem.month).getMonth(),
+      value: Number(monthItem[valueKey]),
+    }));
 };
 
 const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({

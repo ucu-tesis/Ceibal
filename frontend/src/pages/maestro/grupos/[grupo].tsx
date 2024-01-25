@@ -11,7 +11,7 @@ import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
-import { dateFormats } from "@/util/dates";
+import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
 import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Breadcrumb,
@@ -101,48 +101,6 @@ const toAssignmentTableList = (assignments: Assignment[], evaluationGroupId: num
     ),
   }));
 
-const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
-
-const dataLine = {
-  labels: months,
-  datasets: [
-    {
-      id: 1,
-      label: "Grupos",
-      data: [5, 6, 7, 4, 3, 5],
-      backgroundColor: "#B1A5FF",
-      borderColor: "#B1A5FF",
-    },
-    {
-      id: 2,
-      label: "Promedio",
-      data: [3, 2, 1, 4, 7, 3],
-      backgroundColor: "#FBE38E",
-      borderColor: "#FBE38E",
-    },
-  ],
-};
-
-const dataBar = {
-  labels: months,
-  datasets: [
-    {
-      label: "Tareas",
-      data: [65, 59, 80, 81, 56, 55, 40],
-      backgroundColor: "#FED0EEB2",
-      borderColor: "#FED0EEB2",
-      borderWidth: 1,
-    },
-    {
-      label: "Promedio",
-      data: [35, 49, 50, 61, 26, 45, 30],
-      backgroundColor: "#D0E8FFB2",
-      borderColor: "#D0E8FFB2",
-      borderWidth: 1,
-    },
-  ],
-};
-
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
@@ -164,6 +122,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     assignmentsDone,
     assignmentsPending,
     assignmentsDelayed,
+    monthlyAssignmentsPending,
     monthlyAssignmentsDelayed,
     monthlyAssignmentsDone,
     monthlyScoreAverages,
@@ -195,6 +154,48 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const assignmentModalDisclosure = useDisclosure();
   const { isOpen: isOpenReadingModal, onClose: onCloseReadingModal, onOpen: onOpenReadingModal } = useDisclosure();
+
+  const months = monthlyScoreAverages?.map(({ month }) => SPANISH_MONTH_NAMES[month]);
+
+  const dataLine = {
+    labels: months,
+    datasets: [
+      {
+        id: 2,
+        label: "Promedio",
+        data: monthlyScoreAverages?.map(({ value }) => value),
+        backgroundColor: "#FBE38E",
+        borderColor: "#FBE38E",
+      },
+    ],
+  };
+
+  const dataBar = {
+    labels: months,
+    datasets: [
+      {
+        label: "Tareas hechas",
+        data: monthlyAssignmentsDone?.map(({ value }) => value),
+        backgroundColor: "#FED0EEB2",
+        borderColor: "#FED0EEB2",
+        borderWidth: 1,
+      },
+      {
+        label: "Tareas atrasadas",
+        data: monthlyAssignmentsDelayed?.map(({ value }) => value),
+        backgroundColor: "#D0E8FFB2",
+        borderColor: "#D0E8FFB2",
+        borderWidth: 1,
+      },
+      {
+        label: "Tareas pendientes",
+        data: monthlyAssignmentsPending?.map(({ value }) => value),
+        backgroundColor: "#c8fac3",
+        borderColor: "#c8fac3",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   if (isLoading) {
     return <LoadingPage />;

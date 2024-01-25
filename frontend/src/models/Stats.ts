@@ -43,7 +43,7 @@ export interface AssignmentStats {
 }
 
 export interface MonthItem {
-  month: string;
+  month: number;
   value: number;
 }
 
