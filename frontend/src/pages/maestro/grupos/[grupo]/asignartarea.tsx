@@ -1,23 +1,53 @@
-import React, { ChangeEvent, useState } from "react";
-import { Box, Flex, ModalHeader, Spinner } from "@chakra-ui/react";
-import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
-import { StepSeparator, Input, InputGroup, InputRightAddon, ChakraProvider } from "@chakra-ui/react";
-import { Modal, ModalOverlay, ModalBody, ModalContent, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
-import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
-import Select, { Option } from "@/components/selects/Select";
-import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
-import { SearchIcon } from "@chakra-ui/icons";
-import InputDateTimeLocal from "@/components/inputs/InputDateTimeLocal";
-import dayjs from "dayjs";
-import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
+import InputDateTimeLocal from "@/components/inputs/InputDateTimeLocal";
+import Select, { Option } from "@/components/selects/Select";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
+import {
+  inputRegex,
+  tableMaxHeightModal,
+  toastDuration,
+} from "@/constants/constants";
 import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
-import styles from "./asignartarea.module.css";
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  ChakraProvider,
+  Checkbox,
+  Flex,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Stack,
+  Step,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
+  useDisclosure,
+  useSteps,
+  useToast,
+} from "@chakra-ui/react";
+import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { ChangeEvent, useState } from "react";
+import styles from "./asignartarea.module.css";
 
 const READINGS_STEP = "Agregar Tareas";
 const SUMMARY_STEP = "Resumen";
@@ -32,7 +62,12 @@ const readingSelectionColumns: ChakraTableColumn[] = [
   { label: " " },
 ];
 
-const filterReadings = (readings: Reading[], search: string, category?: string, subcategory?: string) => {
+const filterReadings = (
+  readings: Reading[],
+  search: string,
+  category?: string,
+  subcategory?: string
+) => {
   return readings.filter((reading) => {
     return (
       reading.title.toLowerCase().includes(search) &&
@@ -54,7 +89,10 @@ interface SummaryProps {
   selectedReadings: Reading[];
 }
 
-const Summary: React.FC<SummaryProps> = ({ selectedDueDate, selectedReadings }) => {
+const Summary: React.FC<SummaryProps> = ({
+  selectedDueDate,
+  selectedReadings,
+}) => {
   return (
     <>
       <div className={`${styles.desc} row`}>
@@ -80,7 +118,12 @@ interface ReadingModalProps {
   readingTitle?: string;
 }
 
-const ReadingModal: React.FC<ReadingModalProps> = ({ isOpen, onClose, activeContent, readingTitle }) => {
+const ReadingModal: React.FC<ReadingModalProps> = ({
+  isOpen,
+  onClose,
+  activeContent,
+  readingTitle,
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -104,7 +147,9 @@ interface ReadingSectionProps {
   categoryFilter: string;
   setCategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
   subcategoryFilter: string;
-  setSubcategoryFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setSubcategoryFilter: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
   isReadingSelected: (readingId: number) => boolean;
   toggleReading: (reading: Reading) => void;
   onClickReading: (readingContent: string, readingTitle: string) => void;
@@ -170,7 +215,10 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
         <div className="col">
           <label>Categoría</label>
           <Select
-            defaultValue={{ label: categoryFilter || "Todas", value: categoryFilter }}
+            defaultValue={{
+              label: categoryFilter || "Todas",
+              value: categoryFilter,
+            }}
             options={getOptionsFromArray(
               baseReadings.map((r) => r.category),
               defaultOption
@@ -183,8 +231,14 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
         <div className="col">
           <label>Subcategoría</label>
           <Select
-            defaultValue={{ label: subcategoryFilter || "Todas", value: subcategoryFilter }}
-            options={getOptionsFromArray(baseReadings.map((r) => r.subcategory).filter(Boolean), defaultOption)}
+            defaultValue={{
+              label: subcategoryFilter || "Todas",
+              value: subcategoryFilter,
+            }}
+            options={getOptionsFromArray(
+              baseReadings.map((r) => r.subcategory).filter(Boolean),
+              defaultOption
+            )}
             onChange={(option) => {
               setSubcategoryFilter(option.value);
             }}
@@ -208,7 +262,10 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
           subcategory: reading.subcategory,
           title: reading.title,
           action: (
-            <Link href="#" onClick={() => onClickReading(reading.content, reading.title)}>
+            <Link
+              href="#"
+              onClick={() => onClickReading(reading.content, reading.title)}
+            >
               Ver lectura
             </Link>
           ),
@@ -226,7 +283,9 @@ const Page: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>();
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>();
 
-  const [selectedDueDate, setSelectedDueDate] = useState<string>(dayjs().toISOString());
+  const [selectedDueDate, setSelectedDueDate] = useState<string>(
+    dayjs().toISOString()
+  );
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
 
   const [activeContent, setActiveContent] = useState<string>();
@@ -234,7 +293,7 @@ const Page: React.FC = () => {
 
   // TODO pagination
   const readingsQueryData = useQuery({
-    queryKey: ["teacher", "all-readings"],
+    queryKey: ["teacher", "readings", "all"],
     queryFn: () => fetchAllReadings(),
   });
 
@@ -259,7 +318,11 @@ const Page: React.FC = () => {
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (readings: Reading[]) => {
-      await createAssignment(Number(evaluationGroupId), readings, selectedDueDate);
+      await createAssignment(
+        Number(evaluationGroupId),
+        readings,
+        selectedDueDate
+      );
     },
     onSuccess: () => {
       toast({
@@ -305,7 +368,9 @@ const Page: React.FC = () => {
     onOpen();
   };
 
-  const baseReadings = readingsQueryData?.data ? readingsQueryData.data.Readings : [];
+  const baseReadings = readingsQueryData?.data
+    ? readingsQueryData.data.Readings
+    : [];
 
   const filteredReadings = filterReadings(
     baseReadings, // TODO pagination
@@ -325,7 +390,11 @@ const Page: React.FC = () => {
           {steps.map((step, index) => (
             <Step key={index}>
               <StepIndicator>
-                <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
+                <StepStatus
+                  complete={<StepIcon />}
+                  incomplete={<StepNumber />}
+                  active={<StepNumber />}
+                />
               </StepIndicator>
 
               <Stack flexShrink="0">
@@ -356,12 +425,16 @@ const Page: React.FC = () => {
           ></ReadingsSection>
         )}
         {steps[activeStep] === SUMMARY_STEP && (
-          <Summary selectedDueDate={selectedDueDate} selectedReadings={selectedReadings}></Summary>
+          <Summary
+            selectedDueDate={selectedDueDate}
+            selectedReadings={selectedReadings}
+          ></Summary>
         )}
         <Box>
           {createAssignmentMutation.isError && (
             <Box textColor="red">
-              Ha ocurrido un error al asignar la tarea: {(createAssignmentMutation.error as Error)?.message}
+              Ha ocurrido un error al asignar la tarea:{" "}
+              {(createAssignmentMutation.error as Error)?.message}
             </Box>
           )}
         </Box>
@@ -374,11 +447,20 @@ const Page: React.FC = () => {
           ) : (
             <Flex align="center" gap={2}>
               {activeStep > 0 && (
-                <Button onClick={undoStep} className={styles.secondary} variant="outline">
+                <Button
+                  onClick={undoStep}
+                  className={styles.secondary}
+                  variant="outline"
+                >
                   Volver
                 </Button>
               )}
-              <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+              <Button
+                onClick={changeStep}
+                isDisabled={nextCondition()}
+                className={styles.primary}
+                variant="solid"
+              >
                 {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
               </Button>
             </Flex>

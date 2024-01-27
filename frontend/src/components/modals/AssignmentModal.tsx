@@ -1,18 +1,46 @@
-import React, { ChangeEvent, useState } from "react";
-import { Box, Flex, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner } from "@chakra-ui/react";
-import { Stepper, Step, StepIndicator, StepStatus, StepIcon, StepNumber, StepTitle, useSteps } from "@chakra-ui/react";
-import { StepSeparator, Input, InputGroup, InputRightAddon, ModalCloseButton } from "@chakra-ui/react";
-import { Stack, Checkbox, Button, useToast } from "@chakra-ui/react";
-import Select, { Option } from "../selects/Select";
-import { inputRegex, tableMaxHeightModal, toastDuration } from "@/constants/constants";
-import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
-import { SearchIcon } from "@chakra-ui/icons";
-import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
-import dayjs from "dayjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
+import {
+  inputRegex,
+  tableMaxHeightModal,
+  toastDuration,
+} from "@/constants/constants";
 import { Reading } from "@/models/Reading";
 import { getOptionsFromArray } from "@/util/select";
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
+  Input,
+  InputGroup,
+  InputRightAddon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Stack,
+  Step,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
+  useSteps,
+  useToast,
+} from "@chakra-ui/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import React, { ChangeEvent, useState } from "react";
+import InputDateTimeLocal from "../inputs/InputDateTimeLocal";
+import Select, { Option } from "../selects/Select";
+import ChakraTable, { ChakraTableColumn } from "../tables/ChakraTable";
 
 interface AssignmentCreationModalProps {
   onClose: () => void;
@@ -36,7 +64,7 @@ const filterReadings = (
   readings: Reading[],
   search: string,
   category?: string,
-  subcategory?: string,
+  subcategory?: string
 ) => {
   return readings.filter((reading) => {
     return (
@@ -45,7 +73,7 @@ const filterReadings = (
       (!subcategory || reading.subcategory === subcategory)
     );
   });
-}
+};
 
 const defaultOption: Option = {
   label: "Todas",
@@ -55,20 +83,22 @@ const defaultOption: Option = {
 const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
   onClose,
   evaluationGroupId,
-  styles
+  styles,
 }) => {
   const [readingSearch, setReadingSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>();
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>();
-  
-  const [selectedDueDate, setSelectedDueDate] = useState<string>(dayjs().toISOString());
+
+  const [selectedDueDate, setSelectedDueDate] = useState<string>(
+    dayjs().toISOString()
+  );
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
 
   // TODO pagination
   const readingsQueryData = useQuery({
-    queryKey: ["teacher", "all-readings"],
+    queryKey: ["teacher", "readings", "all"],
     queryFn: () => fetchAllReadings(),
-  })
+  });
 
   const isReadingSelected = (readingId: number) => {
     return selectedReadings.some((r) => r.id === readingId);
@@ -130,7 +160,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
 
   function renderReadingsSelection(): React.ReactNode {
     if (readingsQueryData.isLoading) {
-      return 'Loading readings...';
+      return "Loading readings...";
     }
     if (readingsQueryData.isError) {
       return `Error loading readings: ${readingsQueryData.error}`;
@@ -139,78 +169,83 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
       readingsQueryData.data.Readings, // TODO pagination
       readingSearch,
       categoryFilter,
-      subcategoryFilter,
+      subcategoryFilter
     );
-    return <>
-      <div className={`${styles.desc} row`}>
-        <span tabIndex={0}>Fecha límite:</span>
-        <InputDateTimeLocal
-          value={selectedDueDate}
-          onChange={(event: ChangeEvent) => {
-            const { value } = event.target as HTMLInputElement;
-            setSelectedDueDate(dayjs(value).toISOString());
-          }}
-        ></InputDateTimeLocal>
-      </div>
-      <span>
-        <strong tabIndex={0}>Lecturas:</strong>
-      </span>
-      <div className={`${styles.filters} row`}>
-        <InputGroup className={styles.small}>
-          <Input
-            width="auto"
-            onKeyDown={(e) => {
-              if (!e.key.match(inputRegex)) {
-                e.preventDefault();
-              }
+    return (
+      <>
+        <div className={`${styles.desc} row`}>
+          <span tabIndex={0}>Fecha límite:</span>
+          <InputDateTimeLocal
+            value={selectedDueDate}
+            onChange={(event: ChangeEvent) => {
+              const { value } = event.target as HTMLInputElement;
+              setSelectedDueDate(dayjs(value).toISOString());
             }}
-            onChange={({ target: { value } }) => {
-              setReadingSearch(value.toLowerCase());
-            }}
-            maxLength={30}
-            placeholder="Lectura"
-            value={readingSearch} />
-          <InputRightAddon>
-            <SearchIcon />
-          </InputRightAddon>
-        </InputGroup>
-        <div className="col">
-          <label>Categoría</label>
-          <Select
-            defaultValue={{ label: categoryFilter || "Todas", value: categoryFilter }}
-            options={
-              getOptionsFromArray(
-                readingsQueryData.data.Readings.map(r => r.category),
-                defaultOption,
-              )
-            }
-            onChange={(option) => {
-              setCategoryFilter(option.value);
-            }}
-          ></Select>
+          ></InputDateTimeLocal>
         </div>
-        <div className="col">
-          <label>Subcategoría</label>
-          <Select
-            defaultValue={{ label: subcategoryFilter || "Todas", value: subcategoryFilter }}
-            options={
-              getOptionsFromArray(
-                readingsQueryData.data.Readings.map(r => r.subcategory).filter(Boolean),
-                defaultOption,
-              )
-            }
-            onChange={(option) => {
-              setSubcategoryFilter(option.value);
-            }}
-          ></Select>
+        <span>
+          <strong tabIndex={0}>Lecturas:</strong>
+        </span>
+        <div className={`${styles.filters} row`}>
+          <InputGroup className={styles.small}>
+            <Input
+              width="auto"
+              onKeyDown={(e) => {
+                if (!e.key.match(inputRegex)) {
+                  e.preventDefault();
+                }
+              }}
+              onChange={({ target: { value } }) => {
+                setReadingSearch(value.toLowerCase());
+              }}
+              maxLength={30}
+              placeholder="Lectura"
+              value={readingSearch}
+            />
+            <InputRightAddon>
+              <SearchIcon />
+            </InputRightAddon>
+          </InputGroup>
+          <div className="col">
+            <label>Categoría</label>
+            <Select
+              defaultValue={{
+                label: categoryFilter || "Todas",
+                value: categoryFilter,
+              }}
+              options={getOptionsFromArray(
+                readingsQueryData.data.Readings.map((r) => r.category),
+                defaultOption
+              )}
+              onChange={(option) => {
+                setCategoryFilter(option.value);
+              }}
+            ></Select>
+          </div>
+          <div className="col">
+            <label>Subcategoría</label>
+            <Select
+              defaultValue={{
+                label: subcategoryFilter || "Todas",
+                value: subcategoryFilter,
+              }}
+              options={getOptionsFromArray(
+                readingsQueryData.data.Readings.map(
+                  (r) => r.subcategory
+                ).filter(Boolean),
+                defaultOption
+              )}
+              onChange={(option) => {
+                setSubcategoryFilter(option.value);
+              }}
+            ></Select>
+          </div>
         </div>
-      </div>
-      <ChakraTable
-        variant="simple"
-        maxHeight={tableMaxHeightModal}
-        columns={readingSelectionColumns}
-        data={
-          filteredReadings.map(reading => ({
+        <ChakraTable
+          variant="simple"
+          maxHeight={tableMaxHeightModal}
+          columns={readingSelectionColumns}
+          data={filteredReadings.map((reading) => ({
             checkbox: (
               <Checkbox
                 key={reading.id}
@@ -223,27 +258,29 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
             category: reading.category,
             subcategory: reading.subcategory,
             title: reading.title,
-          }))
-        }
-      ></ChakraTable>
-    </>;
+          }))}
+        ></ChakraTable>
+      </>
+    );
   }
 
   function renderSummary(): React.ReactNode {
-    return <>
-      <div className={`${styles.desc} row`}>
-        <span tabIndex={0}>Fecha límite:</span>
-        <span tabIndex={0}>{selectedDueDate}</span>
-      </div>
-      <div className={`${styles.desc} row`}>
-        <span tabIndex={0}>Lecturas:</span>
-        <ul>
-          {selectedReadings.map((reading, index) => {
-            return <li key={index}>{reading.title}</li>;
-          })}
-        </ul>
-      </div>
-    </>;
+    return (
+      <>
+        <div className={`${styles.desc} row`}>
+          <span tabIndex={0}>Fecha límite:</span>
+          <span tabIndex={0}>{selectedDueDate}</span>
+        </div>
+        <div className={`${styles.desc} row`}>
+          <span tabIndex={0}>Lecturas:</span>
+          <ul>
+            {selectedReadings.map((reading, index) => {
+              return <li key={index}>{reading.title}</li>;
+            })}
+          </ul>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -257,7 +294,11 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
             {steps.map((step, index) => (
               <Step key={index}>
                 <StepIndicator>
-                  <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
+                  <StepStatus
+                    complete={<StepIcon />}
+                    incomplete={<StepNumber />}
+                    active={<StepNumber />}
+                  />
                 </StepIndicator>
 
                 <Stack flexShrink="0">
@@ -274,7 +315,7 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
           <Box>
             {createAssignmentMutation.isError && (
               <Box textColor="red">
-                Ha ocurrido un error al asignar la tarea:{' '}
+                Ha ocurrido un error al asignar la tarea:{" "}
                 {(createAssignmentMutation.error as Error)?.message}
               </Box>
             )}
@@ -289,11 +330,20 @@ const AssignmentCreationModal: React.FC<AssignmentCreationModalProps> = ({
           ) : (
             <Flex align="center" gap={2}>
               {activeStep > 0 && (
-                <Button onClick={undoStep} className={styles.secondary} variant="outline">
+                <Button
+                  onClick={undoStep}
+                  className={styles.secondary}
+                  variant="outline"
+                >
                   Volver
                 </Button>
               )}
-              <Button onClick={changeStep} isDisabled={nextCondition()} className={styles.primary} variant="solid">
+              <Button
+                onClick={changeStep}
+                isDisabled={nextCondition()}
+                className={styles.primary}
+                variant="solid"
+              >
                 {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
               </Button>
             </Flex>

@@ -6,11 +6,37 @@ import {
 import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
+import { Reading } from "@/models/Reading";
 import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
 import { Student } from "@/models/Student";
-import { Reading } from "@/models/Reading";
-import axiosInstance from "../axiosInstance";
 import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
+import axiosInstance from "../axiosInstance";
+
+interface CreateReadingResponse {
+  id: number;
+  title: string;
+  content: string;
+  image_url: string; // TODO @Vextil this type could potentially change when adding file support
+  category: string;
+  subcategory: string;
+  position: number;
+  is_public: boolean;
+  created_at: Date;
+  created_by: number;
+}
+
+interface CreateReadingRequest {
+  category: string;
+  content: string;
+  imageUrl?: string; // TODO @Vextil this type could potentially change when adding file support
+  subcategory?: string;
+  title: string;
+}
+
+export interface CategoriesAndSubcategoriesResponse {
+  categories: string[];
+  subcategories: string[];
+}
 
 interface StudentMonthlyAverage {
   month: string;
@@ -166,22 +192,44 @@ export const fetchAssignmentStats = (
     .then(({ data }) => parseAssignmentStatsResponse(data));
 
 export const fetchAllReadings = () =>
-  axiosInstance
-    .get<ReadingsResponse>('/readings')
-    .then(({ data }) => data);
+  axiosInstance.get<ReadingsResponse>("/readings").then(({ data }) => data);
 
-export const createAssignment = (evaluationGroupId: number, readings: Reading[], dueDate: string) => {
-  return axiosInstance.post(`/evaluationGroups/${evaluationGroupId}/assignments`, {
-    reading_ids: readings.map(reading => reading.id),
-    due_date: dueDate,
-  })
+export const createAssignment = (
+  evaluationGroupId: number,
+  readings: Reading[],
+  dueDate: string
+) => {
+  return axiosInstance.post(
+    `/evaluationGroups/${evaluationGroupId}/assignments`,
+    {
+      reading_ids: readings.map((reading) => reading.id),
+      due_date: dueDate,
+    }
+  );
 };
 
-export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
+export const fetchStudentAssignmentDetails = (
+  assignmentId: number,
+  studentId: number
+) =>
   axiosInstance
-    .get<StudentAssignmentDetailsResponse>(`/evaluationGroups/assignments/${assignmentId}/${studentId}`)
+    .get<StudentAssignmentDetailsResponse>(
+      `/evaluationGroups/assignments/${assignmentId}/${studentId}`
+    )
     .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
-      
+
+export const fetchCategoriesAndSubcategories = () =>
+  axiosInstance
+    .get<CategoriesAndSubcategoriesResponse>("/readings/categories")
+    .then(({ data }) => data);
+
+export const createReading = ({ imageUrl, ...req }: CreateReadingRequest) =>
+  axiosInstance
+    .post<CreateReadingResponse>("/readings", {
+      ...req,
+      image_url: imageUrl,
+    })
+    .then(({ data }) => data);
 
 // Parse methods
 
