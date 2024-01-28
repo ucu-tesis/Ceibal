@@ -1,19 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { IsOptional, IsString } from 'class-validator';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
-import { FileUploadService } from 'src/services/file-upload.service';
 
 class CreateReadingDTO {
   @IsString()
@@ -32,10 +22,7 @@ class CreateReadingDTO {
 
 @Controller('readings')
 export class ReadingsController {
-  constructor(
-    private prismaService: PrismaService,
-    private fileUploadService: FileUploadService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   @Get('/')
   @UseGuards(TeacherGuard)
@@ -63,47 +50,37 @@ export class ReadingsController {
   @Get('/categories')
   @UseGuards(TeacherGuard)
   async getAllCategories(@UserData('id') userId: number) {
-    const categories: Array<{ category: string }> = await this.prismaService
-      .$queryRaw`
+    const categories : Array<{ category: string }> = await this.prismaService.$queryRaw`
       Select DISTINCT category from "Reading"
       where is_public = true or created_by = ${userId}
     `;
-    const subcategories: Array<{ subcategory: string }> = await this
-      .prismaService.$queryRaw`
+    const subcategories: Array<{ subcategory: string }> = await this.prismaService.$queryRaw`
       Select DISTINCT subcategory from "Reading"
       where is_public = true or created_by = ${userId}
     `;
     return {
-      categories: categories.map((c) => c.category),
-      subcategories: subcategories
-        .map((sc) => sc.subcategory)
-        .filter((sc) => sc !== null),
+      categories: categories.map(c => c.category),
+      subcategories: subcategories.map(sc => sc.subcategory).filter(sc => sc !== null),
     };
   }
 
   @Post('/')
   @UseGuards(TeacherGuard)
-  @UseInterceptors(FileInterceptor('file'))
   async createReading(
     @UserData('id') userId: number,
     @Body() createDTO: CreateReadingDTO,
-    @UploadedFile() file: File,
   ) {
-    const s3File = await this.fileUploadService.uploadFileToPublicS3(file);
-
     const reading = await this.prismaService.reading.create({
       data: {
         title: createDTO.title,
         content: createDTO.content,
         category: createDTO.category,
         subcategory: createDTO.subcategory,
-        image_url: s3File.url,
+        image_url: createDTO.image_url,
         created_by: userId,
         is_public: false,
       },
     });
-
-    console.log(reading);
     return reading;
   }
 }

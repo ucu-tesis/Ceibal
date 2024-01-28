@@ -66,7 +66,6 @@ interface SearchBoxProps {
   onChange?: (value: Option) => void;
   options: Option[];
   value?: Option;
-  disabled?: boolean;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
@@ -75,7 +74,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   options,
   onChange = () => {},
   value,
-  disabled = false,
 }) => {
   const divRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
@@ -106,8 +104,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   useEffect(() => {
     setFilteredOptions(
       options.filter(({ label }) =>
-        label.toLowerCase()?.includes(searchValue.toLowerCase()),
-      ),
+        label.toLowerCase()?.includes(searchValue.toLowerCase())
+      )
     );
   }, [searchValue, options]);
 
@@ -118,9 +116,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       onKeyDown={enterClick}
       ref={divRef}
       onClick={(event) => {
-        if (disabled) {
-          return;
-        }
         if (!openOptions) {
           setOpen(true);
         } else if (event.target === divRef?.current) {
@@ -139,7 +134,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
               onChange={(event) => {
                 setSearchValue(event.target.value);
               }}
-              disabled={disabled}
             />
             <SearchIcon />
           </span>

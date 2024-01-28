@@ -11,12 +11,16 @@ import {
   MulterOptionsFactory,
 } from '@nestjs/platform-express';
 import { diskStorage, File } from 'multer';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class FileUploadService implements MulterOptionsFactory {
   private readonly s3: S3Client;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private prismaService: PrismaService,
+  ) {
     this.s3 = new S3Client({
       region: configService.get('AWS_REGION'),
       credentials: {
@@ -39,29 +43,8 @@ export class FileUploadService implements MulterOptionsFactory {
     };
   }
 
-  async uploadFileToPrivateS3(file: File): Promise<{
-    key: string;
-    url: string;
-  }> {
+  async uploadFileToS3(file: File): Promise<string> {
     const bucket = this.configService.get('AWS_BUCKET');
-    return this.uploadFileToS3(bucket, file);
-  }
-
-  async uploadFileToPublicS3(file: File): Promise<{
-    key: string;
-    url: string;
-  }> {
-    const bucket = this.configService.get('AWS_PUBLIC_BUCKET');
-    return this.uploadFileToS3(bucket, file);
-  }
-
-  private async uploadFileToS3(
-    bucket: string,
-    file: File,
-  ): Promise<{
-    key: string;
-    url: string;
-  }> {
     const s3ObjectKey = `${Date.now()}-${file.originalname}`;
     try {
       const params = {
@@ -72,14 +55,10 @@ export class FileUploadService implements MulterOptionsFactory {
       };
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      // return the URL
-      return {
-        key: s3ObjectKey,
-        url: `https://${bucket}.s3.amazonaws.com/${s3ObjectKey}`,
-      };
+      return s3ObjectKey;
     } catch (error) {
       console.log(error);
-      throw new BadRequestException('Error uploading file to public S3');
+      throw new BadRequestException('Error uploading file to S3');
     }
   }
 

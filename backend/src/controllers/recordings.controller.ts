@@ -34,11 +34,11 @@ export class RecordingsController {
     @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
     @UploadedFile() file: File,
   ): Promise<{ recordingId: number; analysisId: number }> {
-    const s3File = await this.fileUploadService.uploadFileToPrivateS3(file);
+    const s3ObjectKey = await this.fileUploadService.uploadFileToS3(file);
 
     const recording = await this.prismaService.recording.create({
       data: {
-        recording_url: s3File.key,
+        recording_url: s3ObjectKey,
         student_id: userId,
         // TODO check student is part of evaluation group
         evaluation_group_reading_id: Number(evaluationGroupReadingId),

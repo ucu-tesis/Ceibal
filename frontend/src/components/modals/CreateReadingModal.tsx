@@ -13,7 +13,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
   Switch,
   Textarea,
   useToast,
@@ -47,19 +46,19 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [file, setFile] = useState<File | undefined>(undefined);
+  const [file, setFile] = useState<any>();
   const [category, setCategory] = useState<Option>();
   const [subcategory, setSubCategory] = useState<Option>();
   const { categories, subcategories } = data ?? emptyCategoriesAndSubcategories;
 
   const categoryOptions = useMemo<Option[]>(
     () => categories.map((c) => ({ label: c, value: c })),
-    [categories],
+    [categories]
   );
 
   const subcategoryOptions = useMemo<Option[]>(
     () => subcategories.map((sc) => ({ label: sc, value: sc })),
-    [subcategories],
+    [subcategories]
   );
 
   const onSuccess = useCallback(() => {
@@ -90,7 +89,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
 
   const onFileChange = (event: ChangeEvent) => {
     const element = event.target as HTMLInputElement;
-    setFile(element.files?.[0]);
+    setFile(element.files);
   };
 
   const isAnyRequiredFieldEmpty =
@@ -104,12 +103,11 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
           subcategory: subcategory.value!,
           content,
           title,
-          file,
-        },
+        }, // TODO @Vextil integrate imageUrl
         {
           onSuccess,
           onError,
-        },
+        }
       );
     } else {
       toast({
@@ -140,7 +138,6 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
                 maxLength={100}
                 placeholder="Lectura"
                 value={title}
-                disabled={isLoadingCreateReading}
               />
             </InputGroup>
           </div>
@@ -154,7 +151,6 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               }}
               maxLength={1000}
               value={content}
-              disabled={isLoadingCreateReading}
             ></Textarea>
           </div>
           <div className={`${styles["form-value"]} col`}>
@@ -165,7 +161,6 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               onChange={setCategory}
               options={categoryOptions}
               value={category}
-              disabled={isLoadingCreateReading}
             ></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
@@ -176,7 +171,6 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               onChange={setSubCategory}
               options={subcategoryOptions}
               value={subcategory}
-              disabled={isLoadingCreateReading}
             ></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
@@ -188,24 +182,20 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
             <InputFile
               id="portada"
               accept="image/png, image/gif, image/jpeg"
+              value={file}
               onChange={onFileChange}
-              disabled={isLoadingCreateReading}
             ></InputFile>
           </div>
         </ModalBody>
         <ModalFooter>
-          {isLoadingCreateReading ? (
-            <Spinner />
-          ) : (
-            <Button
-              onClick={createReading}
-              isDisabled={isAnyRequiredFieldEmpty}
-              className={styles.primary}
-              variant="solid"
-            >
-              Crear
-            </Button>
-          )}
+          <Button
+            onClick={createReading}
+            isDisabled={isAnyRequiredFieldEmpty}
+            className={styles.primary}
+            variant="solid"
+          >
+            Crear
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
