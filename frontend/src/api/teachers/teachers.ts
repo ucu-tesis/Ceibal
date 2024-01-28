@@ -107,6 +107,8 @@ interface AssignmentStatsResponse {
     general_errors: number;
   };
   most_repeated_words: RepeatedWords[];
+  group_id: number;
+  group_name: string;
 }
 
 interface ReadingsResponse {
@@ -151,37 +153,46 @@ export const fetchGroups = (teacherCI: number) =>
 export const fetchStudentStats = (groupId: number, studentId: number) =>
   axiosInstance
     .get<StudentStatsResponse>(
-      `/evaluationGroups/${groupId}/students/${studentId}`
+      `/evaluationGroups/${groupId}/students/${studentId}`,
     )
     .then(({ data }) => parseStudentStatsResponse(data));
 
 export const fetchAssignmentStats = (
   evaluationGroupId: number,
-  evaluationGroupReadingId: number
+  evaluationGroupReadingId: number,
 ) =>
   axiosInstance
     .get<AssignmentStatsResponse>(
-      `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
+      `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`,
     )
     .then(({ data }) => parseAssignmentStatsResponse(data));
 
 export const fetchAllReadings = () =>
-  axiosInstance
-    .get<ReadingsResponse>('/readings')
-    .then(({ data }) => data);
+  axiosInstance.get<ReadingsResponse>("/readings").then(({ data }) => data);
 
-export const createAssignment = (evaluationGroupId: number, readings: Reading[], dueDate: string) => {
-  return axiosInstance.post(`/evaluationGroups/${evaluationGroupId}/assignments`, {
-    reading_ids: readings.map(reading => reading.id),
-    due_date: dueDate,
-  })
+export const createAssignment = (
+  evaluationGroupId: number,
+  readings: Reading[],
+  dueDate: string,
+) => {
+  return axiosInstance.post(
+    `/evaluationGroups/${evaluationGroupId}/assignments`,
+    {
+      reading_ids: readings.map((reading) => reading.id),
+      due_date: dueDate,
+    },
+  );
 };
 
-export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
+export const fetchStudentAssignmentDetails = (
+  assignmentId: number,
+  studentId: number,
+) =>
   axiosInstance
-    .get<StudentAssignmentDetailsResponse>(`/evaluationGroups/assignments/${assignmentId}/${studentId}`)
+    .get<StudentAssignmentDetailsResponse>(
+      `/evaluationGroups/assignments/${assignmentId}/${studentId}`,
+    )
     .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
-      
 
 // Parse methods
 
@@ -198,7 +209,7 @@ const parseGroupResponse = (group: GroupResponse): Group => ({
 });
 
 const parseGroupDetailsResponse = (
-  res: GroupDetailsResponse
+  res: GroupDetailsResponse,
 ): GroupDetails => ({
   createdBy: res.created_by,
   id: res.id,
@@ -211,7 +222,7 @@ const parseGroupDetailsResponse = (
 });
 
 const parseAssignmentResponse = (
-  assignment: AssignmentResponse
+  assignment: AssignmentResponse,
 ): Assignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
@@ -233,7 +244,7 @@ const parseStudentResponse = (student: StudentResponse): Student => ({
 });
 
 const parseStudentAssignment = (
-  assignment: StudentStatsAssignment
+  assignment: StudentStatsAssignment,
 ): StudentAssignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.id,
@@ -246,7 +257,7 @@ const parseStudentAssignment = (
 });
 
 const parseMonthlyAverage = (
-  monthlyAverage: StudentMonthlyAverage
+  monthlyAverage: StudentMonthlyAverage,
 ): MonthlyAverage => ({
   groupAverageScore: monthlyAverage.group_avg_score,
   month: new Date(monthlyAverage.month).getMonth(),
@@ -254,7 +265,7 @@ const parseMonthlyAverage = (
 });
 
 const parseStudentStatsResponse = (
-  stats: StudentStatsResponse
+  stats: StudentStatsResponse,
 ): StudentStats => ({
   assignments: stats.Assignments.map(parseStudentAssignment),
   assignmentsDone: stats.assignments_done,
@@ -269,7 +280,7 @@ const parseStudentStatsResponse = (
 });
 
 const parseAssignmentStatsResponse = (
-  stats: AssignmentStatsResponse
+  stats: AssignmentStatsResponse,
 ): AssignmentStats => {
   const {
     assignment: { due_date, created_at, reading, id },
@@ -305,13 +316,15 @@ const parseAssignmentStatsResponse = (
       ({ repetition_count, word }) => ({
         repetitionCount: repetition_count,
         word,
-      })
+      }),
     ),
+    groupId: stats.group_id,
+    groupName: stats.group_name,
   };
 };
 
 const parseStudentAssignmentDetailsResponse = (
-  recording: StudentAssignmentDetailsResponse
+  recording: StudentAssignmentDetailsResponse,
 ): StudentAssignmentDetails => ({
   analysisId: recording.analysis_id,
   studentId: recording.student_id,

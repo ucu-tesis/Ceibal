@@ -63,14 +63,13 @@ const defaultOption: Option = {
 
 export default function Page({ params }: { params: Params }) {
   const router = useRouter();
-  const group = router.query.groupName;
 
   const evaluationGroupReadingId = router.query.tarea;
   const groupId = router.query.grupo;
 
   const { data, isLoading, isError } = useFetchAssignmentStats(
+    Number(groupId),
     Number(evaluationGroupReadingId),
-    Number(groupId)
   );
 
   const {
@@ -134,13 +133,13 @@ export default function Page({ params }: { params: Params }) {
 
   const [readingSearchQuery, setReadingSearchQuery] = useState("");
   const [statusOption, setStatusOption] = useState<string | undefined>(
-    undefined
+    undefined,
   );
 
   const { filteredReadings } = useFilteredEvaluations(
     recordings,
     readingSearchQuery,
-    statusOption
+    statusOption,
   );
 
   const statusList: AnalysisStatus[] = [
@@ -166,28 +165,32 @@ export default function Page({ params }: { params: Params }) {
   ];
 
   const toTableListEvaluation = (readings: AssignmentReading[]) =>
-    readings.map((reading) => ({
-      ...reading,
-      status: statusLabels[reading.status as keyof Object],
-      dateSubmitted: dayjs(reading.dateSubmitted).format(
-        dateFormats.assignmentDueDate
-      ),
-      link: (
-        <Link
-          href={{
-            pathname: "/maestro/grupos/[grupo]/resultado/[evaluacion]",
-            query: {
-              grupo: group,
-              groupName: group,
-              alumno: reading.studentName,
-              evaluacion: 1,
-            },
-          }}
-        >
-          Ver detalles
-        </Link>
-      ),
-    }));
+    readings.map(
+      (reading) =>
+        ({
+          name: reading.studentName,
+          document: reading.cedula,
+          email: reading.email,
+          status: statusLabels[reading.status as keyof Object],
+          dateSubmitted: dayjs(reading.dateSubmitted).format(
+            dateFormats.assignmentDueDate,
+          ),
+          link: (
+            <Link
+              href={{
+                pathname: "/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]",
+                query: {
+                  grupo: groupId,
+                  tarea: evaluationGroupReadingId,
+                  alumno: reading.studentId,
+                },
+              }}
+            >
+              Ver detalles
+            </Link>
+          ),
+        }) as any,
+    );
 
   if (isLoading) {
     return <LoadingPage />;
@@ -204,19 +207,26 @@ export default function Page({ params }: { params: Params }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href={"/maestro/grupos/" + data.groupId}>
+              {data.groupName}
+            </BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">{group}</BreadcrumbLink>
-          </BreadcrumbItem>
-
-          <BreadcrumbItem>
-            <BreadcrumbLink href="#">{assignment?.readingTitle}</BreadcrumbLink>
+            <BreadcrumbLink
+              href={
+                "/maestro/grupos/" +
+                data.groupId +
+                "/tarea/" +
+                assignment?.evaluationGroupReadingId
+              }
+            >
+              Tarea: {assignment?.readingTitle}
+            </BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>Resultado de evaluación</h1>
@@ -244,14 +254,14 @@ export default function Page({ params }: { params: Params }) {
             <h5 tabIndex={0}>
               {assignment?.createdDate
                 ? `Fecha de Creación: ${dayjs(assignment?.createdDate).format(
-                    dateFormats.assignmentDueDate
+                    dateFormats.assignmentDueDate,
                   )}`
                 : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
               {assignment?.dueDate
                 ? `Fecha de Cierre: ${dayjs(assignment?.dueDate).format(
-                    dateFormats.assignmentDueDate
+                    dateFormats.assignmentDueDate,
                   )}`
                 : notFoundMessage}
             </h5>
