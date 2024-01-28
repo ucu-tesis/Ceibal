@@ -1,20 +1,45 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import styles from "./Input.module.css";
 
 interface InputFileProps {
   id: string;
-  value?: any;
   accept?: string;
   onChange?: (event: ChangeEvent) => void;
+  disabled?: boolean;
 }
 
-const InputFile: React.FC<InputFileProps> = ({ value, id, onChange, accept }) => {
+const InputFile: React.FC<InputFileProps> = ({
+  id,
+  onChange,
+  accept,
+  disabled = false,
+}) => {
+  const [fileName, setFileName] = useState<string | undefined>(undefined);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFileName(selectedFile.name);
+    }
+    if (onChange) {
+      onChange(event);
+    }
+  };
+
   return (
     <div className={styles["file-input"]}>
-      <input onChange={onChange} id={id} type="file" accept={accept} />
+      <input
+        onChange={handleFileChange}
+        id={id}
+        type="file"
+        accept={accept}
+        disabled={disabled}
+      />
       <div className="row">
         <button>Subir</button>
-        <span>{value?.[0] ? value?.[0]?.name : "No se ha seleccionado ningún archivo"}</span>
+        <span>
+          {fileName ? fileName : "No se ha seleccionado ningún archivo"}
+        </span>
       </div>
     </div>
   );
