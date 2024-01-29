@@ -411,7 +411,7 @@ export class EvaluationGroupsController {
   ) {
     const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
       where: {
-        id: Number(evaluationGroupId),
+        id: parseInt(evaluationGroupId),
         teacher_id: userId,
       },
     });
@@ -422,8 +422,8 @@ export class EvaluationGroupsController {
     const evaluationGroupReading =
       await this.prismaService.evaluationGroupReading.findFirst({
         where: {
-          id: Number(evaluationGroupReadingId),
-          evaluation_group_id: Number(evaluationGroupId),
+          id: parseInt(evaluationGroupReadingId),
+          evaluation_group_id: parseInt(evaluationGroupId),
         },
         include: {
           Reading: true,
@@ -476,6 +476,10 @@ export class EvaluationGroupsController {
         Student: true,
         Analysis: true,
       },
+      orderBy: {
+        created_at: 'desc',
+      },
+      distinct: ['student_id'],
     });
 
     const averageErrors = await this.prismaService.analysis.aggregate({
@@ -539,7 +543,8 @@ export class EvaluationGroupsController {
           : null;
         return {
           studentName: `${Student.first_name} ${Student.last_name}`,
-          studentId: Student.cedula,
+          studentId: Student.id,
+          cedula: Student.cedula,
           email: Student.email,
           status: lastRecording.status,
           dateSubmitted: created_at,
@@ -551,6 +556,8 @@ export class EvaluationGroupsController {
         general_errors: similarity_error,
       },
       most_repeated_words: mostRepeatedWords,
+      group_id: evaluationGroup.id,
+      group_name: evaluationGroup.name,
     };
   }
 

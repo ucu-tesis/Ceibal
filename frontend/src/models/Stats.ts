@@ -40,6 +40,8 @@ export interface AssignmentStats {
   recordings: AssignmentReading[];
   averageErrors: AverageErrors;
   mostRepeatedWords: RepeatedWords[];
+  groupId: number;
+  groupName: string;
 }
 
 export interface MonthItem {

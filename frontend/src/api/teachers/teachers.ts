@@ -139,6 +139,8 @@ interface AssignmentStatsResponse {
     general_errors: number;
   };
   most_repeated_words: RepeatedWords[];
+  group_id: number;
+  group_name: string;
 }
 
 type MonthItem = {
@@ -371,7 +373,7 @@ const parseStudentStatsResponse = (
 
 const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
   const valueKey = Object.keys(monthAverages[0]).find(
-    (key) => key !== "month"
+    (key) => key !== "month",
   ) as keyof MonthItem;
   return monthAverages
     .filter(({ month }) => !!month)
@@ -430,6 +432,8 @@ const parseAssignmentStatsResponse = (
         word,
       }),
     ),
+    groupId: stats.group_id,
+    groupName: stats.group_name,
   };
 };
 
