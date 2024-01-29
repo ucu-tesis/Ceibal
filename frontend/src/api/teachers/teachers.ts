@@ -1,16 +1,14 @@
-import {
-  Assignment,
-  AssignmentStatus,
-  StudentAssignment,
-} from "@/models/Assignment";
+import { Assignment, AssignmentStatus, StudentAssignment } from "@/models/Assignment";
 import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
-import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
+import { AssignmentStats, GroupStats, MonthlyAverage, StudentStats, MonthItem as StatsMonthItem } from "@/models/Stats";
 import { Student } from "@/models/Student";
 import { Reading } from "@/models/Reading";
 import axiosInstance from "../axiosInstance";
 import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
+import dayjs from "dayjs";
+import { dateFormats } from "@/util/dates";
 
 interface StudentMonthlyAverage {
   month: string;
@@ -109,6 +107,36 @@ interface AssignmentStatsResponse {
   most_repeated_words: RepeatedWords[];
 }
 
+type MonthItem = {
+  month: string;
+};
+
+interface MonthlyScoreAverage extends MonthItem {
+  average_score: number;
+}
+
+interface MonthlyAssignmentsDone extends MonthItem {
+  assignments_done: number;
+}
+
+interface MonthlyAssignmentsPending extends MonthItem {
+  assignments_pending: number;
+}
+
+interface MonthlyAssignmentsDelayed extends MonthItem {
+  assignments_delayed: number;
+}
+
+interface GroupStatsResponse {
+  assignments_done: number;
+  assignments_pending: number;
+  assignments_delayed: number;
+  monthly_score_averages: MonthlyScoreAverage[];
+  monthly_assignments_done: MonthlyAssignmentsDone[];
+  monthly_assignments_pending: MonthlyAssignmentsPending[];
+  monthly_assignments_delayed: MonthlyAssignmentsDelayed[];
+}
+
 interface ReadingsResponse {
   Readings: Reading[];
   page: number;
@@ -150,43 +178,36 @@ export const fetchGroups = (teacherCI: number) =>
 
 export const fetchStudentStats = (groupId: number, studentId: number) =>
   axiosInstance
-    .get<StudentStatsResponse>(
-      `/evaluationGroups/${groupId}/students/${studentId}`
-    )
+    .get<StudentStatsResponse>(`/evaluationGroups/${groupId}/students/${studentId}`)
     .then(({ data }) => parseStudentStatsResponse(data));
 
-export const fetchAssignmentStats = (
-  evaluationGroupId: number,
-  evaluationGroupReadingId: number
-) =>
+export const fetchGroupStats = (groupId: number) =>
   axiosInstance
-    .get<AssignmentStatsResponse>(
-      `evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`
-    )
+    .get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`)
+    .then(({ data }) => parseGroupStatsResponse(data));
+
+export const fetchAssignmentStats = (evaluationGroupId: number, evaluationGroupReadingId: number) =>
+  axiosInstance
+    .get<AssignmentStatsResponse>(`evaluationGroups/${evaluationGroupId}/assignments/${evaluationGroupReadingId}`)
     .then(({ data }) => parseAssignmentStatsResponse(data));
 
-export const fetchAllReadings = () =>
-  axiosInstance
-    .get<ReadingsResponse>('/readings')
-    .then(({ data }) => data);
+export const fetchAllReadings = () => axiosInstance.get<ReadingsResponse>("/readings").then(({ data }) => data);
 
 export const createAssignment = (evaluationGroupId: number, readings: Reading[], dueDate: string) => {
   return axiosInstance.post(`/evaluationGroups/${evaluationGroupId}/assignments`, {
-    reading_ids: readings.map(reading => reading.id),
+    reading_ids: readings.map((reading) => reading.id),
     due_date: dueDate,
-  })
+  });
 };
 
 export const fetchStudentAssignmentDetails = (assignmentId: number, studentId: number) =>
   axiosInstance
     .get<StudentAssignmentDetailsResponse>(`/evaluationGroups/assignments/${assignmentId}/${studentId}`)
     .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
-      
 
 // Parse methods
 
-const parseGroupsResponse = (res: GroupsResponse): Group[] =>
-  res.data.map(parseGroupResponse);
+const parseGroupsResponse = (res: GroupsResponse): Group[] => res.data.map(parseGroupResponse);
 
 const parseGroupResponse = (group: GroupResponse): Group => ({
   createdBy: group.created_by,
@@ -197,9 +218,7 @@ const parseGroupResponse = (group: GroupResponse): Group => ({
   name: group.name,
 });
 
-const parseGroupDetailsResponse = (
-  res: GroupDetailsResponse
-): GroupDetails => ({
+const parseGroupDetailsResponse = (res: GroupDetailsResponse): GroupDetails => ({
   createdBy: res.created_by,
   id: res.id,
   name: res.name,
@@ -210,9 +229,7 @@ const parseGroupDetailsResponse = (
   students: res.Students?.map(parseStudentResponse) ?? [],
 });
 
-const parseAssignmentResponse = (
-  assignment: AssignmentResponse
-): Assignment => ({
+const parseAssignmentResponse = (assignment: AssignmentResponse): Assignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
   readingCategory: assignment.reading_category,
@@ -232,9 +249,7 @@ const parseStudentResponse = (student: StudentResponse): Student => ({
   id: student.id,
 });
 
-const parseStudentAssignment = (
-  assignment: StudentStatsAssignment
-): StudentAssignment => ({
+const parseStudentAssignment = (assignment: StudentStatsAssignment): StudentAssignment => ({
   dueDate: new Date(assignment.due_date),
   evaluationGroupReadingId: assignment.id,
   readingCategory: assignment.reading_category,
@@ -245,17 +260,13 @@ const parseStudentAssignment = (
   status: assignment.status,
 });
 
-const parseMonthlyAverage = (
-  monthlyAverage: StudentMonthlyAverage
-): MonthlyAverage => ({
+const parseMonthlyAverage = (monthlyAverage: StudentMonthlyAverage): MonthlyAverage => ({
   groupAverageScore: monthlyAverage.group_avg_score,
   month: new Date(monthlyAverage.month).getMonth(),
   studentAverageScore: monthlyAverage.student_avg_score,
 });
 
-const parseStudentStatsResponse = (
-  stats: StudentStatsResponse
-): StudentStats => ({
+const parseStudentStatsResponse = (stats: StudentStatsResponse): StudentStats => ({
   assignments: stats.Assignments.map(parseStudentAssignment),
   assignmentsDone: stats.assignments_done,
   assignmentsPending: stats.assignments_pending,
@@ -268,9 +279,27 @@ const parseStudentStatsResponse = (
   groupId: stats.group_id,
 });
 
-const parseAssignmentStatsResponse = (
-  stats: AssignmentStatsResponse
-): AssignmentStats => {
+const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
+  const valueKey = Object.keys(monthAverages[0]).find((key) => key !== "month") as keyof MonthItem;
+  return monthAverages
+    .filter(({ month }) => !!month)
+    .map((monthItem) => ({
+      month: new Date(monthItem.month).getMonth(),
+      value: Number(monthItem[valueKey]),
+    }));
+};
+
+const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({
+  assignmentsDone: stats.assignments_done,
+  assignmentsDelayed: stats.assignments_delayed,
+  assignmentsPending: stats.assignments_pending,
+  monthlyScoreAverages: parseMonthData(stats.monthly_score_averages),
+  monthlyAssignmentsDone: parseMonthData(stats.monthly_assignments_done),
+  monthlyAssignmentsDelayed: parseMonthData(stats.monthly_assignments_delayed),
+  monthlyAssignmentsPending: parseMonthData(stats.monthly_assignments_pending),
+});
+
+const parseAssignmentStatsResponse = (stats: AssignmentStatsResponse): AssignmentStats => {
   const {
     assignment: { due_date, created_at, reading, id },
     assignments_done,
@@ -301,12 +330,10 @@ const parseAssignmentStatsResponse = (
       silencesCount: silences_count,
     },
     averageScore: average_score,
-    mostRepeatedWords: most_repeated_words.map(
-      ({ repetition_count, word }) => ({
-        repetitionCount: repetition_count,
-        word,
-      })
-    ),
+    mostRepeatedWords: most_repeated_words.map(({ repetition_count, word }) => ({
+      repetitionCount: repetition_count,
+      word,
+    })),
   };
 };
 
