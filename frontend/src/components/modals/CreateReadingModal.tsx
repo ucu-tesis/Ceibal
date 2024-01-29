@@ -1,20 +1,27 @@
-import React, { ChangeEvent, useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalOverlay,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-} from "@chakra-ui/react";
-import { Input, InputGroup, Button, Switch, useToast } from "@chakra-ui/react";
-import Select, { Option } from "../selects/Select";
-import { isNullOrEmpty } from "@/util/util";
+import useCreateReading from "@/api/teachers/hooks/useCreateReading";
+import useFetchCategoriesAndSubcategories from "@/api/teachers/hooks/useFetchCategoriesAndSubcategories";
+import { CategoriesAndSubcategoriesResponse } from "@/api/teachers/teachers";
 import { toastDuration } from "@/constants/constants";
-import SearchBox from "../selects/SearchBox";
+import {
+  Button,
+  Input,
+  InputGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Switch,
+  Textarea,
+  useToast,
+} from "@chakra-ui/react";
+import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
 import InputFile from "../inputs/InputFile";
+import SearchBox from "../selects/SearchBox";
+import { Option } from "../selects/Select";
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -22,42 +29,96 @@ interface CreateReadingModalProps {
   styles: any;
 }
 
-const categoryOptions: Option[] = [
-  { value: "intermedio", label: "Intermedio" },
-  { value: "basico", label: "Básico" },
-  { value: "avanzado", label: "Avanzado" },
-];
+const emptyCategoriesAndSubcategories: CategoriesAndSubcategoriesResponse = {
+  categories: [],
+  subcategories: [],
+};
 
-const subCategoryOptions: Option[] = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
-];
-
-const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose, styles }) => {
+const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
+  isOpen,
+  onClose,
+  styles,
+}) => {
   const toast = useToast();
 
-  const [name, setName] = useState<string>();
-  const [text, setText] = useState<string>();
-  const [file, setFile] = useState<any>();
+  const { data, isLoading: isLoadingCategoriesAndSubcategories } =
+    useFetchCategoriesAndSubcategories();
+  const { mutate, isLoading: isLoadingCreateReading } = useCreateReading();
 
-  const onFileChange = (event: ChangeEvent) => {
-    const element = event.target as HTMLInputElement;
-    setFile(element.files);
-  };
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [category, setCategory] = useState<Option>();
+  const [subcategory, setSubCategory] = useState<Option>();
+  const { categories, subcategories } = data ?? emptyCategoriesAndSubcategories;
 
-  const createCondition = () => {
-    return isNullOrEmpty(name) || isNullOrEmpty(text);
-  };
+  const categoryOptions = useMemo<Option[]>(
+    () => categories.map((c) => ({ label: c, value: c })),
+    [categories],
+  );
 
-  const createReading = () => {
+  const subcategoryOptions = useMemo<Option[]>(
+    () => subcategories.map((sc) => ({ label: sc, value: sc })),
+    [subcategories],
+  );
+
+  const onSuccess = useCallback(() => {
+    setTitle("");
+    setContent("");
+    setFile(undefined);
+    setCategory(undefined);
+    setSubCategory(undefined);
+
     onClose();
+
     toast({
       title: "Lectura creada",
       status: "success",
       duration: toastDuration,
       isClosable: true,
     });
+  }, [onClose, toast]);
+
+  const onError = useCallback(() => {
+    toast({
+      title: "La lectura no se pudo crear, intentalo de nuevo",
+      status: "error",
+      duration: toastDuration,
+      isClosable: true,
+    });
+  }, [toast]);
+
+  const onFileChange = (event: ChangeEvent) => {
+    const element = event.target as HTMLInputElement;
+    setFile(element.files?.[0]);
+  };
+
+  const isAnyRequiredFieldEmpty =
+    !category?.value || !content || !file || !title || !subcategory?.value;
+
+  const createReading = () => {
+    if (!isAnyRequiredFieldEmpty) {
+      mutate(
+        {
+          category: category.value!,
+          subcategory: subcategory.value!,
+          content,
+          title,
+          file,
+        },
+        {
+          onSuccess,
+          onError,
+        },
+      );
+    } else {
+      toast({
+        title: "Hay campos vacíos",
+        status: "info",
+        duration: toastDuration,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -74,10 +135,12 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
                 id="lectura"
                 width="auto"
                 onChange={({ target: { value } }) => {
-                  setName(value);
+                  setTitle(value);
                 }}
                 maxLength={100}
                 placeholder="Lectura"
+                value={title}
+                disabled={isLoadingCreateReading}
               />
             </InputGroup>
           </div>
@@ -87,18 +150,34 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
               placeholder="Ingrese texto..."
               id="texto"
               onChange={({ target: { value } }) => {
-                setText(value);
+                setContent(value);
               }}
               maxLength={1000}
+              value={content}
+              disabled={isLoadingCreateReading}
             ></Textarea>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Categoría</label>
-            <SearchBox defaultValue={categoryOptions[0]} options={categoryOptions}></SearchBox>
+            <SearchBox
+              placeholder="Selecciona una categoría"
+              isLoading={isLoadingCategoriesAndSubcategories}
+              onChange={setCategory}
+              options={categoryOptions}
+              value={category}
+              disabled={isLoadingCreateReading}
+            ></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label>Subcategoría</label>
-            <SearchBox defaultValue={subCategoryOptions[0]} options={subCategoryOptions}></SearchBox>
+            <SearchBox
+              placeholder="Selecciona una subcategoría"
+              isLoading={isLoadingCategoriesAndSubcategories}
+              onChange={setSubCategory}
+              options={subcategoryOptions}
+              value={subcategory}
+              disabled={isLoadingCreateReading}
+            ></SearchBox>
           </div>
           <div className={`${styles["form-value"]} col`}>
             <label htmlFor="repo">Repositorio Público</label>
@@ -109,15 +188,24 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({ isOpen, onClose
             <InputFile
               id="portada"
               accept="image/png, image/gif, image/jpeg"
-              value={file}
               onChange={onFileChange}
+              disabled={isLoadingCreateReading}
             ></InputFile>
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={createReading} isDisabled={createCondition()} className={styles.primary} variant="solid">
-            Crear
-          </Button>
+          {isLoadingCreateReading ? (
+            <Spinner />
+          ) : (
+            <Button
+              onClick={createReading}
+              isDisabled={isAnyRequiredFieldEmpty}
+              className={styles.primary}
+              variant="solid"
+            >
+              Crear
+            </Button>
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>

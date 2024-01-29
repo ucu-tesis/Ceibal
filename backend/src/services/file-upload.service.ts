@@ -11,16 +11,12 @@ import {
   MulterOptionsFactory,
 } from '@nestjs/platform-express';
 import { diskStorage, File } from 'multer';
-import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class FileUploadService implements MulterOptionsFactory {
   private readonly s3: S3Client;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private prismaService: PrismaService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.s3 = new S3Client({
       region: configService.get('AWS_REGION'),
       credentials: {
@@ -43,8 +39,29 @@ export class FileUploadService implements MulterOptionsFactory {
     };
   }
 
-  async uploadFileToS3(file: File): Promise<string> {
+  async uploadFileToPrivateS3(file: File): Promise<{
+    key: string;
+    url: string;
+  }> {
     const bucket = this.configService.get('AWS_BUCKET');
+    return this.uploadFileToS3(bucket, file);
+  }
+
+  async uploadFileToPublicS3(file: File): Promise<{
+    key: string;
+    url: string;
+  }> {
+    const bucket = this.configService.get('AWS_PUBLIC_BUCKET');
+    return this.uploadFileToS3(bucket, file);
+  }
+
+  private async uploadFileToS3(
+    bucket: string,
+    file: File,
+  ): Promise<{
+    key: string;
+    url: string;
+  }> {
     const s3ObjectKey = `${Date.now()}-${file.originalname}`;
     try {
       const params = {
@@ -55,10 +72,14 @@ export class FileUploadService implements MulterOptionsFactory {
       };
       const command = new PutObjectCommand(params);
       await this.s3.send(command);
-      return s3ObjectKey;
+      // return the URL
+      return {
+        key: s3ObjectKey,
+        url: `https://${bucket}.s3.amazonaws.com/${s3ObjectKey}`,
+      };
     } catch (error) {
       console.log(error);
-      throw new BadRequestException('Error uploading file to S3');
+      throw new BadRequestException('Error uploading file to public S3');
     }
   }
 
@@ -71,6 +92,15 @@ export class FileUploadService implements MulterOptionsFactory {
       Bucket: bucket,
       Key: s3ObjectKey,
     };
+
+    // If the key is an URL, that means it's already a signed URL
+    // or it's not an S3 upload, skip signing and return the URL.
+    if (
+      s3ObjectKey.startsWith('http://') ||
+      s3ObjectKey.startsWith('https://')
+    ) {
+      return s3ObjectKey;
+    }
 
     try {
       const command = new GetObjectCommand(getObjectParams);

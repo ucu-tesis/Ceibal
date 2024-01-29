@@ -21,7 +21,9 @@
   z-index: 2;
 }
 
-.options > div, .options > input, .options > span {
+.options > div,
+.options > input,
+.options > span {
   font-size: 14px;
   padding: 12px 16px;
   min-width: max-content;
@@ -58,4 +60,8 @@
 
 .options > div:hover {
   background-color: var(--ceibal-light-grey-secondary);
+}
+
+.spinner-container {
+  padding: 4px;
 }

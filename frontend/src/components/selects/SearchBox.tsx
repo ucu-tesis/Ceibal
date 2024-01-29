@@ -1,13 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
 import { ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
+import React, { useEffect, useRef, useState } from "react";
+import Spinner from "../spinners/Spinner";
 import styles from "./Select.module.css";
-
-interface SelectProps {
-  id?: string;
-  onChange?: (value: Option) => void;
-  options: Option[];
-  defaultValue: Option;
-}
 
 export type Option = {
   value?: string;
@@ -21,12 +15,72 @@ const enterClick = (event: any) => {
   }
 };
 
-const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
+interface FilteredOptionsProps {
+  filteredOptions: Option[];
+  isLoading: boolean;
+  onChange: (option: Option) => void;
+  setOpen: (open: boolean) => void;
+}
+
+const FilteredOptions: React.FC<FilteredOptionsProps> = ({
+  filteredOptions,
+  isLoading,
+  onChange,
+  setOpen,
+}) => {
+  if (isLoading) {
+    return (
+      <div className={`${styles["spinner-container"]}`}>
+        <Spinner size="small" />
+      </div>
+    );
+  }
+
+  if (filteredOptions.length === 0) {
+    return <span>No hay resultados</span>;
+  }
+
+  return (
+    <>
+      {filteredOptions.map((element, index) => (
+        <div
+          tabIndex={0}
+          key={`${element.label}-${index}`}
+          onKeyDown={enterClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange(element);
+            setOpen(false);
+          }}
+        >
+          {element.label}
+        </div>
+      ))}
+    </>
+  );
+};
+
+interface SearchBoxProps {
+  placeholder: string;
+  isLoading?: boolean;
+  onChange?: (value: Option) => void;
+  options: Option[];
+  value?: Option;
+  disabled?: boolean;
+}
+
+const SearchBox: React.FC<SearchBoxProps> = ({
+  placeholder,
+  isLoading = false,
+  options,
+  onChange = () => {},
+  value,
+  disabled = false,
+}) => {
   const divRef = useRef(null);
-  const [selectValue, setValue] = useState(defaultValue);
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue, setSearchValue] = useState("");
   const [openOptions, setOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] = useState<Option[]>(options);
+  const [filteredOptions, setFilteredOptions] = useState(options);
 
   useEffect(() => {
     const clickOutSearchBox = (e: Event) => {
@@ -50,7 +104,11 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
   }, [openOptions]);
 
   useEffect(() => {
-    setFilteredOptions(options.filter(({ label }) => label.toLowerCase()?.includes(searchValue.toLowerCase())));
+    setFilteredOptions(
+      options.filter(({ label }) =>
+        label.toLowerCase()?.includes(searchValue.toLowerCase()),
+      ),
+    );
   }, [searchValue, options]);
 
   return (
@@ -60,6 +118,9 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
       onKeyDown={enterClick}
       ref={divRef}
       onClick={(event) => {
+        if (disabled) {
+          return;
+        }
         if (!openOptions) {
           setOpen(true);
         } else if (event.target === divRef?.current) {
@@ -67,7 +128,7 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
         }
       }}
     >
-      {selectValue.label}
+      {value?.label ?? placeholder}
       <ChevronDownIcon />
       {openOptions && (
         <div className={`${styles.options} col`}>
@@ -78,30 +139,16 @@ const SearchBox: React.FC<SelectProps> = ({ options, defaultValue, onChange = (v
               onChange={(event) => {
                 setSearchValue(event.target.value);
               }}
+              disabled={disabled}
             />
             <SearchIcon />
           </span>
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((element, index) => {
-              return (
-                <div
-                  tabIndex={0}
-                  key={index}
-                  onKeyDown={enterClick}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setValue(element);
-                    onChange(element);
-                    setOpen(false);
-                  }}
-                >
-                  {element.label}
-                </div>
-              );
-            })
-          ) : (
-            <span>No hay resultados</span>
-          )}
+          <FilteredOptions
+            filteredOptions={filteredOptions}
+            isLoading={isLoading}
+            onChange={onChange}
+            setOpen={setOpen}
+          />
         </div>
       )}
     </div>

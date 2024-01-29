@@ -1,7 +1,7 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
+import useFetchGroupStats from "@/api/teachers/hooks/useFetchGroupStats";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import AssignmentCreationModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
 import ChakraTable, {
@@ -13,7 +13,7 @@ import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment } from "@/models/Assignment";
 import { Student } from "@/models/Student";
-import { dateFormats } from "@/util/dates";
+import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
 import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Breadcrumb,
@@ -94,7 +94,7 @@ const toTableList = (students: Student[], evaluationGroupId: number) =>
 
 const toAssignmentTableList = (
   assignments: Assignment[],
-  evaluationGroupId: number,
+  evaluationGroupId: number
 ) =>
   assignments.map(
     ({
@@ -124,52 +124,15 @@ const toAssignmentTableList = (
     })
   );
 
-const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
-
-const dataLine = {
-  labels: months,
-  datasets: [
-    {
-      id: 1,
-      label: "Grupos",
-      data: [5, 6, 7, 4, 3, 5],
-      backgroundColor: "#B1A5FF",
-      borderColor: "#B1A5FF",
-    },
-    {
-      id: 2,
-      label: "Promedio",
-      data: [3, 2, 1, 4, 7, 3],
-      backgroundColor: "#FBE38E",
-      borderColor: "#FBE38E",
-    },
-  ],
-};
-
-const dataBar = {
-  labels: months,
-  datasets: [
-    {
-      label: "Tareas",
-      data: [65, 59, 80, 81, 56, 55, 40],
-      backgroundColor: "#FED0EEB2",
-      borderColor: "#FED0EEB2",
-      borderWidth: 1,
-    },
-    {
-      label: "Promedio",
-      data: [35, 49, 50, 61, 26, 45, 30],
-      backgroundColor: "#D0E8FFB2",
-      borderColor: "#D0E8FFB2",
-      borderWidth: 1,
-    },
-  ],
-};
-
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useFetchGroupStats(evaluationGroupId);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -182,6 +145,16 @@ export default function Page({ params }: { params: { grupo: number } }) {
     students: [],
     assignments: [],
   };
+  const {
+    assignmentsDone,
+    assignmentsPending,
+    assignmentsDelayed,
+    monthlyAssignmentsPending,
+    monthlyAssignmentsDelayed,
+    monthlyAssignmentsDone,
+    monthlyScoreAverages,
+  } = statsData ?? { assignmentsDone: 0 };
+
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
 
   const [startDate, setStartDate] = useState(new Date());
@@ -195,6 +168,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   useChartJSInitializer();
 
+  const router = useRouter();
+
   const { filteredAssignments } = useFilteredAssignments(
     assignments,
     assignmentSearchQuery,
@@ -205,12 +180,55 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
     useAssignmentFilterOptions(assignments);
 
-  const assignmentModalDisclosure = useDisclosure();
   const {
     isOpen: isOpenReadingModal,
     onClose: onCloseReadingModal,
     onOpen: onOpenReadingModal,
   } = useDisclosure();
+
+  const months = monthlyScoreAverages?.map(
+    ({ month }) => SPANISH_MONTH_NAMES[month]
+  );
+
+  const dataLine = {
+    labels: months,
+    datasets: [
+      {
+        id: 2,
+        label: "Promedio",
+        data: monthlyScoreAverages?.map(({ value }) => value),
+        backgroundColor: "#FBE38E",
+        borderColor: "#FBE38E",
+      },
+    ],
+  };
+
+  const dataBar = {
+    labels: months,
+    datasets: [
+      {
+        label: "Tareas hechas",
+        data: monthlyAssignmentsDone?.map(({ value }) => value),
+        backgroundColor: "#c8fac3",
+        borderColor: "#c8fac3",
+        borderWidth: 1,
+      },
+      {
+        label: "Tareas pendientes",
+        data: monthlyAssignmentsPending?.map(({ value }) => value),
+        backgroundColor: "#D0E8FFB2",
+        borderColor: "#D0E8FFB2",
+        borderWidth: 1,
+      },
+      {
+        label: "Tareas atrasadas",
+        data: monthlyAssignmentsDelayed?.map(({ value }) => value),
+        backgroundColor: "#FED0EEB2",
+        borderColor: "#FED0EEB2",
+        borderWidth: 1,
+      },
+    ],
+  };
 
   if (isLoading) {
     return <LoadingPage />;
@@ -231,14 +249,18 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-          <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>{groupName}</BreadcrumbLink>
+            <BreadcrumbLink href={"/maestro/grupos/" + evaluationGroupId}>
+              {groupName}
+            </BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={assignmentModalDisclosure.onOpen}
+              onClick={() =>
+                router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)
+              }
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
@@ -331,7 +353,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, evaluationGroupId)}
+                data={toAssignmentTableList(
+                  filteredAssignments,
+                  evaluationGroupId
+                )}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -340,18 +365,18 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <div className={`row ${styles["mob-col"]}`}>
                     <div className="row">
                       <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                      <span>Enviadas: 25</span>
+                      <span>Enviadas: {assignmentsDone}</span>
                     </div>
                     <div className="row">
                       <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                      <span>Pendientes: 25</span>
+                      <span>Pendientes: {assignmentsPending}</span>
                     </div>
                     <div className="row">
                       <Image
                         alt="lecturas atrasadas"
                         src={IncompleteTasksIcon}
                       />
-                      <span>Atrasadas: 25</span>
+                      <span>Atrasadas: {assignmentsDelayed}</span>
                     </div>
                   </div>
                 </div>
@@ -374,13 +399,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      {assignmentModalDisclosure.isOpen && (
-        <AssignmentCreationModal
-          onClose={assignmentModalDisclosure.onClose}
-          evaluationGroupId={evaluationGroupId}
-          styles={styles}
-        />
-      )}      
       <CreateReadingModal
         isOpen={isOpenReadingModal}
         onClose={onCloseReadingModal}

@@ -43,3 +43,18 @@ export interface AssignmentStats {
   groupId: number;
   groupName: string;
 }
+
+export interface MonthItem {
+  month: number;
+  value: number;
+}
+
+export interface GroupStats {
+  assignmentsDone: number;
+  assignmentsPending: number;
+  assignmentsDelayed: number;
+  monthlyScoreAverages: MonthItem[];
+  monthlyAssignmentsDone: MonthItem[];
+  monthlyAssignmentsPending: MonthItem[];
+  monthlyAssignmentsDelayed: MonthItem[];
+}

@@ -6,11 +6,43 @@ import {
 import { AssignmentReading } from "@/models/AssignmentReading";
 import { Group } from "@/models/Group";
 import { GroupDetails } from "@/models/GroupDetails";
-import { AssignmentStats, MonthlyAverage, StudentStats } from "@/models/Stats";
-import { Student } from "@/models/Student";
 import { Reading } from "@/models/Reading";
-import axiosInstance from "../axiosInstance";
+import {
+  AssignmentStats,
+  GroupStats,
+  MonthlyAverage,
+  MonthItem as StatsMonthItem,
+  StudentStats,
+} from "@/models/Stats";
+import { Student } from "@/models/Student";
 import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
+import axiosInstance from "../axiosInstance";
+
+interface CreateReadingResponse {
+  id: number;
+  title: string;
+  content: string;
+  image_url: string; // TODO @Vextil this type could potentially change when adding file support
+  category: string;
+  subcategory: string;
+  position: number;
+  is_public: boolean;
+  created_at: Date;
+  created_by: number;
+}
+
+interface CreateReadingRequest {
+  category: string;
+  content: string;
+  file: File;
+  subcategory: string;
+  title: string;
+}
+
+export interface CategoriesAndSubcategoriesResponse {
+  categories: string[];
+  subcategories: string[];
+}
 
 interface StudentMonthlyAverage {
   month: string;
@@ -111,6 +143,36 @@ interface AssignmentStatsResponse {
   group_name: string;
 }
 
+type MonthItem = {
+  month: string;
+};
+
+interface MonthlyScoreAverage extends MonthItem {
+  average_score: number;
+}
+
+interface MonthlyAssignmentsDone extends MonthItem {
+  assignments_done: number;
+}
+
+interface MonthlyAssignmentsPending extends MonthItem {
+  assignments_pending: number;
+}
+
+interface MonthlyAssignmentsDelayed extends MonthItem {
+  assignments_delayed: number;
+}
+
+interface GroupStatsResponse {
+  assignments_done: number;
+  assignments_pending: number;
+  assignments_delayed: number;
+  monthly_score_averages: MonthlyScoreAverage[];
+  monthly_assignments_done: MonthlyAssignmentsDone[];
+  monthly_assignments_pending: MonthlyAssignmentsPending[];
+  monthly_assignments_delayed: MonthlyAssignmentsDelayed[];
+}
+
 interface ReadingsResponse {
   Readings: Reading[];
   page: number;
@@ -157,6 +219,11 @@ export const fetchStudentStats = (groupId: number, studentId: number) =>
     )
     .then(({ data }) => parseStudentStatsResponse(data));
 
+export const fetchGroupStats = (groupId: number) =>
+  axiosInstance
+    .get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`)
+    .then(({ data }) => parseGroupStatsResponse(data));
+
 export const fetchAssignmentStats = (
   evaluationGroupId: number,
   evaluationGroupReadingId: number,
@@ -193,6 +260,31 @@ export const fetchStudentAssignmentDetails = (
       `/evaluationGroups/assignments/${assignmentId}/${studentId}`,
     )
     .then(({ data }) => parseStudentAssignmentDetailsResponse(data));
+
+export const fetchCategoriesAndSubcategories = () =>
+  axiosInstance
+    .get<CategoriesAndSubcategoriesResponse>("/readings/categories")
+    .then(({ data }) => data);
+
+export const createReading = async (request: CreateReadingRequest) => {
+  const formData = new FormData();
+  formData.append("category", request.category);
+  formData.append("subcategory", request.subcategory);
+  formData.append("content", request.content);
+  formData.append("title", request.title);
+  formData.append("file", request.file);
+
+  const { data } = await axiosInstance.post<CreateReadingResponse>(
+    "/readings",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+  return data;
+};
 
 // Parse methods
 
@@ -277,6 +369,28 @@ const parseStudentStatsResponse = (
   studentId: stats.student_id,
   groupName: stats.group_name,
   groupId: stats.group_id,
+});
+
+const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
+  const valueKey = Object.keys(monthAverages[0]).find(
+    (key) => key !== "month",
+  ) as keyof MonthItem;
+  return monthAverages
+    .filter(({ month }) => !!month)
+    .map((monthItem) => ({
+      month: new Date(monthItem.month).getMonth(),
+      value: Number(monthItem[valueKey]),
+    }));
+};
+
+const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({
+  assignmentsDone: stats.assignments_done,
+  assignmentsDelayed: stats.assignments_delayed,
+  assignmentsPending: stats.assignments_pending,
+  monthlyScoreAverages: parseMonthData(stats.monthly_score_averages),
+  monthlyAssignmentsDone: parseMonthData(stats.monthly_assignments_done),
+  monthlyAssignmentsDelayed: parseMonthData(stats.monthly_assignments_delayed),
+  monthlyAssignmentsPending: parseMonthData(stats.monthly_assignments_pending),
 });
 
 const parseAssignmentStatsResponse = (
