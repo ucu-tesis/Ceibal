@@ -1,10 +1,11 @@
 import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
 import ErrorPage from "@/components/errorPage/ErrorPage";
 import LoadingPage from "@/components/loadingPage/LoadingPage";
-import AssignmentCreationModal from "@/components/modals/AssignmentModal";
 import CreateReadingModal from "@/components/modals/CreateReadingModal";
 import Select from "@/components/selects/Select";
-import ChakraTable, { ChakraTableColumn } from "@/components/tables/ChakraTable";
+import ChakraTable, {
+  ChakraTableColumn,
+} from "@/components/tables/ChakraTable";
 import { inputRegex } from "@/constants/constants";
 import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
@@ -92,7 +93,7 @@ const toTableList = (students: Student[], evaluationGroupId: number) =>
 
 const toAssignmentTableList = (
   assignments: Assignment[],
-  evaluationGroupId: number,
+  evaluationGroupId: number
 ) =>
   assignments.map(
     ({
@@ -202,10 +203,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
     subcategoryOption
   );
 
-  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } = useAssignmentFilterOptions(assignments);
+  const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
+    useAssignmentFilterOptions(assignments);
 
-  const assignmentModalDisclosure = useDisclosure();
-  const { isOpen: isOpenReadingModal, onClose: onCloseReadingModal, onOpen: onOpenReadingModal } = useDisclosure();
+  const {
+    isOpen: isOpenReadingModal,
+    onClose: onCloseReadingModal,
+    onOpen: onOpenReadingModal,
+  } = useDisclosure();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -226,21 +231,30 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-          <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>{groupName}</BreadcrumbLink>
+            <BreadcrumbLink href={"/maestro/grupos/" + evaluationGroupId}>
+              {groupName}
+            </BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles["mob-col"]} row`}>
             <Button
-              onClick={() => router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)}
+              onClick={() =>
+                router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)
+              }
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
             >
               Asignar Tarea
             </Button>
-            <Button onClick={onOpenReadingModal} leftIcon={<AddIcon />} className={styles.secondary} variant="outline">
+            <Button
+              onClick={onOpenReadingModal}
+              leftIcon={<AddIcon />}
+              className={styles.secondary}
+              variant="outline"
+            >
               Crear Lectura
             </Button>
           </div>
@@ -321,7 +335,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
               </div>
               <ChakraTable
                 columns={assignmentColumns}
-                data={toAssignmentTableList(filteredAssignments, evaluationGroupId)}
+                data={toAssignmentTableList(
+                  filteredAssignments,
+                  evaluationGroupId
+                )}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
@@ -337,7 +354,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                       <span>Pendientes: 25</span>
                     </div>
                     <div className="row">
-                      <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+                      <Image
+                        alt="lecturas atrasadas"
+                        src={IncompleteTasksIcon}
+                      />
                       <span>Atrasadas: 25</span>
                     </div>
                   </div>
@@ -361,14 +381,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
           </TabPanels>
         </Tabs>
       </div>
-      {assignmentModalDisclosure.isOpen && (
-        <AssignmentCreationModal
-          onClose={assignmentModalDisclosure.onClose}
-          evaluationGroupId={evaluationGroupId}
-          styles={styles}
-        />
-      )}
-      <CreateReadingModal isOpen={isOpenReadingModal} onClose={onCloseReadingModal} styles={styles} />
+      <CreateReadingModal
+        isOpen={isOpenReadingModal}
+        onClose={onCloseReadingModal}
+        styles={styles}
+      />
     </ChakraProvider>
   );
 }
