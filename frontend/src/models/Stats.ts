@@ -41,3 +41,18 @@ export interface AssignmentStats {
   averageErrors: AverageErrors;
   mostRepeatedWords: RepeatedWords[];
 }
+
+export interface MonthItem {
+  month: number;
+  value: number;
+}
+
+export interface GroupStats {
+  assignmentsDone: number;
+  assignmentsPending: number;
+  assignmentsDelayed: number;
+  monthlyScoreAverages: MonthItem[];
+  monthlyAssignmentsDone: MonthItem[];
+  monthlyAssignmentsPending: MonthItem[];
+  monthlyAssignmentsDelayed: MonthItem[];
+}
