@@ -219,10 +219,7 @@ export default function Page({ params }: { params: Params }) {
           <BreadcrumbItem>
             <BreadcrumbLink
               href={
-                "/maestro/grupos/" +
-                data.groupId +
-                "/tarea/" +
-                assignment?.evaluationGroupReadingId
+                `/maestro/grupos/${data.groupId}/tarea/${assignment?.evaluationGroupReadingId}`
               }
             >
               Tarea: {assignment?.readingTitle}
