@@ -54,3 +54,19 @@
   border-bottom: 1px solid var(--ceibal-black);
   margin-bottom: 0px;
 }
+
+.empty-message td {
+  background-color: white;
+  text-align: center !important;
+}
+
+.empty-message td > div {
+  padding: 32px;
+  align-items: center;
+  gap: 16px;
+}
+
+.empty-message td span {
+  font-weight: 600;
+  font-size: 16px;
+}
