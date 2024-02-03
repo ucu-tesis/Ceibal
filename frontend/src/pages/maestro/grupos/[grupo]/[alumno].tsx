@@ -6,7 +6,7 @@ import Select from "@/components/selects/Select";
 import ChakraTable, {
   ChakraTableColumn,
 } from "@/components/tables/ChakraTable";
-import { inputRegex } from "@/constants/constants";
+import { errorMetrics, inputRegex } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
 import { Assignment, StudentAssignment } from "@/models/Assignment";
@@ -28,7 +28,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { Line } from "react-chartjs-2";
+import { Line, Radar } from "react-chartjs-2";
 import DatePicker from "react-datepicker";
 import IncompleteTasksIcon from "../../../../assets/images/lecturas_atrasadas.svg";
 import SentTasksIcon from "../../../../assets/images/lecturas_enviadas.svg";
@@ -46,31 +46,6 @@ const taskColumns: ChakraTableColumn[] = [
   { label: "Lectura" },
   { label: "Fecha de entrega" },
 ];
-
-// const metrics = [
-//   "Repeticiones",
-//   "Pausar",
-//   "Faltas",
-//   "Velocidad",
-//   "Pronunciación",
-// ];
-
-// const dataRadar = {
-//   labels: metrics,
-//   datasets: [
-//     {
-//       label: "Puntuación",
-//       data: [65, 59, 90, 81, 56, 55, 40],
-//       fill: true,
-//       backgroundColor: "rgba(255, 99, 132, 0.2)",
-//       borderColor: "rgb(255, 99, 132)",
-//       pointBackgroundColor: "rgb(255, 99, 132)",
-//       pointBorderColor: "#fff",
-//       pointHoverBackgroundColor: "#fff",
-//       pointHoverBorderColor: "rgb(255, 99, 132)",
-//     },
-//   ],
-// };
 
 const defaultOption: Option = {
   label: "Todas",
@@ -123,7 +98,7 @@ export default function Page() {
 
   const { grupo, alumno } = router.query;
 
-  const { data, isLoading, isError } = useFetchStudentStats(
+  const { data, isLoading, isError, error } = useFetchStudentStats(
     Number(grupo),
     Number(alumno)
   );
@@ -165,7 +140,10 @@ export default function Page() {
 
   if (isError) {
     return (
+      <>
       <ErrorPage intendedAction={`cargar estadísticas de alumno`} />
+      <span>{JSON.stringify(error)}</span>
+      </>
     );
   }
 
@@ -175,6 +153,7 @@ export default function Page() {
     assignmentsUncompleted,
     averageScore,
     monthlyAverages,
+    averageErrors
   } = data;
 
   const labels = monthlyAverages.map(
@@ -200,6 +179,27 @@ export default function Page() {
   const monthlyAveragesChartData = {
     labels,
     datasets,
+  };
+
+  const dataRadar = {
+    labels: errorMetrics,
+    datasets: [
+      {
+        label: "Errores",
+        data: [
+          averageErrors?.repetitionsCount,
+          averageErrors?.silencesCount,
+          averageErrors?.generalErrors,
+        ],
+        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgb(255, 99, 132)",
+        pointBackgroundColor: "rgb(255, 99, 132)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
+      },
+    ],
   };
 
   return (
@@ -258,7 +258,7 @@ export default function Page() {
           {monthlyAverages.length > 0 && (
             <Line data={monthlyAveragesChartData} width={400}></Line>
           )}
-          {/* <Radar data={dataRadar}></Radar> */}
+          <Radar data={dataRadar}></Radar>
         </div>
         <h2 tabIndex={0}>Tareas</h2>
         <div className={`${styles.filters} row`}>

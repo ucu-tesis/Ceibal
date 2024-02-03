@@ -68,6 +68,11 @@ interface StudentStatsResponse {
   assignments_done: number;
   assignments_pending: number;
   monthly_averages: StudentMonthlyAverage[];
+  average_errors: {
+    repetitions_count: number;
+    silences_count: number;
+    general_errors: number;
+  };
   student_name: string;
   student_id: number;
   group_name: string;
@@ -365,6 +370,11 @@ const parseStudentStatsResponse = (
   assignmentsUncompleted: stats.assignments_delayed,
   averageScore: stats.average_score,
   monthlyAverages: stats.monthly_averages.map(parseMonthlyAverage),
+  averageErrors: {
+    generalErrors: stats.average_errors.general_errors,
+    repetitionsCount: stats.average_errors.repetitions_count,
+    silencesCount: stats.average_errors.silences_count,
+  },
   studentName: stats.student_name,
   studentId: stats.student_id,
   groupName: stats.group_name,

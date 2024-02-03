@@ -411,7 +411,7 @@ export class EvaluationGroupsController {
         };
       }),
       monthly_averages: monthlyAverages,
-      average_erros: {
+      average_errors: {
         silences_count,
         repetitions_count,
         general_errors: similarity_error,

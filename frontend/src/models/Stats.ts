@@ -14,6 +14,7 @@ export interface StudentStats {
   averageScore: number;
   assignments: StudentAssignment[];
   monthlyAverages: MonthlyAverage[];
+  averageErrors: AverageErrors;
   studentName: string;
   studentId: number;
   groupName: string;
