@@ -6,7 +6,7 @@ import Select from "@/components/selects/Select";
 import ChakraTable, {
   ChakraTableColumn,
 } from "@/components/tables/ChakraTable";
-import { inputRegex, notFoundMessage } from "@/constants/constants";
+import { errorMetrics, inputRegex, notFoundMessage } from "@/constants/constants";
 import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
 import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
 import { AssignmentReading } from "@/models/AssignmentReading";
@@ -54,8 +54,6 @@ const readingColumns: ChakraTableColumn[] = [
   { label: "Fecha de Entrega" },
 ];
 
-const metrics = ["Repeticiones", "Pausas", "Faltas"];
-
 const defaultOption: Option = {
   label: "Todos",
   value: undefined,
@@ -93,7 +91,7 @@ export default function Page({ params }: { params: Params }) {
   };
 
   const dataRadar = {
-    labels: metrics,
+    labels: errorMetrics,
     datasets: [
       {
         label: "Errores",

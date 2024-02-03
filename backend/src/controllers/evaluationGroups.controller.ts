@@ -353,6 +353,22 @@ export class EvaluationGroupsController {
       },
     });
 
+    const averageErrors = await this.prismaService.analysis.aggregate({
+      _avg: {
+        silences_count: true,
+        repetitions_count: true,
+        similarity_error: true,
+      },
+      where: {
+        Recording: {
+          student_id: student.id,
+        },
+      },
+    });
+
+    const { similarity_error, repetitions_count, silences_count } =
+      averageErrors._avg;
+
     // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
     const monthlyAverages = await this.prismaService.$queryRaw`
       SELECT
@@ -395,6 +411,11 @@ export class EvaluationGroupsController {
         };
       }),
       monthly_averages: monthlyAverages,
+      average_errors: {
+        silences_count,
+        repetitions_count,
+        general_errors: similarity_error,
+      },
       student_name: `${student.first_name} ${student.last_name}`,
       student_id: student.id,
       group_name: evaluationGroup.name,
