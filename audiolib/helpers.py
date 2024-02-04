@@ -42,7 +42,7 @@ def save_data(file, text):
             shutil.copyfileobj(file, audioFile)
 
         # Save text to directory.
-        with open(os.path.join(newDir, f'{dateString}.txt'), 'w') as textFile:
+        with open(os.path.join(newDir, f'{dateString}.txt'), 'w', encoding='UTF-8') as textFile:
             textFile.write(text)
 
     else:

@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 from allosaurus.app import read_recognizer
 
 import epitran
-import panphon
 from panphon import distance
 
 import os
@@ -59,7 +58,7 @@ def process_text_grid(folder, filename, audio, sr):
     """
     allosaurus_model = read_recognizer()
     epi = epitran.Epitran('spa-Latn')
-    dst_measure = panphon.distance.Distance()
+    dst_measure = distance.Distance()
 
     #Lectura de archivo textgrid
     tg = textgrid.openTextgrid(os.path.join(folder, filename+'.TextGrid'), False)
@@ -183,11 +182,7 @@ def get_similarity_aligned(input_folder, filename, output_folder, audio_samples,
     #Alineación
     #print("Realizando alineación...")
     #Quiet does not seem to be working with clean at the same time
-    std_out = subprocess.run(
-        ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean"],
-        # ["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean", "--silent"],
-        capture_output=True
-    )
+    std_out = subprocess.run(["mfa", "align", input_folder, MFA_DICT, MFA_ACOUSTIC_MODEL, output_folder, "--clean", "--silent"],capture_output=True)
 
     #arrays de salida
     allo_aligned_dst = [0]

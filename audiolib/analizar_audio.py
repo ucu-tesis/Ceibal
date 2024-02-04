@@ -59,7 +59,7 @@ def generate_lab_file(folder, filename, text):
         filename (string): Indica nombre de archivo
         text (string): Indica texto a almacenar
     """
-    with open(os.path.join(folder, filename + '.lab'), 'w') as f:
+    with open(os.path.join(folder, filename + '.lab'), 'w', encoding='UTF-8') as f:
         f.write(text)
 
 def set_up_mfa_folder(input_dir, mfa_folder, filename, audio_ext):

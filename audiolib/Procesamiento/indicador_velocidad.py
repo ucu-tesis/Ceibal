@@ -92,7 +92,7 @@ def speed_indicator(folder, audio_samples, sr, wSize, offset):
     hop_samp = int(sr*offset)
     
     # frames a procesar
-    num_frames = int((L-win_samp)/hop_samp)
+    num_frames = max(0, int((L - win_samp) / hop_samp))
 
     # TODO si num_frames <= 0 tirar error distinto (esperado) en el backend
     
