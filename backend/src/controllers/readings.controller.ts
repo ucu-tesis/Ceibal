@@ -14,6 +14,7 @@ import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
 import { PrismaService } from 'src/prisma.service';
 import { FileUploadService } from 'src/services/file-upload.service';
+import { File } from 'multer';
 
 class CreateReadingDTO {
   @IsString()
