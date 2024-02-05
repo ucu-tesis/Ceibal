@@ -1,18 +1,18 @@
-import Recorder from "@/components/Recorder";
-import PrimaryButton from "@/components/buttons/PrimaryButton";
-import SecondaryButton from "@/components/buttons/SecondaryButton";
-import TextContainer from "@/components/containers/TextContainer";
-import ModalDialog from "@/components/modals/ModalDialog";
-import Spinner from "@/components/spinners/Spinner";
-import useFileUpload from "@/hooks/students/useFileUpload";
-import { ReadingDetails } from "@/models/ReadingDetails";
-import { Text } from "@chakra-ui/react";
-import Head from "next/head";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
-import SendIcon from "../../assets/images/send_icon.svg";
-import styles from "./RecordScreen.module.css";
+import Recorder from '@/components/Recorder';
+import PrimaryButton from '@/components/buttons/PrimaryButton';
+import SecondaryButton from '@/components/buttons/SecondaryButton';
+import TextContainer from '@/components/containers/TextContainer';
+import ModalDialog from '@/components/modals/ModalDialog';
+import Spinner from '@/components/spinners/Spinner';
+import useFileUpload from '@/hooks/students/useFileUpload';
+import { ReadingDetails } from '@/models/ReadingDetails';
+import { Text } from '@chakra-ui/react';
+import Head from 'next/head';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useRef, useState } from 'react';
+import SendIcon from '../../assets/images/send_icon.svg';
+import styles from './RecordScreen.module.css';
 
 export interface RecordScreenProps {
   readingDetails: ReadingDetails;
@@ -24,7 +24,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [bufferSource, setBufferSource] =
     useState<AudioBufferSourceNode | null>(null);
-  const [mimeType, setMimetype] = useState<string>("");
+  const [mimeType, setMimetype] = useState<string>('');
   const [newRecord, setNewRecord] = useState(false);
 
   const [errorModal, setErrorModal] = useState(false);
@@ -47,7 +47,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   };
 
   const { mutate, isLoading, error } = useFileUpload(
-    readingDetails.evaluationGroupReadingId
+    readingDetails.evaluationGroupReadingId,
   );
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {
@@ -57,25 +57,25 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
     });
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     try {
       mutate(formData, { onSuccess, onError });
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error('Error uploading file:', error);
       setErrorModal(true);
     }
   }
 
   function getFileExtension(mimeType: string) {
     const mimeToExtensionMap: { [key: string]: string } = {
-      "audio/mpeg": "mp3",
-      "audio/mp4": "m4a",
-      "audio/ogg": "ogg",
-      "audio/webm": "webm",
-      "audio/wav": "wav",
+      'audio/mpeg': 'mp3',
+      'audio/mp4': 'm4a',
+      'audio/ogg': 'ogg',
+      'audio/webm': 'webm',
+      'audio/wav': 'wav',
     };
-    return mimeToExtensionMap[mimeType] || "unknown";
+    return mimeToExtensionMap[mimeType] || 'unknown';
   }
 
   const onSend = () => {
@@ -85,16 +85,16 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
         setSendActive(false);
         setNewRecord(true);
         if (recorder) {
-          recorder.style.animation = "appear 0.6s ease-in-out";
+          recorder.style.animation = 'appear 0.6s ease-in-out';
         }
       });
       const recorder = divRef.current;
       if (recorder) {
-        recorder.style.animation = "vanish 0.6s ease-in-out";
+        recorder.style.animation = 'vanish 0.6s ease-in-out';
       }
       if (ref.current) {
         const sendButton = ref.current as HTMLElement;
-        sendButton.style.animation = "vanish 0.6s ease-in-out";
+        sendButton.style.animation = 'vanish 0.6s ease-in-out';
       }
     }
   };
@@ -113,18 +113,18 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   const closeModalAndPushReadingsListScreen = () => {
     const modal = modalRef.current;
     if (modal) {
-      modal.style.transform = "scale(0.5)";
+      modal.style.transform = 'scale(0.5)';
     }
     setTimeout(() => {
       setOpenModal(false);
-      router.push("/alumno/lecturas");
+      router.push('/alumno/lecturas');
     }, 300);
   };
 
   const closeErrorModal = () => {
     const modal = errorModalRef.current;
     if (modal) {
-      modal.style.transform = "scale(0.5)";
+      modal.style.transform = 'scale(0.5)';
     }
     setTimeout(() => {
       setErrorModal(false);
@@ -151,7 +151,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
                 </Text>
                 <SecondaryButton
                   onClick={closeModalAndPushReadingsListScreen}
-                  variant={"blueFill" as keyof Object}
+                  variant={'blueFill' as keyof Object}
                 >
                   Continuar
                 </SecondaryButton>
@@ -166,13 +166,13 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
               </span>
               <SecondaryButton
                 onClick={closeErrorModal}
-                variant={"redFill" as keyof Object}
+                variant={'redFill' as keyof Object}
               >
                 Cerrar
               </SecondaryButton>
             </ModalDialog>
           )}
-          <div className={`${styles["reading-info-container"]}`}>
+          <div className={`${styles['reading-info-container']}`}>
             {readingDetails.title && (
               <h1 className={styles.title}>{readingDetails.title}</h1>
             )}
@@ -202,7 +202,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
                 <PrimaryButton
                   buttonRef={ref}
                   onClick={onSend}
-                  variant={"large" as keyof Object}
+                  variant={'large' as keyof Object}
                 >
                   <div>
                     <Image src={SendIcon} alt=""></Image>

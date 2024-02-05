@@ -1,5 +1,5 @@
-import { useUser } from "../UserContext";
+import { useUser } from '../UserContext';
 
-export const useIsStudent = () => useUser()?.type === "student";
+export const useIsStudent = () => useUser()?.type === 'student';
 
-export const useIsTeacher = () => useUser()?.type === "teacher";
+export const useIsTeacher = () => useUser()?.type === 'teacher';

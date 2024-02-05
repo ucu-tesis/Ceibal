@@ -1,27 +1,27 @@
-import { fetchPendingReadings, fetchReadings } from "@/api/students/students";
-import PrimaryAccordion from "@/components/accordions/PrimaryAccordion";
-import SecondaryAccordion from "@/components/accordions/SecondaryAccordion";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ReadingTable from "@/components/tables/ReadingTable";
-import { Category } from "@/models/Category";
-import { useQuery } from "@tanstack/react-query";
-import Head from "next/head";
-import React from "react";
-import styles from "./lecturas.module.css";
+import { fetchPendingReadings, fetchReadings } from '@/api/students/students';
+import PrimaryAccordion from '@/components/accordions/PrimaryAccordion';
+import SecondaryAccordion from '@/components/accordions/SecondaryAccordion';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ReadingTable from '@/components/tables/ReadingTable';
+import { Category } from '@/models/Category';
+import { useQuery } from '@tanstack/react-query';
+import Head from 'next/head';
+import React from 'react';
+import styles from './lecturas.module.css';
 
 const PENDING_READINGS_NOTE =
-  "Parece que tenés tareas pendientes. Cuando las termines, vas a poder ver todas las lecturas del sistema.";
+  'Parece que tenés tareas pendientes. Cuando las termines, vas a poder ver todas las lecturas del sistema.';
 
 const useFetchReadings = () =>
   useQuery({
-    queryKey: ["student", "readings", "all"],
+    queryKey: ['student', 'readings', 'all'],
     queryFn: fetchReadings,
   });
 
 const useFetchPendingReadings = () =>
   useQuery({
-    queryKey: ["student", "readings", "pending"],
+    queryKey: ['student', 'readings', 'pending'],
     queryFn: fetchPendingReadings,
   });
 
@@ -49,7 +49,7 @@ const Readings: React.FC<{
                   <div className={styles.secondaryAccordionSpacer} />
                 )}
               </div>
-            )
+            ),
           )}
         </PrimaryAccordion>
       ))}

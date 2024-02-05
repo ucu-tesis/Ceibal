@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./Button.module.css";
-import localFont from "next/font/local";
+import React from 'react';
+import styles from './Button.module.css';
+import localFont from 'next/font/local';
 
 interface RoundedButtonProps {
   onClick?: () => void;
@@ -11,16 +11,20 @@ interface RoundedButtonProps {
 const mozaicFont = localFont({
   src: [
     {
-      path: "../../assets/fonts/ceibalmozaic-regular-webfont.woff2",
-      style: "normal",
+      path: '../../assets/fonts/ceibalmozaic-regular-webfont.woff2',
+      style: 'normal',
     },
   ],
 });
 
-const RoundedButton: React.FC<RoundedButtonProps> = ({ children, variant, onClick }) => {
+const RoundedButton: React.FC<RoundedButtonProps> = ({
+  children,
+  variant,
+  onClick,
+}) => {
   const classVariants = {
-    'black': styles["black"],
-    'white': styles["white"],
+    black: styles['black'],
+    white: styles['white'],
   };
   return (
     <button

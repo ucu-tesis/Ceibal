@@ -1,4 +1,4 @@
-export type AnalysisStatus = "PENDING" | "WORKING" | "COMPLETED" | "FAILED";
+export type AnalysisStatus = 'PENDING' | 'WORKING' | 'COMPLETED' | 'FAILED';
 
 export interface Recording {
   id: number;

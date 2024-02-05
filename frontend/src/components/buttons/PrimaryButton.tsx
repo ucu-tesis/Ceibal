@@ -1,8 +1,8 @@
-import React from "react";
-import styles from "./Button.module.css";
+import React from 'react';
+import styles from './Button.module.css';
 
 const classVariants = {
-  pink: styles["stop-fill"],
+  pink: styles['stop-fill'],
   large: styles.large,
 };
 
@@ -19,14 +19,14 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   disabled,
   ...buttonProps
 }) => {
-  const disabledClass = disabled ? styles.disabled : "";
+  const disabledClass = disabled ? styles.disabled : '';
 
   return (
     <button
       ref={buttonRef}
       type="submit"
       className={`${styles.button} ${styles.big} ${
-        classVariants[variant] ?? ""
+        classVariants[variant] ?? ''
       } row ${disabledClass}`}
       disabled={disabled}
       {...buttonProps}

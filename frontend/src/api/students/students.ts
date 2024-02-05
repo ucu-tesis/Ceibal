@@ -1,11 +1,11 @@
-import { Achievement } from "@/models/Achievement";
-import { Category } from "@/models/Category";
-import { PaginatedRecordings } from "@/models/CompletedReadings";
-import { ReadingMinimalInfo } from "@/models/Reading";
-import { ReadingDetails } from "@/models/ReadingDetails";
-import { AnalysisStatus, Recording } from "@/models/Recording";
-import { Subcategory } from "@/models/Subcategory";
-import axiosInstance from "../axiosInstance";
+import { Achievement } from '@/models/Achievement';
+import { Category } from '@/models/Category';
+import { PaginatedRecordings } from '@/models/CompletedReadings';
+import { ReadingMinimalInfo } from '@/models/Reading';
+import { ReadingDetails } from '@/models/ReadingDetails';
+import { AnalysisStatus, Recording } from '@/models/Recording';
+import { Subcategory } from '@/models/Subcategory';
+import axiosInstance from '../axiosInstance';
 
 interface AchievementResponse {
   achieved: boolean;
@@ -52,7 +52,7 @@ interface ReadingListResponse {
 
 type PendingReadingListResponse = Pick<
   ReadingListResponse,
-  "reading_id" | "title"
+  'reading_id' | 'title'
 > & { due_date: string };
 
 interface SubcategoryListResponse {
@@ -62,7 +62,7 @@ interface SubcategoryListResponse {
 
 type PendingSubcategoryListResponse = Pick<
   SubcategoryListResponse,
-  "subcategory"
+  'subcategory'
 > & { readings: PendingReadingListResponse[] };
 
 interface CategoryListResponse {
@@ -90,7 +90,7 @@ interface RecordingResponse {
   };
 }
 
-type PendingCategoryListResponse = Pick<CategoryListResponse, "category"> & {
+type PendingCategoryListResponse = Pick<CategoryListResponse, 'category'> & {
   subcategories: PendingSubcategoryListResponse[];
 };
 
@@ -112,12 +112,12 @@ export const fetchReadingDetails = (id: number) =>
 
 export const fetchReadings = () =>
   axiosInstance
-    .get<CategoryListResponse[]>("students/readings/all")
+    .get<CategoryListResponse[]>('students/readings/all')
     .then(({ data }) => parseReadingsListResponse(data));
 
 export const fetchAchievements = () =>
   axiosInstance
-    .get<AchievementResponse[]>("students/achievements")
+    .get<AchievementResponse[]>('students/achievements')
     .then(({ data }) => parseAchievementsResponse(data));
 
 export const fetchRecording = (recordingId: number) =>
@@ -127,18 +127,18 @@ export const fetchRecording = (recordingId: number) =>
 
 export const fetchPendingReadings = () =>
   axiosInstance
-    .get<PendingCategoryListResponse[]>("students/readings/pending")
+    .get<PendingCategoryListResponse[]>('students/readings/pending')
     .then(({ data }) => parsePendingReadingsListResponse(data));
 
 export const fetchPendingReadingsCount = () =>
   axiosInstance
-    .get<PendingReadingsCountResponse>("students/readings/pending-amount")
+    .get<PendingReadingsCountResponse>('students/readings/pending-amount')
     .then(({ data }) => data.assignments_pending);
 
 // Parse methods
 
 const parseRecordingsResponse = (
-  res: PaginatedRecordingsResponse
+  res: PaginatedRecordingsResponse,
 ): PaginatedRecordings => ({
   page: res.page,
   pageSize: res.page_size,
@@ -152,7 +152,7 @@ const parseReadingResponse = (recording: RecordingResponse): Recording => ({
 });
 
 const parseReadingDetails = (
-  readingDetails: ReadingDetailsResponse
+  readingDetails: ReadingDetailsResponse,
 ): ReadingDetails => ({
   category: readingDetails.reading_category,
   content: readingDetails.reading_content,
@@ -172,7 +172,7 @@ const parseSubcategoryListResponse = ({
   readings,
   subcategory,
 }: SubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "Otros",
+  name: subcategory ?? 'Otros',
   readings: readings.map(parseReadingListResponse).filter((r) => !!r.title), // Remove readings without name
 });
 
@@ -185,7 +185,7 @@ const parseReadingListResponse = ({
 });
 
 const parsePendingReadingsListResponse = (
-  res: PendingCategoryListResponse[]
+  res: PendingCategoryListResponse[],
 ): Category[] =>
   res.map(({ category, subcategories }) => ({
     name: category,
@@ -196,7 +196,7 @@ const parsePendingSubcategoryListResponse = ({
   readings,
   subcategory,
 }: PendingSubcategoryListResponse): Subcategory => ({
-  name: subcategory ?? "Otros",
+  name: subcategory ?? 'Otros',
   readings: readings.map(parsePendingReadingListResponse),
 });
 

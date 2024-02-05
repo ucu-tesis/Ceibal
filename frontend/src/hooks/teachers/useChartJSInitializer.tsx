@@ -10,8 +10,8 @@ import {
   CategoryScale,
   Legend,
   BarElement,
-  ArcElement
-} from "chart.js";
+  ArcElement,
+} from 'chart.js';
 
 const useChartJSInitializer = () => {
   ChartJS.register(
@@ -25,7 +25,7 @@ const useChartJSInitializer = () => {
     RadarController,
     RadialLinearScale,
     PieController,
-    ArcElement
+    ArcElement,
   );
 };
 

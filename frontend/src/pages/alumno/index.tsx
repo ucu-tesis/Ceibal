@@ -1,15 +1,15 @@
-import useFetchPendingReadingsCount from "@/api/students/hooks/useFetchPendingReadingsCount";
-import CardButton from "@/components/buttons/CardButton";
-import Spinner from "@/components/spinners/Spinner";
-import { useUser } from "@/providers/UserContext";
-import Head from "next/head";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React from "react";
-import ChicaLeyendo from "../../assets/images/chica_leyendo.svg";
-import PodioPrimerLugar from "../../assets/images/podio_primer_lugar.svg";
-import Trofeo from "../../assets/images/trofeo.svg";
-import styles from "./alumno.module.css";
+import useFetchPendingReadingsCount from '@/api/students/hooks/useFetchPendingReadingsCount';
+import CardButton from '@/components/buttons/CardButton';
+import Spinner from '@/components/spinners/Spinner';
+import { useUser } from '@/providers/UserContext';
+import Head from 'next/head';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React from 'react';
+import ChicaLeyendo from '../../assets/images/chica_leyendo.svg';
+import PodioPrimerLugar from '../../assets/images/podio_primer_lugar.svg';
+import Trofeo from '../../assets/images/trofeo.svg';
+import styles from './alumno.module.css';
 
 const AssignmentsPendingCount = ({
   isLoading,
@@ -22,7 +22,7 @@ const AssignmentsPendingCount = ({
     return <Spinner size="small" />;
   }
   return !!count ? (
-    <div className={styles["pending-amount-container"]}>
+    <div className={styles['pending-amount-container']}>
       <span>{count}</span>
     </div>
   ) : null;
@@ -41,12 +41,12 @@ const StudentHomeScreen: React.FC = () => {
       </Head>
       <div className={`${styles.background} col`}>
         <h1>¡Qué alegría encontrarte,</h1>
-        <h1 className={`${styles["student-name"]}`}>
+        <h1 className={`${styles['student-name']}`}>
           {user.firstName}
           <span>!</span>
         </h1>
         <h2>¿Qué quieres hacer hoy?</h2>
-        <div className={`${styles["button-container"]} col`}>
+        <div className={`${styles['button-container']} col`}>
           <CardButton
             leftIcon={<Image src={ChicaLeyendo} alt="" />}
             onClick={() => router.push(`${currentPathName}/lecturas`)}

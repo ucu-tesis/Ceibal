@@ -1,5 +1,5 @@
-import { Assignment } from "@/models/Assignment";
-import { useMemo } from "react";
+import { Assignment } from '@/models/Assignment';
+import { useMemo } from 'react';
 
 const assignmentFilter =
   (query: string, sectionFilter?: string, chapterFilter?: string) =>
@@ -12,11 +12,11 @@ const useFilteredAssignments = (
   assignments: Assignment[],
   query: string,
   category?: string,
-  subcategory?: string
+  subcategory?: string,
 ) => {
   const filteredAssignments = useMemo(
     () => assignments.filter(assignmentFilter(query, category, subcategory)),
-    [assignments, query, category, subcategory]
+    [assignments, query, category, subcategory],
   );
   return { filteredAssignments };
 };

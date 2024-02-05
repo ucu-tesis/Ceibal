@@ -1,6 +1,6 @@
-import { useIsStudent } from "@/providers/hooks/user";
-import React from "react";
-import styles from "./ErrorPage.module.css";
+import { useIsStudent } from '@/providers/hooks/user';
+import React from 'react';
+import styles from './ErrorPage.module.css';
 
 interface ErrorPageProps {
   intendedAction?: string;

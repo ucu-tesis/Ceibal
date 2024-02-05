@@ -2,21 +2,21 @@ import {
   Assignment,
   AssignmentStatus,
   StudentAssignment,
-} from "@/models/Assignment";
-import { AssignmentReading } from "@/models/AssignmentReading";
-import { Group } from "@/models/Group";
-import { GroupDetails } from "@/models/GroupDetails";
-import { Reading } from "@/models/Reading";
+} from '@/models/Assignment';
+import { AssignmentReading } from '@/models/AssignmentReading';
+import { Group } from '@/models/Group';
+import { GroupDetails } from '@/models/GroupDetails';
+import { Reading } from '@/models/Reading';
 import {
   AssignmentStats,
   GroupStats,
   MonthlyAverage,
   MonthItem as StatsMonthItem,
   StudentStats,
-} from "@/models/Stats";
-import { Student } from "@/models/Student";
-import { StudentAssignmentDetails } from "@/models/StudentAssignmentDetails";
-import axiosInstance from "../axiosInstance";
+} from '@/models/Stats';
+import { Student } from '@/models/Student';
+import { StudentAssignmentDetails } from '@/models/StudentAssignmentDetails';
+import axiosInstance from '../axiosInstance';
 
 interface CreateReadingResponse {
   id: number;
@@ -212,7 +212,7 @@ export const fetchGroupDetails = (groupId: number) =>
 
 export const fetchGroups = (teacherCI: number) =>
   axiosInstance
-    .get<GroupsResponse>("/evaluationGroups", {
+    .get<GroupsResponse>('/evaluationGroups', {
       params: { ci: teacherCI }, // TODO: Modify when backend changes the CI param.
     })
     .then(({ data }) => parseGroupsResponse(data));
@@ -240,7 +240,7 @@ export const fetchAssignmentStats = (
     .then(({ data }) => parseAssignmentStatsResponse(data));
 
 export const fetchAllReadings = () =>
-  axiosInstance.get<ReadingsResponse>("/readings").then(({ data }) => data);
+  axiosInstance.get<ReadingsResponse>('/readings').then(({ data }) => data);
 
 export const createAssignment = (
   evaluationGroupId: number,
@@ -268,23 +268,23 @@ export const fetchStudentAssignmentDetails = (
 
 export const fetchCategoriesAndSubcategories = () =>
   axiosInstance
-    .get<CategoriesAndSubcategoriesResponse>("/readings/categories")
+    .get<CategoriesAndSubcategoriesResponse>('/readings/categories')
     .then(({ data }) => data);
 
 export const createReading = async (request: CreateReadingRequest) => {
   const formData = new FormData();
-  formData.append("category", request.category);
-  formData.append("subcategory", request.subcategory);
-  formData.append("content", request.content);
-  formData.append("title", request.title);
-  formData.append("file", request.file);
+  formData.append('category', request.category);
+  formData.append('subcategory', request.subcategory);
+  formData.append('content', request.content);
+  formData.append('title', request.title);
+  formData.append('file', request.file);
 
   const { data } = await axiosInstance.post<CreateReadingResponse>(
-    "/readings",
+    '/readings',
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     },
   );
@@ -325,7 +325,7 @@ const parseAssignmentResponse = (
   evaluationGroupReadingId: assignment.evaluation_group_reading_id,
   readingCategory: assignment.reading_category,
   readingId: assignment.reading_id,
-  readingSubcategory: assignment.reading_subcategory ?? "",
+  readingSubcategory: assignment.reading_subcategory ?? '',
   readingTitle: assignment.reading_title,
 });
 
@@ -347,7 +347,7 @@ const parseStudentAssignment = (
   evaluationGroupReadingId: assignment.id,
   readingCategory: assignment.reading_category,
   readingId: assignment.reading_id,
-  readingSubcategory: assignment.reading_subcategory ?? "", // TODO Make this nullable in Assignment.ts model
+  readingSubcategory: assignment.reading_subcategory ?? '', // TODO Make this nullable in Assignment.ts model
   readingTitle: assignment.reading_title,
   score: assignment.score,
   status: assignment.status,
@@ -383,7 +383,7 @@ const parseStudentStatsResponse = (
 
 const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
   const valueKey = Object.keys(monthAverages[0]).find(
-    (key) => key !== "month",
+    (key) => key !== 'month',
   ) as keyof MonthItem;
   return monthAverages
     .filter(({ month }) => !!month)

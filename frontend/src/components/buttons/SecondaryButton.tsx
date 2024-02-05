@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./Button.module.css";
-import localFont from "next/font/local";
+import React from 'react';
+import styles from './Button.module.css';
+import localFont from 'next/font/local';
 
 interface SecondaryButtonProps {
   onClick?: () => void;
@@ -8,21 +8,25 @@ interface SecondaryButtonProps {
   children: string | JSX.Element | JSX.Element[];
 }
 
-const SecondaryButton: React.FC<SecondaryButtonProps> = ({ onClick, variant, children }) => {
+const SecondaryButton: React.FC<SecondaryButtonProps> = ({
+  onClick,
+  variant,
+  children,
+}) => {
   const classVariants = {
-    blueFill: styles["blue-fill"],
-    redFill: styles["red-fill"],
-    noFill: styles["no-fill"],
-    outlined: `${styles["no-fill"]} ${styles.outlined}`,
+    blueFill: styles['blue-fill'],
+    redFill: styles['red-fill'],
+    noFill: styles['no-fill'],
+    outlined: `${styles['no-fill']} ${styles.outlined}`,
   };
 
   return (
     <button
       type="submit"
-      className={`${styles.button} ${styles.large} ${classVariants[variant] ?? ""} row`}
+      className={`${styles.button} ${styles.large} ${classVariants[variant] ?? ''} row`}
       onClick={onClick}
     >
-     {children}
+      {children}
     </button>
   );
 };

@@ -1,5 +1,5 @@
-import React, { ChangeEvent, useState } from "react";
-import styles from "./Input.module.css";
+import React, { ChangeEvent, useState } from 'react';
+import styles from './Input.module.css';
 
 interface InputFileProps {
   id: string;
@@ -27,7 +27,7 @@ const InputFile: React.FC<InputFileProps> = ({
   };
 
   return (
-    <div className={styles["file-input"]}>
+    <div className={styles['file-input']}>
       <input
         onChange={handleFileChange}
         id={id}
@@ -38,7 +38,7 @@ const InputFile: React.FC<InputFileProps> = ({
       <div className="row">
         <button>Subir</button>
         <span>
-          {fileName ? fileName : "No se ha seleccionado ningún archivo"}
+          {fileName ? fileName : 'No se ha seleccionado ningún archivo'}
         </span>
       </div>
     </div>

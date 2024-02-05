@@ -1,7 +1,7 @@
-import Image from "next/image";
-import React, { useState } from "react";
-import ChevronRight from "../../assets/images/chevron_right.svg";
-import styles from "./accordion.module.css";
+import Image from 'next/image';
+import React, { useState } from 'react';
+import ChevronRight from '../../assets/images/chevron_right.svg';
+import styles from './accordion.module.css';
 
 interface AccordionProps {
   title: string;
@@ -16,7 +16,7 @@ const SecondaryAccordion: React.FC<AccordionProps> = ({ title, children }) => {
   return (
     <div className={`${styles.accordion}`}>
       <span
-        className={`row ${styles.secondary} ${!open ? styles.closed : ""}`}
+        className={`row ${styles.secondary} ${!open ? styles.closed : ''}`}
         tabIndex={0}
         title={title}
         onClick={onClickAccordion}
@@ -26,7 +26,7 @@ const SecondaryAccordion: React.FC<AccordionProps> = ({ title, children }) => {
           <Image src={ChevronRight} alt=""></Image>
         </div>
       </span>
-      <div className={`${styles.body} ${open ? styles.open : ""}`}>
+      <div className={`${styles.body} ${open ? styles.open : ''}`}>
         {open && children}
       </div>
     </div>

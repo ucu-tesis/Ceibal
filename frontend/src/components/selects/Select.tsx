@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import styles from "./Select.module.css";
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import styles from './Select.module.css';
 
 interface SelectProps {
   id?: string;
@@ -15,7 +15,7 @@ export type Option = {
 };
 
 const enterClick = (event: any) => {
-  if (event.key === "Enter") {
+  if (event.key === 'Enter') {
     const element = event.target as HTMLElement;
     element.click();
   }
@@ -23,7 +23,11 @@ const enterClick = (event: any) => {
 
 // TODO this is a mix of controlled and uncontrolled. it should use `value` instead of `defaultValue`
 // Also the label should not be part of selectValue, it should be calculated from `value` + `options` instead
-const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (value) => {} }) => {
+const Select: React.FC<SelectProps> = ({
+  options,
+  defaultValue,
+  onChange = (value) => {},
+}) => {
   const divRef = useRef(null);
   const [selectValue, setValue] = useState(defaultValue);
   const [openOptions, setOpen] = useState(false);
@@ -40,20 +44,20 @@ const Select: React.FC<SelectProps> = ({ options, defaultValue, onChange = (valu
       }
     };
 
-    window.addEventListener("click", clickOutSelect);
+    window.addEventListener('click', clickOutSelect);
     const chakraModal = document.querySelector('[role="dialog"]');
-    chakraModal?.addEventListener("click", clickOutSelect);
+    chakraModal?.addEventListener('click', clickOutSelect);
 
     return () => {
-      window.removeEventListener("click", clickOutSelect);
-      chakraModal?.removeEventListener("click", clickOutSelect);
+      window.removeEventListener('click', clickOutSelect);
+      chakraModal?.removeEventListener('click', clickOutSelect);
     };
   }, [openOptions]);
 
   return (
     <div
       tabIndex={0}
-      className={`${styles["select-bar"]} row`}
+      className={`${styles['select-bar']} row`}
       onKeyDown={enterClick}
       ref={divRef}
       onClick={() => {

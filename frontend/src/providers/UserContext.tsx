@@ -1,7 +1,7 @@
-import axiosInstance from "@/api/axiosInstance";
-import axios, { AxiosError } from "axios";
-import { useRouter } from "next/router";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import axiosInstance from '@/api/axiosInstance';
+import axios, { AxiosError } from 'axios';
+import { useRouter } from 'next/router';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export interface User {
   id: number;
@@ -32,8 +32,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const isStudentRoute = router.pathname.startsWith("/alumno");
-  const isTeacherRoute = router.pathname.startsWith("/maestro");
+  const isStudentRoute = router.pathname.startsWith('/alumno');
+  const isTeacherRoute = router.pathname.startsWith('/maestro');
   const isProtectedRoute = isStudentRoute || isTeacherRoute;
 
   useEffect(() => {
@@ -55,13 +55,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     if (loading) return;
 
     if (!user && (isStudentRoute || isTeacherRoute)) {
-      router.replace("/login");
+      router.replace('/login');
     }
 
-    if (user?.type === "teacher" && isStudentRoute) {
-      router.replace("/maestro/grupos");
-    } else if (user?.type === "student" && isTeacherRoute) {
-      router.replace("/alumno");
+    if (user?.type === 'teacher' && isStudentRoute) {
+      router.replace('/maestro/grupos');
+    } else if (user?.type === 'student' && isTeacherRoute) {
+      router.replace('/alumno');
     }
   }, [user, isStudentRoute, isTeacherRoute, router, loading]);
 
@@ -74,16 +74,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
 const fetchUserData = async (): Promise<User | null> => {
   try {
-    const response = await axiosInstance.get("/auth/user-init");
+    const response = await axiosInstance.get('/auth/user-init');
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
       if (axiosError?.response?.status !== 401) {
-        console.error("Error fetching user data:", axiosError);
+        console.error('Error fetching user data:', axiosError);
       }
     } else {
-      console.error("Unknown error:", error);
+      console.error('Unknown error:', error);
     }
     return null;
   }

@@ -1,15 +1,15 @@
-import useFetchAchievements from "@/api/students/hooks/useFetchAchievements";
-import CrossIcon from "@/assets/images/cross.svg";
-import ImageButton from "@/components/buttons/ImageButton";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ModalDialog from "@/components/modals/ModalDialog";
-import ProgressBar from "@/components/progress/ProgressBar";
-import { Achievement } from "@/models/Achievement";
-import Head from "next/head";
-import Image from "next/image";
-import React, { useRef, useState } from "react";
-import styles from "./premios.module.css";
+import useFetchAchievements from '@/api/students/hooks/useFetchAchievements';
+import CrossIcon from '@/assets/images/cross.svg';
+import ImageButton from '@/components/buttons/ImageButton';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ModalDialog from '@/components/modals/ModalDialog';
+import ProgressBar from '@/components/progress/ProgressBar';
+import { Achievement } from '@/models/Achievement';
+import Head from 'next/head';
+import Image from 'next/image';
+import React, { useRef, useState } from 'react';
+import styles from './premios.module.css';
 
 const Premios: React.FC = () => {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement>();
@@ -27,7 +27,7 @@ const Premios: React.FC = () => {
   const closeModal = () => {
     const modal = modalRef.current;
     if (modal) {
-      modal.style.transform = "scale(0.5)";
+      modal.style.transform = 'scale(0.5)';
     }
     setTimeout(() => {
       setAchievementModal(false);
@@ -62,10 +62,10 @@ const Premios: React.FC = () => {
                 onClick={() => onAchievementClick(a)}
                 src={a.imageUrl}
                 altText={`Un logro ${
-                  a.achieved ? "completado" : "por completar"
+                  a.achieved ? 'completado' : 'por completar'
                 }`}
                 title={a.name}
-                overlayText={a.achieved ? "En Proceso" : undefined}
+                overlayText={a.achieved ? 'En Proceso' : undefined}
               />
             );
           })}
@@ -73,14 +73,14 @@ const Premios: React.FC = () => {
       </div>
       {achievementModal && (
         <ModalDialog title="Detalle de logro" componentRef={modalRef}>
-          <button onClick={closeModal} className={styles["close-btn"]}>
+          <button onClick={closeModal} className={styles['close-btn']}>
             <Image src={CrossIcon} alt="cerrar modal"></Image>
           </button>
-          <div className={`${styles["achievement-modal"]} col`}>
+          <div className={`${styles['achievement-modal']} col`}>
             <ImageButton
               src={selectedAchievement?.imageUrl}
               altText={`Un logro ${
-                selectedAchievement?.achieved ? "completado" : "por completar"
+                selectedAchievement?.achieved ? 'completado' : 'por completar'
               }`}
               title=""
             />

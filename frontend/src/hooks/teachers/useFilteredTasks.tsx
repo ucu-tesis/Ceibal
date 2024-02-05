@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
 // TODO integrate with backend API
 interface Task {
@@ -14,10 +14,15 @@ const taskFilter =
     (sectionFilter ? sectionFilter === category : true) &&
     (chapterFilter ? chapterFilter === subcategory : true);
 
-const useFilteredTasks = (tasks: Task[], query: string, category?: string, subcategory?: string) => {
+const useFilteredTasks = (
+  tasks: Task[],
+  query: string,
+  category?: string,
+  subcategory?: string,
+) => {
   const filteredTasks = useMemo(
     () => tasks.filter(taskFilter(query, category, subcategory)),
-    [tasks, query, category, subcategory]
+    [tasks, query, category, subcategory],
   );
   return { filteredTasks };
 };

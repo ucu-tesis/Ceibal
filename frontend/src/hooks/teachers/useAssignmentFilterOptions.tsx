@@ -1,5 +1,5 @@
-import { Assignment } from "@/models/Assignment";
-import { useMemo } from "react";
+import { Assignment } from '@/models/Assignment';
+import { useMemo } from 'react';
 
 type Option = {
   value?: string;
@@ -7,14 +7,14 @@ type Option = {
 };
 
 const defaultOption: Option = {
-  label: "Todas",
+  label: 'Todas',
   value: undefined,
 };
 
 const useAssignmentFilterOptions = (assignments: Assignment[]) => {
   const readingCategoryOptions: Option[] = useMemo(() => {
     const categories = Array.from(
-      new Set(assignments.map((assignment) => assignment.readingCategory))
+      new Set(assignments.map((assignment) => assignment.readingCategory)),
     ).filter((category) => !!category);
     return [
       defaultOption,
@@ -27,7 +27,7 @@ const useAssignmentFilterOptions = (assignments: Assignment[]) => {
 
   const readingSubcategoryOptions: Option[] = useMemo(() => {
     const subcategories = Array.from(
-      new Set(assignments.map((assignment) => assignment.readingSubcategory))
+      new Set(assignments.map((assignment) => assignment.readingSubcategory)),
     ).filter((subcategory) => !!subcategory);
     return [
       defaultOption,

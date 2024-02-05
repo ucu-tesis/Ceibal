@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import localFont from "next/font/local";
-import { useRouter } from "next/router";
-import styles from "./evaluacion.module.css";
-import SecondaryButton from "@/components/buttons/SecondaryButton";
-import PlayIcon from "@/assets/images/play_icon.svg";
-import StopIcon from "@/assets/images/pause_icon.svg";
-import Head from "next/head";
-import { FastAverageColor } from "fast-average-color";
-import Star from "@/assets/images/star_eval.svg";
-import StarOutlined from "@/assets/images/star_eval_outlined.svg";
-import { useQuery } from "@tanstack/react-query";
-import { fetchRecording } from "@/api/students/students";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ErrorPage from "@/components/errorPage/ErrorPage";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import localFont from 'next/font/local';
+import { useRouter } from 'next/router';
+import styles from './evaluacion.module.css';
+import SecondaryButton from '@/components/buttons/SecondaryButton';
+import PlayIcon from '@/assets/images/play_icon.svg';
+import StopIcon from '@/assets/images/pause_icon.svg';
+import Head from 'next/head';
+import { FastAverageColor } from 'fast-average-color';
+import Star from '@/assets/images/star_eval.svg';
+import StarOutlined from '@/assets/images/star_eval_outlined.svg';
+import { useQuery } from '@tanstack/react-query';
+import { fetchRecording } from '@/api/students/students';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ErrorPage from '@/components/errorPage/ErrorPage';
 
 const useFetchRecordings = (recordingId: number) =>
   useQuery({
-    queryKey: ["student", "recording", recordingId],
+    queryKey: ['student', 'recording', recordingId],
     queryFn: () => fetchRecording(recordingId),
   });
 
 const mozaicFont = localFont({
   src: [
     {
-      path: "../../../../assets/fonts/ceibalmozaic-regular-webfont.woff2",
-      style: "normal",
+      path: '../../../../assets/fonts/ceibalmozaic-regular-webfont.woff2',
+      style: 'normal',
     },
   ],
 });
@@ -55,7 +55,7 @@ export default function Page() {
   const [audioPlaying, setAudioPlaying] = useState(false);
 
   const onClickPlay = () => {
-    const audioElement = document.querySelector("audio") as HTMLAudioElement;
+    const audioElement = document.querySelector('audio') as HTMLAudioElement;
     if (!audioPlaying) {
       setAudioPlaying(true);
       audioElement?.play();
@@ -67,14 +67,20 @@ export default function Page() {
 
   useEffect(() => {
     const fac = new FastAverageColor();
-    const container = document.getElementById("container");
+    const container = document.getElementById('container');
     if (container) {
-      fac.getColorAsync(container.querySelector("img")).then(({ hex }) => setImageAverageColor(hex));
+      fac
+        .getColorAsync(container.querySelector('img'))
+        .then(({ hex }) => setImageAverageColor(hex));
     }
   }, [data]);
 
   const stars = Array.from({ length: 5 }, (_, index) => (
-    <Image key={`star-${index}`} src={starsCount > index ? Star : StarOutlined} alt="estrella" />
+    <Image
+      key={`star-${index}`}
+      src={starsCount > index ? Star : StarOutlined}
+      alt="estrella"
+    />
   ));
 
   if (isLoading) {
@@ -95,11 +101,11 @@ export default function Page() {
         <h2>{title}</h2>
         <Image
           className={styles.rounded}
-          src={imageURL ?? ""}
+          src={imageURL ?? ''}
           width={300}
           height={400}
           alt={`imagen de lectura: ${title}`}
-          style={{ border: `2px solid ${imageAverageColor}` ?? "unset" }}
+          style={{ border: `2px solid ${imageAverageColor}` ?? 'unset' }}
         />
         <div className={`${styles.info} row`}>
           <div className="row">
@@ -112,9 +118,20 @@ export default function Page() {
           </div>
         </div>
         <div className={`${styles.stars} row`}>{stars}</div>
-        <SecondaryButton onClick={onClickPlay} variant={"outlined" as keyof Object}>
-          <div>{audioPlaying ? <Image src={StopIcon} alt=""></Image> : <Image src={PlayIcon} alt=""></Image>}</div>
-          <div style={{ fontFamily: mozaicFont.style.fontFamily }}>{audioPlaying ? "Parar" : "Reproducir"}</div>
+        <SecondaryButton
+          onClick={onClickPlay}
+          variant={'outlined' as keyof Object}
+        >
+          <div>
+            {audioPlaying ? (
+              <Image src={StopIcon} alt=""></Image>
+            ) : (
+              <Image src={PlayIcon} alt=""></Image>
+            )}
+          </div>
+          <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
+            {audioPlaying ? 'Parar' : 'Reproducir'}
+          </div>
         </SecondaryButton>
         <audio>
           <source src={url} />
