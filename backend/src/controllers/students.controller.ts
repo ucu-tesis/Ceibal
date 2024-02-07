@@ -143,7 +143,7 @@ export class StudentsController {
     const assignments = readings.map((r) => ({
       due_date: r.due_date,
       reading_category: r.Reading.category,
-      reading_id: r.id,
+      reading_id: r.reading_id,
       reading_subcategory: r.Reading.subcategory,
       reading_title: r.Reading.title,
     }));
