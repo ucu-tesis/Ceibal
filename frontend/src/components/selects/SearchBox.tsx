@@ -1,7 +1,7 @@
-import { ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
-import React, { useEffect, useRef, useState } from "react";
-import Spinner from "../spinners/Spinner";
-import styles from "./Select.module.css";
+import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
+import React, { useEffect, useRef, useState } from 'react';
+import Spinner from '../spinners/Spinner';
+import styles from './Select.module.css';
 
 export type Option = {
   value?: string;
@@ -9,7 +9,7 @@ export type Option = {
 };
 
 const enterClick = (event: any) => {
-  if (event.key === "Enter") {
+  if (event.key === 'Enter') {
     const element = event.target as HTMLElement;
     element.click();
   }
@@ -30,7 +30,7 @@ const FilteredOptions: React.FC<FilteredOptionsProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className={`${styles["spinner-container"]}`}>
+      <div className={`${styles['spinner-container']}`}>
         <Spinner size="small" />
       </div>
     );
@@ -78,7 +78,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   disabled = false,
 }) => {
   const divRef = useRef(null);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [openOptions, setOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState(options);
 
@@ -94,12 +94,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       }
     };
 
-    window.addEventListener("click", clickOutSearchBox);
+    window.addEventListener('click', clickOutSearchBox);
     const chakraModal = document.querySelector('[role="dialog"]');
-    chakraModal?.addEventListener("click", clickOutSearchBox);
+    chakraModal?.addEventListener('click', clickOutSearchBox);
     return () => {
-      window.removeEventListener("click", clickOutSearchBox);
-      chakraModal?.removeEventListener("click", clickOutSearchBox);
+      window.removeEventListener('click', clickOutSearchBox);
+      chakraModal?.removeEventListener('click', clickOutSearchBox);
     };
   }, [openOptions]);
 
@@ -114,7 +114,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   return (
     <div
       tabIndex={0}
-      className={`${styles["select-bar"]} row`}
+      className={`${styles['select-bar']} row`}
       onKeyDown={enterClick}
       ref={divRef}
       onClick={(event) => {

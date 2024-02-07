@@ -1,10 +1,27 @@
-import React, { useState, useRef, useEffect } from "react";
-import Head from "next/head";
-import Link from "next/link";
-import { ChakraProvider, Table, Thead, Tbody, Tr, Th, Td, TableContainer, useDisclosure } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Input, InputGroup, InputRightAddon } from "@chakra-ui/react";
-import { Button, Switch } from "@chakra-ui/react";
-import { SearchIcon, ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
+import React, { useState, useRef, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import {
+  ChakraProvider,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  useDisclosure,
+} from '@chakra-ui/react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Input,
+  InputGroup,
+  InputRightAddon,
+} from '@chakra-ui/react';
+import { Button, Switch } from '@chakra-ui/react';
+import { SearchIcon, ChevronRightIcon, AddIcon } from '@chakra-ui/icons';
 import {
   Modal,
   ModalOverlay,
@@ -13,10 +30,10 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-} from "@chakra-ui/react";
-import Select from "@/components/selects/Select";
-import styles from "./listado.module.css";
-import { inputRegex } from "@/constants/constants";
+} from '@chakra-ui/react';
+import Select from '@/components/selects/Select';
+import styles from './listado.module.css';
+import { inputRegex } from '@/constants/constants';
 
 type Option = {
   value: string;
@@ -46,7 +63,7 @@ const ListTeachers: React.FC = () => {
     if (cellEditable) {
       if (tableRef.current) {
         const table = tableRef.current as HTMLElement;
-        const tableCell = table?.querySelector("td");
+        const tableCell = table?.querySelector('td');
         tableCell?.focus();
       }
     }
@@ -57,16 +74,20 @@ const ListTeachers: React.FC = () => {
   };
 
   const options: Option[] = [
-    { value: "todos", label: "Todos" },
-    { value: "habilitado", label: "Habilitado" },
-    { value: "deshabilitado", label: "Deshabilitado" },
+    { value: 'todos', label: 'Todos' },
+    { value: 'habilitado', label: 'Habilitado' },
+    { value: 'deshabilitado', label: 'Deshabilitado' },
   ];
 
   const [sampleTeachers] = useState<Teacher[]>([
-    { name: "Ana Gonzalez", email: "agonzalez@gmail.com", ci: "4485263-8" },
-    { name: "Martín Rodriguez", email: "mrodriguez@gmail.com", ci: "4712354-3" },
-    { name: "Laura Pereira", email: "lpereira@gmail.com", ci: "3025665-8" },
-    { name: "María Fernandez", email: "mfernandez@gmail.com", ci: "3458974-2" },
+    { name: 'Ana Gonzalez', email: 'agonzalez@gmail.com', ci: '4485263-8' },
+    {
+      name: 'Martín Rodriguez',
+      email: 'mrodriguez@gmail.com',
+      ci: '4712354-3',
+    },
+    { name: 'Laura Pereira', email: 'lpereira@gmail.com', ci: '3025665-8' },
+    { name: 'María Fernandez', email: 'mfernandez@gmail.com', ci: '3458974-2' },
   ]);
 
   const [teachersList, setTeachersList] = useState<Teacher[]>(sampleTeachers);
@@ -75,7 +96,10 @@ const ListTeachers: React.FC = () => {
     if (searchValue) {
       const searchRegex = new RegExp(searchValue);
       const newTeachersList = sampleTeachers.filter(({ name, ci }) => {
-        return name.toLowerCase().match(searchRegex) || ci.toLowerCase().match(searchRegex);
+        return (
+          name.toLowerCase().match(searchRegex) ||
+          ci.toLowerCase().match(searchRegex)
+        );
       });
       setTeachersList(newTeachersList);
     } else {
@@ -84,10 +108,10 @@ const ListTeachers: React.FC = () => {
   }, [searchValue, sampleTeachers]);
 
   const schools: Classroom[] = [
-    { school: "Escuela 15", year: "1er año" },
-    { school: "Escuela 16", year: "2do año" },
-    { school: "Escuela 17", year: "2do año" },
-    { school: "Escuela 18", year: "1er año" },
+    { school: 'Escuela 15', year: '1er año' },
+    { school: 'Escuela 16', year: '2do año' },
+    { school: 'Escuela 17', year: '2do año' },
+    { school: 'Escuela 18', year: '1er año' },
   ];
 
   return (
@@ -118,7 +142,9 @@ const ListTeachers: React.FC = () => {
               maxLength={30}
               placeholder="Documento o Nombre"
               onChange={({ target: { value } }) => {
-                value !== "" ? setSearchValue(value.toLowerCase()) : setSearchValue(null);
+                value !== ''
+                  ? setSearchValue(value.toLowerCase())
+                  : setSearchValue(null);
               }}
             />
             <InputRightAddon>
@@ -127,8 +153,8 @@ const ListTeachers: React.FC = () => {
           </InputGroup>
           <Select options={options} defaultValue={options[0]}></Select>
         </div>
-        <TableContainer className={`${styles["table-border"]}`}>
-          <Table className={`${styles["main-table"]}`}>
+        <TableContainer className={`${styles['table-border']}`}>
+          <Table className={`${styles['main-table']}`}>
             <Thead>
               <Tr>
                 <Th>Nombre</Th>
@@ -161,7 +187,7 @@ const ListTeachers: React.FC = () => {
             <ModalHeader>Editar</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <div className={`${styles["edit-modal"]} row`}>
+              <div className={`${styles['edit-modal']} row`}>
                 <div className="col">
                   <span>Primer Nombre</span>
                   <span>Segundo Nombre</span>
@@ -179,7 +205,7 @@ const ListTeachers: React.FC = () => {
                   <Switch size="md" colorScheme="green" />
                 </div>
               </div>
-              <div className={`${styles["add-class"]} row`}>
+              <div className={`${styles['add-class']} row`}>
                 <span>Clases</span>
                 <Button
                   borderRadius="24px"
@@ -193,7 +219,7 @@ const ListTeachers: React.FC = () => {
               </div>
 
               <TableContainer>
-                <Table ref={tableRef} className={`${styles["main-table"]}`}>
+                <Table ref={tableRef} className={`${styles['main-table']}`}>
                   <Thead>
                     <Tr>
                       <Th>Escuela</Th>

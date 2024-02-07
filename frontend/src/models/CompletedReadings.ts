@@ -1,4 +1,4 @@
-import { Recording } from "./Recording";
+import { Recording } from './Recording';
 
 export interface PaginatedRecordings {
   page: number;

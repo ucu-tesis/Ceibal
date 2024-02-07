@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "./Progress.module.css";
+import React from 'react';
+import styles from './Progress.module.css';
 
 interface ProgressBarProps {
   value: number;
@@ -8,13 +8,13 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
   return (
     <div
-      className={`${styles["progress-track"]} ${
-        styles[value > 0 ? "with-progress" : ".with-no-progress"]
+      className={`${styles['progress-track']} ${
+        styles[value > 0 ? 'with-progress' : '.with-no-progress']
       }`}
     >
       {value !== 0 && (
         <div
-          className={styles["progress-value"]}
+          className={styles['progress-value']}
           tabIndex={0}
           style={{ width: `${value}%` }}
         >
@@ -22,7 +22,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
         </div>
       )}
       {value === 0 && (
-        <div className={styles["no-progress"]} tabIndex={0}>
+        <div className={styles['no-progress']} tabIndex={0}>
           0%
         </div>
       )}

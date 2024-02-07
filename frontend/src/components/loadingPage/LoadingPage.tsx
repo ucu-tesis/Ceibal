@@ -1,7 +1,7 @@
-import { useIsStudent } from "@/providers/hooks/user";
-import React from "react";
-import Spinner from "../spinners/Spinner";
-import styles from "./LoadingPage.module.css";
+import { useIsStudent } from '@/providers/hooks/user';
+import React from 'react';
+import Spinner from '../spinners/Spinner';
+import styles from './LoadingPage.module.css';
 
 const LoadingPage: React.FC = () => {
   const isStudent = useIsStudent();

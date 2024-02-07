@@ -1,22 +1,22 @@
-import useFetchGroups from "@/api/teachers/hooks/useFetchGroups";
-import Select from "@/components/selects/Select";
+import useFetchGroups from '@/api/teachers/hooks/useFetchGroups';
+import Select from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
-import { Group } from "@/models/Group";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+} from '@/components/tables/ChakraTable';
+import { Group } from '@/models/Group';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   ChakraProvider,
-} from "@chakra-ui/react";
-import Head from "next/head";
-import Link from "next/link";
-import React, { useState } from "react";
-import useFilteredGroups from "../../../hooks/teachers/useFilteredGroups";
-import useGroupFilterOptions from "../../../hooks/teachers/useGroupFilterOptions";
-import styles from "./grupos.module.css";
+} from '@chakra-ui/react';
+import Head from 'next/head';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import useFilteredGroups from '../../../hooks/teachers/useFilteredGroups';
+import useGroupFilterOptions from '../../../hooks/teachers/useGroupFilterOptions';
+import styles from './grupos.module.css';
 
 const TEACHER_CI = 2; // TODO: Replace when auth integration is done.
 
@@ -26,9 +26,9 @@ type Option = {
 };
 
 const columns: ChakraTableColumn[] = [
-  { label: "Grupo" },
-  { label: "Año", reactKey: "anio" },
-  { label: "", reactKey: "link", width: "40%" },
+  { label: 'Grupo' },
+  { label: 'Año', reactKey: 'anio' },
+  { label: '', reactKey: 'link', width: '40%' },
 ];
 
 const toTableList = (groups: Group[]) => {
@@ -39,7 +39,7 @@ const toTableList = (groups: Group[]) => {
       link: (
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]",
+            pathname: '/maestro/grupos/[grupo]',
             query: { grupo: id },
           }}
         >

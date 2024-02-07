@@ -1,17 +1,17 @@
-import { createAssignment, fetchAllReadings } from "@/api/teachers/teachers";
-import InputDateTimeLocal from "@/components/inputs/InputDateTimeLocal";
-import Select, { Option } from "@/components/selects/Select";
+import { createAssignment, fetchAllReadings } from '@/api/teachers/teachers';
+import InputDateTimeLocal from '@/components/inputs/InputDateTimeLocal';
+import Select, { Option } from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
+} from '@/components/tables/ChakraTable';
 import {
   inputRegex,
   tableMaxHeightModal,
   toastDuration,
-} from "@/constants/constants";
-import { Reading } from "@/models/Reading";
-import { getOptionsFromArray } from "@/util/select";
-import { SearchIcon } from "@chakra-ui/icons";
+} from '@/constants/constants';
+import { Reading } from '@/models/Reading';
+import { getOptionsFromArray } from '@/util/select';
+import { SearchIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -40,33 +40,33 @@ import {
   useDisclosure,
   useSteps,
   useToast,
-} from "@chakra-ui/react";
-import { UseQueryResult, useMutation, useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import Head from "next/head";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { ChangeEvent, useState } from "react";
-import styles from "./asignartarea.module.css";
+} from '@chakra-ui/react';
+import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { ChangeEvent, useState } from 'react';
+import styles from './asignartarea.module.css';
 
-const READINGS_STEP = "Agregar Tareas";
-const SUMMARY_STEP = "Resumen";
+const READINGS_STEP = 'Agregar Tareas';
+const SUMMARY_STEP = 'Resumen';
 
 const steps = [READINGS_STEP, SUMMARY_STEP];
 
 const readingSelectionColumns: ChakraTableColumn[] = [
-  { label: "" },
-  { label: "Categoría" },
-  { label: "Subcategoría" },
-  { label: "Lectura" },
-  { label: " " },
+  { label: '' },
+  { label: 'Categoría' },
+  { label: 'Subcategoría' },
+  { label: 'Lectura' },
+  { label: ' ' },
 ];
 
 const filterReadings = (
   readings: Reading[],
   search: string,
   category?: string,
-  subcategory?: string
+  subcategory?: string,
 ) => {
   return readings.filter((reading) => {
     return (
@@ -78,7 +78,7 @@ const filterReadings = (
 };
 
 const defaultOption: Option = {
-  label: "Todas",
+  label: 'Todas',
   value: undefined,
 };
 
@@ -127,7 +127,7 @@ const ReadingModal: React.FC<ReadingModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent className={styles["modal-content"]}>
+      <ModalContent className={styles['modal-content']}>
         <ModalHeader>{readingTitle}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>{activeContent}</ModalBody>
@@ -216,12 +216,12 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
           <label>Categoría</label>
           <Select
             defaultValue={{
-              label: categoryFilter || "Todas",
+              label: categoryFilter || 'Todas',
               value: categoryFilter,
             }}
             options={getOptionsFromArray(
               baseReadings.map((r) => r.category),
-              defaultOption
+              defaultOption,
             )}
             onChange={(option) => {
               setCategoryFilter(option.value);
@@ -232,12 +232,12 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
           <label>Subcategoría</label>
           <Select
             defaultValue={{
-              label: subcategoryFilter || "Todas",
+              label: subcategoryFilter || 'Todas',
               value: subcategoryFilter,
             }}
             options={getOptionsFromArray(
               baseReadings.map((r) => r.subcategory).filter(Boolean),
-              defaultOption
+              defaultOption,
             )}
             onChange={(option) => {
               setSubcategoryFilter(option.value);
@@ -279,12 +279,12 @@ const Page: React.FC = () => {
   const router = useRouter();
   const { grupo: evaluationGroupId } = router.query;
 
-  const [readingSearch, setReadingSearch] = useState("");
+  const [readingSearch, setReadingSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>();
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>();
 
   const [selectedDueDate, setSelectedDueDate] = useState<string>(
-    dayjs().toISOString()
+    dayjs().toISOString(),
   );
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
 
@@ -293,7 +293,7 @@ const Page: React.FC = () => {
 
   // TODO pagination
   const readingsQueryData = useQuery({
-    queryKey: ["teacher", "readings", "all"],
+    queryKey: ['teacher', 'readings', 'all'],
     queryFn: () => fetchAllReadings(),
   });
 
@@ -321,13 +321,13 @@ const Page: React.FC = () => {
       await createAssignment(
         Number(evaluationGroupId),
         readings,
-        selectedDueDate
+        selectedDueDate,
       );
     },
     onSuccess: () => {
       toast({
-        title: "Tarea creada",
-        status: "success",
+        title: 'Tarea creada',
+        status: 'success',
         duration: toastDuration - DURATION_OFFSET,
         isClosable: true,
         onCloseComplete: () => {
@@ -376,7 +376,7 @@ const Page: React.FC = () => {
     baseReadings, // TODO pagination
     readingSearch,
     categoryFilter,
-    subcategoryFilter
+    subcategoryFilter,
   );
 
   return (
@@ -412,7 +412,7 @@ const Page: React.FC = () => {
             filteredReadings={filteredReadings}
             readingsQueryData={readingsQueryData}
             selectedDueDate={selectedDueDate}
-            categoryFilter={categoryFilter ?? ""}
+            categoryFilter={categoryFilter ?? ''}
             isReadingSelected={isReadingSelected}
             onClickReading={onClickReading}
             readingSearch={readingSearch}
@@ -420,7 +420,7 @@ const Page: React.FC = () => {
             setReadingSearch={setReadingSearch}
             setSelectedDueDate={setSelectedDueDate}
             setSubcategoryFilter={setSubcategoryFilter}
-            subcategoryFilter={subcategoryFilter ?? ""}
+            subcategoryFilter={subcategoryFilter ?? ''}
             toggleReading={toggleReading}
           ></ReadingsSection>
         )}
@@ -433,7 +433,7 @@ const Page: React.FC = () => {
         <Box>
           {createAssignmentMutation.isError && (
             <Box textColor="red">
-              Ha ocurrido un error al asignar la tarea:{" "}
+              Ha ocurrido un error al asignar la tarea:{' '}
               {(createAssignmentMutation.error as Error)?.message}
             </Box>
           )}
@@ -461,7 +461,7 @@ const Page: React.FC = () => {
                 className={styles.primary}
                 variant="solid"
               >
-                {activeStep < steps.length - 1 ? "Continuar" : "Asignar Tarea"}
+                {activeStep < steps.length - 1 ? 'Continuar' : 'Asignar Tarea'}
               </Button>
             </Flex>
           )}

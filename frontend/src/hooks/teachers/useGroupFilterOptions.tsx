@@ -1,8 +1,8 @@
-import { Group } from "@/models/Group";
-import { useMemo } from "react";
+import { Group } from '@/models/Group';
+import { useMemo } from 'react';
 
 const defaultOption = {
-  label: "Todos",
+  label: 'Todos',
   value: undefined,
 };
 
@@ -19,7 +19,7 @@ const useGroupFilterOptions = (groups: Group[]) => {
         value: `${year}`,
       })),
     ],
-    [schoolYears]
+    [schoolYears],
   );
   return { filterOptions };
 };

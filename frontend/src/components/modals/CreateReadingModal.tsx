@@ -1,7 +1,7 @@
-import useCreateReading from "@/api/teachers/hooks/useCreateReading";
-import useFetchCategoriesAndSubcategories from "@/api/teachers/hooks/useFetchCategoriesAndSubcategories";
-import { CategoriesAndSubcategoriesResponse } from "@/api/teachers/teachers";
-import { toastDuration } from "@/constants/constants";
+import useCreateReading from '@/api/teachers/hooks/useCreateReading';
+import useFetchCategoriesAndSubcategories from '@/api/teachers/hooks/useFetchCategoriesAndSubcategories';
+import { CategoriesAndSubcategoriesResponse } from '@/api/teachers/teachers';
+import { toastDuration } from '@/constants/constants';
 import {
   Button,
   Input,
@@ -17,11 +17,11 @@ import {
   Switch,
   Textarea,
   useToast,
-} from "@chakra-ui/react";
-import React, { ChangeEvent, useCallback, useMemo, useState } from "react";
-import InputFile from "../inputs/InputFile";
-import SearchBox from "../selects/SearchBox";
-import { Option } from "../selects/Select";
+} from '@chakra-ui/react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import InputFile from '../inputs/InputFile';
+import SearchBox from '../selects/SearchBox';
+import { Option } from '../selects/Select';
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -45,8 +45,8 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
     useFetchCategoriesAndSubcategories();
   const { mutate, isLoading: isLoadingCreateReading } = useCreateReading();
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [file, setFile] = useState<File | undefined>(undefined);
   const [category, setCategory] = useState<Option>();
   const [subcategory, setSubCategory] = useState<Option>();
@@ -63,8 +63,8 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
   );
 
   const onSuccess = useCallback(() => {
-    setTitle("");
-    setContent("");
+    setTitle('');
+    setContent('');
     setFile(undefined);
     setCategory(undefined);
     setSubCategory(undefined);
@@ -72,8 +72,8 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
     onClose();
 
     toast({
-      title: "Lectura creada",
-      status: "success",
+      title: 'Lectura creada',
+      status: 'success',
       duration: toastDuration,
       isClosable: true,
     });
@@ -81,8 +81,8 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
 
   const onError = useCallback(() => {
     toast({
-      title: "La lectura no se pudo crear, intentalo de nuevo",
-      status: "error",
+      title: 'La lectura no se pudo crear, intentalo de nuevo',
+      status: 'error',
       duration: toastDuration,
       isClosable: true,
     });
@@ -113,8 +113,8 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
       );
     } else {
       toast({
-        title: "Hay campos vacíos",
-        status: "info",
+        title: 'Hay campos vacíos',
+        status: 'info',
         duration: toastDuration,
         isClosable: true,
       });
@@ -124,11 +124,11 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent className={styles["modal-content"]}>
+      <ModalContent className={styles['modal-content']}>
         <ModalHeader tabIndex={0}>Crear Lectura</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label htmlFor="lectura">Nombre</label>
             <InputGroup className={styles.medium}>
               <Input
@@ -144,7 +144,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               />
             </InputGroup>
           </div>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label htmlFor="texto">Texto</label>
             <Textarea
               placeholder="Ingrese texto..."
@@ -157,7 +157,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               disabled={isLoadingCreateReading}
             ></Textarea>
           </div>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label>Categoría</label>
             <SearchBox
               placeholder="Selecciona una categoría"
@@ -168,7 +168,7 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               disabled={isLoadingCreateReading}
             ></SearchBox>
           </div>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label>Subcategoría</label>
             <SearchBox
               placeholder="Selecciona una subcategoría"
@@ -179,11 +179,11 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               disabled={isLoadingCreateReading}
             ></SearchBox>
           </div>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label htmlFor="repo">Repositorio Público</label>
             <Switch id="repo" colorScheme="green" size="lg" />
           </div>
-          <div className={`${styles["form-value"]} col`}>
+          <div className={`${styles['form-value']} col`}>
             <label htmlFor="portada">Portada</label>
             <InputFile
               id="portada"

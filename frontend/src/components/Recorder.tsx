@@ -1,13 +1,13 @@
-import localFont from "next/font/local";
-import Image from "next/image";
-import React, { SetStateAction, useEffect, useRef, useState } from "react";
-import PauseIcon from "../assets/images/pause_icon.svg";
-import PlayIcon from "../assets/images/play_icon.svg";
-import RecordAgainIcon from "../assets/images/record_again_icon.svg";
-import RecordIcon from "../assets/images/record_icon.svg";
-import StopIcon from "../assets/images/stop_icon.svg";
-import PrimaryButton from "./buttons/PrimaryButton";
-import SecondaryButton from "./buttons/SecondaryButton";
+import localFont from 'next/font/local';
+import Image from 'next/image';
+import React, { SetStateAction, useEffect, useRef, useState } from 'react';
+import PauseIcon from '../assets/images/pause_icon.svg';
+import PlayIcon from '../assets/images/play_icon.svg';
+import RecordAgainIcon from '../assets/images/record_again_icon.svg';
+import RecordIcon from '../assets/images/record_icon.svg';
+import StopIcon from '../assets/images/stop_icon.svg';
+import PrimaryButton from './buttons/PrimaryButton';
+import SecondaryButton from './buttons/SecondaryButton';
 
 interface RecorderProps {
   onComplete: (audioBuffer: ArrayBuffer, mimeType: string) => void;
@@ -21,8 +21,8 @@ interface RecorderProps {
 const mozaicFont = localFont({
   src: [
     {
-      path: "../assets/fonts/ceibalmozaic-regular-webfont.woff2",
-      style: "normal",
+      path: '../assets/fonts/ceibalmozaic-regular-webfont.woff2',
+      style: 'normal',
     },
   ],
 });
@@ -37,7 +37,7 @@ const Recorder: React.FC<RecorderProps> = ({
 }) => {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
+    null,
   );
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -79,7 +79,7 @@ const Recorder: React.FC<RecorderProps> = ({
       };
 
       recorder.onstop = async () => {
-        const mimeType = recorder.mimeType.split(";")[0];
+        const mimeType = recorder.mimeType.split(';')[0];
         const blob = new Blob(audioChunks, { type: mimeType });
         const buffer = await new Response(blob).arrayBuffer();
         setArrayBuffer(buffer);
@@ -89,16 +89,16 @@ const Recorder: React.FC<RecorderProps> = ({
       recorder.start();
       setRecording(true);
     } catch (error) {
-      console.error("Error starting recording:", error);
+      console.error('Error starting recording:', error);
     }
   };
 
   const stopRecording = () => {
     const buttonElement = document.getElementById(
-      "primary-button"
+      'primary-button',
     ) as HTMLElement;
     if (mediaRecorder) {
-      buttonElement.style.transform = "scale(0.75)";
+      buttonElement.style.transform = 'scale(0.75)';
       setTimeout(() => {
         mediaRecorder.stop();
         setRecording(false);
@@ -136,7 +136,7 @@ const Recorder: React.FC<RecorderProps> = ({
         <>
           <SecondaryButton
             onClick={startRecording}
-            variant={"noFill" as keyof Object}
+            variant={'noFill' as keyof Object}
           >
             <div>
               <Image src={RecordAgainIcon} alt=""></Image>
@@ -147,13 +147,13 @@ const Recorder: React.FC<RecorderProps> = ({
           </SecondaryButton>
           <SecondaryButton
             onClick={toggleAudioPlayback}
-            variant={"outlined" as keyof Object}
+            variant={'outlined' as keyof Object}
           >
             <div>
               <Image src={playing ? PauseIcon : PlayIcon} alt=""></Image>
             </div>
             <div style={{ fontFamily: mozaicFont.style.fontFamily }}>
-              {playing ? "Parar" : "Reproducir"}
+              {playing ? 'Parar' : 'Reproducir'}
             </div>
           </SecondaryButton>
         </>
@@ -161,7 +161,7 @@ const Recorder: React.FC<RecorderProps> = ({
         <PrimaryButton
           id="primary-button"
           onClick={recording ? stopRecording : startRecording}
-          variant={(recording ? "pink" : "") as keyof Object}
+          variant={(recording ? 'pink' : '') as keyof Object}
           disabled={stopButtonDisabled}
         >
           {recording ? (
