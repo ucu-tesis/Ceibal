@@ -143,7 +143,6 @@ export default function Page() {
     return (
       <>
         <ErrorPage intendedAction={`cargar estadísticas de alumno`} />
-        <span>{JSON.stringify(error)}</span>
       </>
     );
   }

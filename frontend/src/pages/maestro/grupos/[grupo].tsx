@@ -139,12 +139,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const {
     name: groupName,
     students,
-    assignments,
   } = data ?? {
     name: '',
     students: [],
     assignments: [],
   };
+  const assignments = data?.assignments ?? [];
   const {
     assignmentsDone,
     assignmentsPending,
@@ -171,7 +171,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const router = useRouter();
 
   const { filteredAssignments } = useFilteredAssignments(
-    assignments,
+    assignments ?? [],
     assignmentSearchQuery,
     categoryOption,
     subcategoryOption,
