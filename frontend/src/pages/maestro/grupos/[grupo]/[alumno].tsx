@@ -140,11 +140,7 @@ export default function Page() {
   }
 
   if (isError) {
-    return (
-      <>
-        <ErrorPage intendedAction={`cargar estadísticas de alumno`} />
-      </>
-    );
+    return <ErrorPage intendedAction="cargar estadísticas de alumno" />;
   }
 
   const {

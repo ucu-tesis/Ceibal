@@ -63,11 +63,7 @@ const EvaluationList: React.FC = () => {
   }
 
   if (isError) {
-    return (
-      <>
-        <ErrorPage intendedAction={`obtener listado de grupos`} />
-      </>
-    );
+    return <ErrorPage intendedAction="obtener listado de grupos" />;
   }
 
   return (

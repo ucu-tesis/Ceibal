@@ -136,10 +136,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
-  const {
-    name: groupName,
-    students,
-  } = data ?? {
+  const { name: groupName, students } = data ?? {
     name: '',
     students: [],
     assignments: [],
@@ -171,7 +168,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const router = useRouter();
 
   const { filteredAssignments } = useFilteredAssignments(
-    assignments ?? [],
+    assignments,
     assignmentSearchQuery,
     categoryOption,
     subcategoryOption,
