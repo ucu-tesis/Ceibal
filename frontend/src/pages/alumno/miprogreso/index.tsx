@@ -10,6 +10,8 @@ import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styles from './miprogreso.module.css';
 import { useRouter } from 'next/router';
+import dayjs from 'dayjs';
+import { dateFormats } from '@/util/dates';
 
 const useFetchCompletedReadings = () => {
   const { id } = useUser();
@@ -66,7 +68,7 @@ const MiProgreso: React.FC = () => {
       </Head>
       <div className={`${styles.container} row`}>
         {recordings.map(
-          // TODO use analysis_status and date_submitted
+          // TODO use analysis_status
           (
             {
               id,
@@ -83,6 +85,9 @@ const MiProgreso: React.FC = () => {
               key={id}
               title={reading_title}
               image={reading_image}
+              dateSubmitted={dayjs(dateSubmitted).format(
+                dateFormats.assignmentDueDate,
+              )}
               onClick={() => router.push(`${currentPathName}/${id}`)}
               starsCount={Math.round(analysis_score / 20)}
             />
