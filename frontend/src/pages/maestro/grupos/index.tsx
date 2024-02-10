@@ -1,5 +1,7 @@
 import useFetchGroups from '@/api/teachers/hooks/useFetchGroups';
 import Select from '@/components/selects/Select';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
@@ -51,10 +53,18 @@ const toTableList = (groups: Group[]) => {
 };
 
 const EvaluationList: React.FC = () => {
-  const { data: groups } = useFetchGroups(TEACHER_CI);
+  const { data: groups, isError, isLoading } = useFetchGroups(TEACHER_CI);
   const [yearFilter, setYear] = useState<Option | undefined>(undefined);
   const { filteredGroups } = useFilteredGroups(groups ?? [], yearFilter?.value);
   const { filterOptions } = useGroupFilterOptions(groups ?? []);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (isError) {
+    return <ErrorPage intendedAction="obtener listado de grupos" />;
+  }
 
   return (
     <ChakraProvider>

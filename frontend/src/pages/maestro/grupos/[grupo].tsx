@@ -136,15 +136,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
-  const {
-    name: groupName,
-    students,
-    assignments,
-  } = data ?? {
+  const { name: groupName, students } = data ?? {
     name: '',
     students: [],
     assignments: [],
   };
+  const assignments = data?.assignments ?? [];
   const {
     assignmentsDone,
     assignmentsPending,
