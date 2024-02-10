@@ -38,7 +38,8 @@ const Recorder: React.FC<RecorderProps> = ({
   setBufferSource,
 }) => {
   const [recording, setRecording] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>();
+  const activeStreamRef = useRef<MediaStream>();
+  const mediaRecorderRef = useRef<MediaRecorder>();
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
   const audioContext = useRef<AudioContext | null>(null);
@@ -70,6 +71,10 @@ const Recorder: React.FC<RecorderProps> = ({
     ) as HTMLElement;
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
+      activeStreamRef.current?.getAudioTracks().forEach((track: MediaStreamTrack) => {
+        track.stop();
+        activeStreamRef.current!.removeTrack(track);
+      });
       if (buttonElement) {
         buttonElement.style.transform = 'scale(0.75)';
       }
@@ -86,6 +91,7 @@ const Recorder: React.FC<RecorderProps> = ({
       disableStopButtonTemporarily();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
+      activeStreamRef.current = stream;
       mediaRecorderRef.current = recorder;
 
       const audioChunks: Blob[] = [];
