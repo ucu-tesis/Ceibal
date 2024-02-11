@@ -67,32 +67,38 @@ const MiProgreso: React.FC = () => {
         <title>Mi Progreso</title>
       </Head>
       <div className={`${styles.container} row`}>
-        {recordings.map(
-          // TODO use analysis_status
-          (
-            {
-              id,
-              reading_image,
-              analysis_score,
-              analysis_status,
-              reading_title,
-              dateSubmitted,
-            },
-            index,
-          ) => (
-            <ReadCard
-              ref={index === recordings.length - 1 ? lastElementRef : undefined}
-              key={id}
-              title={reading_title}
-              image={reading_image}
-              dateSubmitted={dayjs(dateSubmitted).format(
-                dateFormats.assignmentDueDate,
-              )}
-              onClick={() => router.push(`${currentPathName}/${id}`)}
-              starsCount={Math.round(analysis_score / 20)}
-            />
-          ),
-        )}
+        {recordings
+          .sort(({ dateSubmitted: lds }, { dateSubmitted: rds }) =>
+            rds.localeCompare(lds),
+          )
+          .map(
+            // TODO use analysis_status
+            (
+              {
+                id,
+                reading_image,
+                analysis_score,
+                analysis_status,
+                reading_title,
+                dateSubmitted,
+              },
+              index,
+            ) => (
+              <ReadCard
+                ref={
+                  index === recordings.length - 1 ? lastElementRef : undefined
+                }
+                key={id}
+                title={reading_title}
+                image={reading_image}
+                dateSubmitted={dayjs(dateSubmitted).format(
+                  dateFormats.assignmentDueDate,
+                )}
+                onClick={() => router.push(`${currentPathName}/${id}`)}
+                starsCount={Math.round(analysis_score / 20)}
+              />
+            ),
+          )}
       </div>
       {isFetchingNextPage && (
         <div className={`${styles['spinner-container']}`}>
