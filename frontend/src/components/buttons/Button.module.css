@@ -127,6 +127,7 @@
   width: 100%;
   max-width: 100%;
   opacity: 0.2;
+  object-fit: cover;
 }
 
 .card-button:hover {
