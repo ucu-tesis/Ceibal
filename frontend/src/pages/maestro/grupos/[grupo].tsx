@@ -264,14 +264,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
             >
               Asignar Tarea
             </Button>
-            <Button
-              onClick={onOpenReadingModal}
-              leftIcon={<AddIcon />}
-              className={styles.secondary}
-              variant="outline"
-            >
-              Crear Lectura
-            </Button>
           </div>
         </div>
         <Tabs>

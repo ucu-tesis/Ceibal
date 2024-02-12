@@ -38,7 +38,7 @@ const TeacherHomeScreen: React.FC = () => {
               <Image src={ReadingBookOverlay} alt="ver lecturas" />
             }
             text="Lecturas"
-            onClick={() => {}}
+            onClick={() => router.push(`${currentPathName}/lecturas`)}
           ></TeacherCardButton>
         </div>
       </div>
