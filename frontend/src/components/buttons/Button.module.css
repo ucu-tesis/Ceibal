@@ -102,10 +102,20 @@
   transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
+.teacher.card-button {
+  width: 100%;
+  padding: 32px;
+  height: 250px;
+}
+
 .card-button:hover {
   cursor: pointer;
   transform: scale(1.25);
   background-color: #ffcc80;
+}
+
+.teacher.card-button:hover {
+  background-color: var(--ceibal-light-grey-secondary);
 }
 
 .card-button img {
@@ -214,6 +224,12 @@
     padding: 8px 16px;
   }
 
+  .teacher.card-button {
+    gap: 16px;
+    width: 250px;
+    height: auto;
+  }
+
   /* Disable hover for mobile.  */
   .card-button:hover {
     transform: scale(1);
@@ -223,6 +239,16 @@
   .card-button:active {
     transform: scale(1.25);
     background-color: #ffcc80;
+  }
+
+  .teacher.card-button:hover {
+    transform: scale(1);
+    background-color: var(--ceibal-light-grey-secondary);
+  }
+
+  .teacher.card-button:active {
+    transform: scale(1.25);
+    background-color: var(--ceibal-light-grey-secondary);
   }
 
   .card-button img {
