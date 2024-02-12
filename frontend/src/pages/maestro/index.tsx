@@ -6,8 +6,9 @@ import { useUser } from '@/providers/UserContext';
 import styles from './maestro.module.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import TeacherCardButton from '@/components/buttons/TeacherCardButton';
-import { AddIcon } from '@chakra-ui/icons';
+import ReadingBookOverlay from '@/assets/images/reading-book-full.png';
 import ReadingBook from '@/assets/images/reading-book.png';
+import GroupsOverlay from '@/assets/images/groups-full.png';
 import Groups from '@/assets/images/groups.png';
 
 const TeacherHomeScreen: React.FC = () => {
@@ -24,15 +25,19 @@ const TeacherHomeScreen: React.FC = () => {
       <div className={`${styles.container} row`}>
         <div>
           <TeacherCardButton
-            leftIcon={<Image src={Groups} alt="ver grupos" />}
-            text="Ver Grupos"
+            icon={<Image src={Groups} alt="ver grupos" />}
+            backgroundImage={<Image src={GroupsOverlay} alt="ver grupos" />}
+            text="Grupos"
             onClick={() => router.push(`${currentPathName}/grupos`)}
           ></TeacherCardButton>
         </div>
         <div>
           <TeacherCardButton
-            leftIcon={<Image src={ReadingBook} alt="ver lecturas" />}
-            text="Ver Lecturas"
+            icon={<Image src={ReadingBook} alt="ver lecturas" />}
+            backgroundImage={
+              <Image src={ReadingBookOverlay} alt="ver lecturas" />
+            }
+            text="Lecturas"
             onClick={() => {}}
           ></TeacherCardButton>
         </div>

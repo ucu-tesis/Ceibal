@@ -2,13 +2,15 @@ import React from 'react';
 import styles from './Button.module.css';
 
 interface TeacherCardButtonProps {
-  leftIcon: JSX.Element;
+  icon: JSX.Element;
+  backgroundImage: JSX.Element;
   onClick: () => void;
   text: string;
 }
 
 const TeacherCardButton: React.FC<TeacherCardButtonProps> = ({
-  leftIcon,
+  icon,
+  backgroundImage,
   onClick,
   text,
 }) => {
@@ -17,7 +19,10 @@ const TeacherCardButton: React.FC<TeacherCardButtonProps> = ({
       className={`${styles.teacher} ${styles['card-button']}`}
       onClick={onClick}
     >
-      {leftIcon}
+      <div>
+        {icon}
+        <div className={styles['card-overlay']}>{backgroundImage}</div>
+      </div>
       <span>{text}</span>
     </button>
   );

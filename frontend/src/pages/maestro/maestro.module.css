@@ -1,11 +1,11 @@
 .container {
     position: absolute;
-    top: 200%;
+    top: 150%;
     width: 100%;
     padding: 64px;
     justify-content: center;
     align-items: center;
-    gap: 32px;
+    gap: 64px;
 }
 
 @media (max-width: 700px) {

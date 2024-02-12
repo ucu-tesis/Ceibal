@@ -103,9 +103,30 @@
 }
 
 .teacher.card-button {
+  position: relative;
+  flex-direction: column;
+  gap: 64px;
   width: 100%;
-  padding: 32px;
-  height: 250px;
+  padding: 32px 64px;
+}
+
+.teacher.card-button .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity linear 0.3s, transform linear 0.1s;
+}
+
+.teacher.card-button .card-overlay img {
+  border-radius: 10px;
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  opacity: 0.2;
 }
 
 .card-button:hover {
@@ -118,9 +139,19 @@
   background-color: var(--ceibal-light-grey-secondary);
 }
 
+.teacher.card-button:hover .card-overlay {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .card-button img {
   max-height: 70px;
   max-width: 70px;
+}
+
+.teacher.card-button img {
+  max-height: 160px;
+  max-width: 160px;
 }
 
 .card-button span {
@@ -128,6 +159,10 @@
   flex-direction: column;
   text-align: start;
   font-size: 24px;
+}
+
+.teacher.card-button span {
+  flex: none;
 }
 
 .icon-button-container {
