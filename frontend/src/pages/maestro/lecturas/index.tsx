@@ -3,7 +3,7 @@ import Head from 'next/head';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
-import { inputRegex, tableMaxHeightModal } from '@/constants/constants';
+import { inputRegex } from '@/constants/constants';
 import Link from 'next/link';
 import {
   Breadcrumb,
