@@ -7,11 +7,12 @@ interface ReadCardProps {
   title: string;
   starsCount: number;
   image?: string;
+  dateSubmitted: string;
   onClick?: () => void;
 }
 
 const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
-  ({ title, image, starsCount, onClick = undefined }, ref) => {
+  ({ title, image, starsCount, dateSubmitted, onClick = undefined }, ref) => {
     const stars = Array.from({ length: starsCount }, (_, index) => (
       <Image key={`star-${index}`} src={Star} alt="estrella" />
     ));
@@ -30,6 +31,7 @@ const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
           priority
         />
         <span>{title}</span>
+        <span>{dateSubmitted}</span>
         <div className={`${styles.stars} row`}>{stars}</div>
       </div>
     );
