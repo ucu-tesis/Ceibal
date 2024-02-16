@@ -124,6 +124,21 @@ const toAssignmentTableList = (
     }),
   );
 
+const chartOptions = (title: string) => {
+  return {
+    plugins: {
+      title: {
+        display: true,
+        text: title,
+        font: {
+          size: 16,
+          weight: '500',
+        },
+      },
+    },
+  };
+};
+
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
@@ -383,8 +398,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 </div>
               </div>
               <div className={`row ${styles.canvas}`}>
-                <Line data={dataLine}></Line>
-                <Bar data={dataBar}></Bar>
+                <Line
+                  data={dataLine}
+                  options={chartOptions('Promedio de score mensual')}
+                ></Line>
+                <Bar
+                  data={dataBar}
+                  options={chartOptions('Promedio de tareas hechas')}
+                ></Bar>
               </div>
             </TabPanel>
           </TabPanels>
