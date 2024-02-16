@@ -206,9 +206,11 @@ export default function Page() {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
               {data.groupName}

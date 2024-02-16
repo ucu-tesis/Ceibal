@@ -1,0 +1,16 @@
+.container {
+    position: absolute;
+    top: 150%;
+    width: 100%;
+    padding: 64px;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+}
+
+@media (max-width: 700px) {
+    .container {
+        padding: 8px;
+        flex-direction: column;
+    }
+}

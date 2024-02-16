@@ -242,9 +242,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>
               {groupName}
@@ -263,14 +265,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
               variant="solid"
             >
               Asignar Tarea
-            </Button>
-            <Button
-              onClick={onOpenReadingModal}
-              leftIcon={<AddIcon />}
-              className={styles.secondary}
-              variant="outline"
-            >
-              Crear Lectura
             </Button>
           </div>
         </div>

@@ -48,6 +48,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ChangeEvent, useState } from 'react';
 import styles from './asignartarea.module.css';
+import useFetchAllReadings from '@/api/teachers/hooks/useFetchAllReadings';
 
 const READINGS_STEP = 'Agregar Tareas';
 const SUMMARY_STEP = 'Resumen';
@@ -292,10 +293,7 @@ const Page: React.FC = () => {
   const [activeTitle, setActiveTitle] = useState<string>();
 
   // TODO pagination
-  const readingsQueryData = useQuery({
-    queryKey: ['teacher', 'readings', 'all'],
-    queryFn: () => fetchAllReadings(),
-  });
+  const readingsQueryData = useFetchAllReadings();
 
   const isReadingSelected = (readingId: number) => {
     return selectedReadings.some((r) => r.id === readingId);
