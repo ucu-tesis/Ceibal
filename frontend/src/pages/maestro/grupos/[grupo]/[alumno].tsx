@@ -34,6 +34,7 @@ import IncompleteTasksIcon from '../../../../assets/images/lecturas_atrasadas.sv
 import SentTasksIcon from '../../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../../assets/images/lecturas_pendientes.svg';
 import styles from './alumno.module.css';
+import { chartOptions } from '@/util/chart';
 
 type Option = {
   value?: string;
@@ -183,9 +184,9 @@ export default function Page() {
       {
         label: 'Errores',
         data: [
-          averageErrors?.repetitionsCount,
-          averageErrors?.silencesCount,
           averageErrors?.generalErrors,
+          averageErrors?.silencesCount,
+          averageErrors?.repetitionsCount,
         ],
         fill: true,
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -260,9 +261,16 @@ export default function Page() {
         </div>
         <div className={`row ${styles.canvas}`}>
           {monthlyAverages.length > 0 && (
-            <Line data={monthlyAveragesChartData} width={400}></Line>
+            <Line
+              data={monthlyAveragesChartData}
+              width={400}
+              options={chartOptions('Promedio de score mensual')}
+            ></Line>
           )}
-          <Radar data={dataRadar}></Radar>
+          <Radar
+            data={dataRadar}
+            options={chartOptions('Errores cometidos')}
+          ></Radar>
         </div>
         <h2 tabIndex={0}>Tareas</h2>
         <div className={`${styles.filters} row`}>

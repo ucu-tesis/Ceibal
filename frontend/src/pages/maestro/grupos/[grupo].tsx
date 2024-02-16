@@ -44,6 +44,7 @@ import SentTasksIcon from '../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
 import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
 import styles from './grupos.module.css';
+import { chartOptions } from '@/util/chart';
 
 const columns: ChakraTableColumn[] = [
   { label: 'Nombre' },
@@ -123,21 +124,6 @@ const toAssignmentTableList = (
       ),
     }),
   );
-
-const chartOptions = (title: string) => {
-  return {
-    plugins: {
-      title: {
-        display: true,
-        text: title,
-        font: {
-          size: 16,
-          weight: '500',
-        },
-      },
-    },
-  };
-};
 
 export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
