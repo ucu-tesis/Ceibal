@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "./Button.module.css";
+import React from 'react';
+import styles from './Button.module.css';
 
 interface CardButtonProps {
   leftIcon: JSX.Element;
@@ -15,7 +15,7 @@ const CardButton: React.FC<CardButtonProps> = ({
   text,
 }) => {
   return (
-    <button className={`${styles["card-button"]}`} onClick={onClick}>
+    <button className={`${styles['card-button']}`} onClick={onClick}>
       {leftIcon}
       <span>{text}</span>
       {rightNode && <div>{rightNode}</div>}

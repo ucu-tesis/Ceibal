@@ -1,6 +1,6 @@
-import Image from "next/image";
-import React from "react";
-import styles from "./Button.module.css";
+import Image from 'next/image';
+import React from 'react';
+import styles from './Button.module.css';
 
 interface ImageButtonProps {
   onClick?: (achievement: any) => void;
@@ -16,15 +16,15 @@ const ImageButton: React.FC<ImageButtonProps> = ({
   src,
   altText,
   title,
-  variant = "",
+  variant = '',
   overlayText = undefined,
 }) => {
   return (
-    <div className={`${styles["btn-col"]} col`}>
+    <div className={`${styles['btn-col']} col`}>
       <button
         onClick={onClick}
         type="button"
-        className={`${styles["image-btn"]} ${styles[variant] ?? ""}`}
+        className={`${styles['image-btn']} ${styles[variant] ?? ''}`}
       >
         <Image
           className={`${styles.image}`}

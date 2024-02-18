@@ -1,13 +1,13 @@
-import { fetchReadingDetails } from "@/api/students/students";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import RecordScreen from "@/components/recordScreen/RecordScreen";
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
+import { fetchReadingDetails } from '@/api/students/students';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import RecordScreen from '@/components/recordScreen/RecordScreen';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
 
 const useReadingDetails = (id: number) =>
   useQuery({
-    queryKey: ["student", "reading", id],
+    queryKey: ['student', 'reading', id],
     queryFn: () => fetchReadingDetails(id),
   });
 

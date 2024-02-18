@@ -1,5 +1,5 @@
-import { Assignment, StudentAssignment } from "./Assignment";
-import { AssignmentReading } from "./AssignmentReading";
+import { Assignment, StudentAssignment } from './Assignment';
+import { AssignmentReading } from './AssignmentReading';
 
 export interface MonthlyAverage {
   groupAverageScore: number;

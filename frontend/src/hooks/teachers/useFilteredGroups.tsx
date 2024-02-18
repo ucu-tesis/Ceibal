@@ -1,5 +1,5 @@
-import { Group } from "@/models/Group";
-import { useMemo } from "react";
+import { Group } from '@/models/Group';
+import { useMemo } from 'react';
 
 const groupFilter =
   (query: string) =>
@@ -9,7 +9,7 @@ const groupFilter =
 const useFilteredGroups = (groups: Group[], query: string | undefined) => {
   const filteredGroups = useMemo(
     () => (query ? groups.filter(groupFilter(query)) : groups),
-    [groups, query]
+    [groups, query],
   );
   return { filteredGroups };
 };

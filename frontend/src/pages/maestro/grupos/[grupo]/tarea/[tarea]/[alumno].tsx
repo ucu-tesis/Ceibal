@@ -1,18 +1,21 @@
-import React from "react";
-import Head from "next/head";
-import { ChakraProvider } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import ProgressCircle from "@/components/progress/ProgressCircle";
-import styles from "./resultado.module.css";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import { useRouter } from "next/router";
-import useFetchStudentAssignmentDetails from "@/api/teachers/hooks/useFetchRecordingDetails";
+import React from 'react';
+import Head from 'next/head';
+import { ChakraProvider } from '@chakra-ui/react';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
+import { ChevronRightIcon } from '@chakra-ui/icons';
+import ProgressCircle from '@/components/progress/ProgressCircle';
+import styles from './resultado.module.css';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import { useRouter } from 'next/router';
+import useFetchStudentAssignmentDetails from '@/api/teachers/hooks/useFetchRecordingDetails';
 
 export default function Page() {
   const { tarea, alumno } = useRouter().query;
-  const { data, isLoading, isError } = useFetchStudentAssignmentDetails(Number(tarea), Number(alumno));
+  const { data, isLoading, isError } = useFetchStudentAssignmentDetails(
+    Number(tarea),
+    Number(alumno),
+  );
 
   if (isLoading) {
     return <LoadingPage />;
@@ -34,15 +37,23 @@ export default function Page() {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
-            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>{data.groupName}</BreadcrumbLink>
+            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
+              {data.groupName}
+            </BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}>{data.studentName}</BreadcrumbLink>
+            <BreadcrumbLink
+              href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}
+            >
+              {data.studentName}
+            </BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
@@ -57,19 +68,25 @@ export default function Page() {
             <h5 tabIndex={0}>Categoría: {data.category}</h5>
             <h5 tabIndex={0}>Subcategoría: {data.subcategory}</h5>
           </div>
-          <ProgressCircle value={data.score?.toString() ?? '0'}></ProgressCircle>
+          <ProgressCircle
+            value={data.score?.toString() ?? '0'}
+          ></ProgressCircle>
         </div>
         <h2 tabIndex={0}>Métricas</h2>
         <div className={`row ${styles.stats} ${styles.border}`}>
           <div className={`col`}>
             <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
             <h5 tabIndex={0}>Cantidad Repeticiones: {data.repetitionsCount}</h5>
-            <h5 tabIndex={0}>Velocidad de lectura: {data.wordsVelocity} palabras/minuto</h5>
+            <h5 tabIndex={0}>
+              Velocidad de lectura: {data.wordsVelocity} palabras/minuto
+            </h5>
           </div>
-          {data.recordingUrl ? <audio controls className={`${styles.audio}`}>
-            <source src={data.recordingUrl}/>
-\            Your browser does not support the audio element.
-          </audio> : null}
+          {data.recordingUrl ? (
+            <audio controls className={`${styles.audio}`}>
+              <source src={data.recordingUrl} />\ Your browser does not support
+              the audio element.
+            </audio>
+          ) : null}
         </div>
       </div>
     </ChakraProvider>

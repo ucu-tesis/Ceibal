@@ -1,22 +1,24 @@
-import useFetchGroups from "@/api/teachers/hooks/useFetchGroups";
-import Select from "@/components/selects/Select";
+import useFetchGroups from '@/api/teachers/hooks/useFetchGroups';
+import Select from '@/components/selects/Select';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
 import ChakraTable, {
   ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
-import { Group } from "@/models/Group";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+} from '@/components/tables/ChakraTable';
+import { Group } from '@/models/Group';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   ChakraProvider,
-} from "@chakra-ui/react";
-import Head from "next/head";
-import Link from "next/link";
-import React, { useState } from "react";
-import useFilteredGroups from "../../../hooks/teachers/useFilteredGroups";
-import useGroupFilterOptions from "../../../hooks/teachers/useGroupFilterOptions";
-import styles from "./grupos.module.css";
+} from '@chakra-ui/react';
+import Head from 'next/head';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import useFilteredGroups from '../../../hooks/teachers/useFilteredGroups';
+import useGroupFilterOptions from '../../../hooks/teachers/useGroupFilterOptions';
+import styles from './grupos.module.css';
 
 const TEACHER_CI = 2; // TODO: Replace when auth integration is done.
 
@@ -26,9 +28,9 @@ type Option = {
 };
 
 const columns: ChakraTableColumn[] = [
-  { label: "Grupo" },
-  { label: "Año", reactKey: "anio" },
-  { label: "", reactKey: "link", width: "40%" },
+  { label: 'Grupo' },
+  { label: 'Año', reactKey: 'anio' },
+  { label: '', reactKey: 'link', width: '40%' },
 ];
 
 const toTableList = (groups: Group[]) => {
@@ -39,7 +41,7 @@ const toTableList = (groups: Group[]) => {
       link: (
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]",
+            pathname: '/maestro/grupos/[grupo]',
             query: { grupo: id },
           }}
         >
@@ -51,10 +53,18 @@ const toTableList = (groups: Group[]) => {
 };
 
 const EvaluationList: React.FC = () => {
-  const { data: groups } = useFetchGroups(TEACHER_CI);
+  const { data: groups, isError, isLoading } = useFetchGroups(TEACHER_CI);
   const [yearFilter, setYear] = useState<Option | undefined>(undefined);
   const { filteredGroups } = useFilteredGroups(groups ?? [], yearFilter?.value);
   const { filterOptions } = useGroupFilterOptions(groups ?? []);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (isError) {
+    return <ErrorPage intendedAction="obtener listado de grupos" />;
+  }
 
   return (
     <ChakraProvider>
@@ -63,6 +73,9 @@ const EvaluationList: React.FC = () => {
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>

@@ -1,18 +1,22 @@
-import useFetchAssignmentStats from "@/api/teachers/hooks/useFetchAssignmentStats";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import ProgressCircle from "@/components/progress/ProgressCircle";
-import Select from "@/components/selects/Select";
+import useFetchAssignmentStats from '@/api/teachers/hooks/useFetchAssignmentStats';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ProgressCircle from '@/components/progress/ProgressCircle';
+import Select from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
-import { errorMetrics, inputRegex, notFoundMessage } from "@/constants/constants";
-import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
-import useFilteredEvaluations from "@/hooks/teachers/useFilteredEvaluations";
-import { AssignmentReading } from "@/models/AssignmentReading";
-import { AnalysisStatus } from "@/models/Recording";
-import { dateFormats } from "@/util/dates";
-import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
+} from '@/components/tables/ChakraTable';
+import {
+  errorMetrics,
+  inputRegex,
+  notFoundMessage,
+} from '@/constants/constants';
+import useChartJSInitializer from '@/hooks/teachers/useChartJSInitializer';
+import useFilteredEvaluations from '@/hooks/teachers/useFilteredEvaluations';
+import { AssignmentReading } from '@/models/AssignmentReading';
+import { AnalysisStatus } from '@/models/Recording';
+import { dateFormats } from '@/util/dates';
+import { ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,18 +25,18 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
-} from "@chakra-ui/react";
-import dayjs from "dayjs";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { Pie, Radar } from "react-chartjs-2";
-import IncompleteTasksIcon from "../../../../../assets/images/lecturas_atrasadas.svg";
-import SentTasksIcon from "../../../../../assets/images/lecturas_enviadas.svg";
-import PendingTasksIcon from "../../../../../assets/images/lecturas_pendientes.svg";
-import styles from "./tarea.module.css";
+} from '@chakra-ui/react';
+import dayjs from 'dayjs';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { Pie, Radar } from 'react-chartjs-2';
+import IncompleteTasksIcon from '../../../../../assets/images/lecturas_atrasadas.svg';
+import SentTasksIcon from '../../../../../assets/images/lecturas_enviadas.svg';
+import PendingTasksIcon from '../../../../../assets/images/lecturas_pendientes.svg';
+import styles from './tarea.module.css';
 
 interface Params {
   alumno: string;
@@ -47,15 +51,15 @@ type Option = {
 };
 
 const readingColumns: ChakraTableColumn[] = [
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Mail" },
-  { label: "Estado" },
-  { label: "Fecha de Entrega" },
+  { label: 'Nombre' },
+  { label: 'Documento' },
+  { label: 'Mail' },
+  { label: 'Estado' },
+  { label: 'Fecha de Entrega' },
 ];
 
 const defaultOption: Option = {
-  label: "Todos",
+  label: 'Todos',
   value: undefined,
 };
 
@@ -94,19 +98,19 @@ export default function Page({ params }: { params: Params }) {
     labels: errorMetrics,
     datasets: [
       {
-        label: "Errores",
+        label: 'Errores',
         data: [
           averageErrors?.repetitionsCount,
           averageErrors?.silencesCount,
           averageErrors?.generalErrors,
         ],
         fill: true,
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgb(255, 99, 132)",
-        pointBackgroundColor: "rgb(255, 99, 132)",
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgb(255, 99, 132)",
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgb(255, 99, 132)',
+        pointBackgroundColor: 'rgb(255, 99, 132)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(255, 99, 132)',
       },
     ],
   };
@@ -115,12 +119,12 @@ export default function Page({ params }: { params: Params }) {
     labels: mostRepeatedWords.map(({ word }) => word),
     datasets: [
       {
-        label: "My First Dataset",
+        label: 'My First Dataset',
         data: mostRepeatedWords.map(({ repetitionCount }) => repetitionCount),
         backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(54, 162, 235)",
-          "rgb(255, 205, 86)",
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)',
         ],
         hoverOffset: 4,
       },
@@ -129,7 +133,7 @@ export default function Page({ params }: { params: Params }) {
 
   useChartJSInitializer();
 
-  const [readingSearchQuery, setReadingSearchQuery] = useState("");
+  const [readingSearchQuery, setReadingSearchQuery] = useState('');
   const [statusOption, setStatusOption] = useState<string | undefined>(
     undefined,
   );
@@ -141,17 +145,17 @@ export default function Page({ params }: { params: Params }) {
   );
 
   const statusList: AnalysisStatus[] = [
-    "COMPLETED",
-    "FAILED",
-    "PENDING",
-    "WORKING",
+    'COMPLETED',
+    'FAILED',
+    'PENDING',
+    'WORKING',
   ];
 
   const statusLabels = {
-    COMPLETED: "Completado",
-    FAILED: "Fallido",
-    PENDING: "Pendiente",
-    WORKING: "Procesando",
+    COMPLETED: 'Completado',
+    FAILED: 'Fallido',
+    PENDING: 'Pendiente',
+    WORKING: 'Procesando',
   };
 
   const statusOptions: Option[] = [
@@ -176,7 +180,7 @@ export default function Page({ params }: { params: Params }) {
           link: (
             <Link
               href={{
-                pathname: "/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]",
+                pathname: '/maestro/grupos/[grupo]/tarea/[tarea]/[alumno]',
                 query: {
                   grupo: groupId,
                   tarea: evaluationGroupReadingId,
@@ -205,20 +209,20 @@ export default function Page({ params }: { params: Params }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
-            <BreadcrumbLink href={"/maestro/grupos/" + data.groupId}>
+            <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
               {data.groupName}
             </BreadcrumbLink>
           </BreadcrumbItem>
 
           <BreadcrumbItem>
             <BreadcrumbLink
-              href={
-                `/maestro/grupos/${data.groupId}/tarea/${assignment?.evaluationGroupReadingId}`
-              }
+              href={`/maestro/grupos/${data.groupId}/tarea/${assignment?.evaluationGroupReadingId}`}
             >
               Tarea: {assignment?.readingTitle}
             </BreadcrumbLink>
@@ -226,22 +230,22 @@ export default function Page({ params }: { params: Params }) {
         </Breadcrumb>
         <h1 tabIndex={0}>Resultado de evaluación</h1>
 
-        <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
+        <div className={`row ${styles.space} ${styles['tablet-col']}`}>
           <div className={`col ${styles.stats}`}>
             <h5 tabIndex={0}>
-              Lectura:{" "}
+              Lectura:{' '}
               {assignment?.readingTitle
                 ? assignment.readingTitle
                 : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
-              Categoría:{" "}
+              Categoría:{' '}
               {assignment?.readingCategory
                 ? assignment.readingCategory
                 : notFoundMessage}
             </h5>
             <h5 tabIndex={0}>
-              Subcategoría:{" "}
+              Subcategoría:{' '}
               {assignment?.readingSubcategory
                 ? assignment.readingSubcategory
                 : notFoundMessage}
@@ -261,8 +265,8 @@ export default function Page({ params }: { params: Params }) {
                 : notFoundMessage}
             </h5>
           </div>
-          <div className={styles["stats-box"]}>
-            <div className={`row ${styles["mob-col"]}`}>
+          <div className={styles['stats-box']}>
+            <div className={`row ${styles['mob-col']}`}>
               <ProgressCircle
                 value={Math.round(averageScore).toString()}
                 variant="small"

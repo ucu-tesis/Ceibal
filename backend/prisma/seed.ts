@@ -330,6 +330,7 @@ async function addStudentReading(
         'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
       evaluation_group_reading_id: groupReadingId,
       student_id: studentId,
+      created_at: createdAt,
     },
   });
 

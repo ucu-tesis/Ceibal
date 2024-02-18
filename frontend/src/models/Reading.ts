@@ -8,6 +8,6 @@ export interface Reading {
   subcategory: string;
 }
 
-export type ReadingMinimalInfo = Pick<Reading, "id" | "title"> & {
+export type ReadingMinimalInfo = Pick<Reading, 'id' | 'title'> & {
   dueDate?: Date;
 };

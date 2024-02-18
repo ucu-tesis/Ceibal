@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "./Container.module.css";
+import React from 'react';
+import styles from './Container.module.css';
 
 export interface TextContainterProps {
   content: string;

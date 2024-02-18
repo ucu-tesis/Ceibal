@@ -1,20 +1,20 @@
-import useFetchGroupDetails from "@/api/teachers/hooks/useFetchGroupDetails";
-import useFetchGroupStats from "@/api/teachers/hooks/useFetchGroupStats";
-import ErrorPage from "@/components/errorPage/ErrorPage";
-import LoadingPage from "@/components/loadingPage/LoadingPage";
-import CreateReadingModal from "@/components/modals/CreateReadingModal";
-import Select from "@/components/selects/Select";
+import useFetchGroupDetails from '@/api/teachers/hooks/useFetchGroupDetails';
+import useFetchGroupStats from '@/api/teachers/hooks/useFetchGroupStats';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import CreateReadingModal from '@/components/modals/CreateReadingModal';
+import Select from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
-} from "@/components/tables/ChakraTable";
-import { inputRegex } from "@/constants/constants";
-import useAssignmentFilterOptions from "@/hooks/teachers/useAssignmentFilterOptions";
-import useChartJSInitializer from "@/hooks/teachers/useChartJSInitializer";
-import useFilteredAssignments from "@/hooks/teachers/useFilteredAssignments";
-import { Assignment } from "@/models/Assignment";
-import { Student } from "@/models/Student";
-import { SPANISH_MONTH_NAMES, dateFormats } from "@/util/dates";
-import { AddIcon, ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
+} from '@/components/tables/ChakraTable';
+import { inputRegex } from '@/constants/constants';
+import useAssignmentFilterOptions from '@/hooks/teachers/useAssignmentFilterOptions';
+import useChartJSInitializer from '@/hooks/teachers/useChartJSInitializer';
+import useFilteredAssignments from '@/hooks/teachers/useFilteredAssignments';
+import { Assignment } from '@/models/Assignment';
+import { Student } from '@/models/Student';
+import { SPANISH_MONTH_NAMES, dateFormats } from '@/util/dates';
+import { AddIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,34 +30,34 @@ import {
   TabPanels,
   Tabs,
   useDisclosure,
-} from "@chakra-ui/react";
-import dayjs from "dayjs";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { Bar, Line } from "react-chartjs-2";
-import DatePicker from "react-datepicker";
-import IncompleteTasksIcon from "../../../assets/images/lecturas_atrasadas.svg";
-import SentTasksIcon from "../../../assets/images/lecturas_enviadas.svg";
-import PendingTasksIcon from "../../../assets/images/lecturas_pendientes.svg";
-import useFilteredStudents from "../../../hooks/teachers/useFilteredStudents";
-import styles from "./grupos.module.css";
+} from '@chakra-ui/react';
+import dayjs from 'dayjs';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { Bar, Line } from 'react-chartjs-2';
+import DatePicker from 'react-datepicker';
+import IncompleteTasksIcon from '../../../assets/images/lecturas_atrasadas.svg';
+import SentTasksIcon from '../../../assets/images/lecturas_enviadas.svg';
+import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
+import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
+import styles from './grupos.module.css';
 
 const columns: ChakraTableColumn[] = [
-  { label: "Nombre" },
-  { label: "Documento" },
-  { label: "Correo" },
-  { label: "Tareas Completadas" },
-  { label: "", reactKey: "link", width: "20%" },
+  { label: 'Nombre' },
+  { label: 'Documento' },
+  { label: 'Correo' },
+  { label: 'Tareas Completadas' },
+  { label: '', reactKey: 'link', width: '20%' },
 ];
 
 const assignmentColumns: ChakraTableColumn[] = [
-  { label: "Categoría" },
-  { label: "Subcategoría" },
-  { label: "Lectura" },
-  { label: "Fecha de Entrega" },
+  { label: 'Categoría' },
+  { label: 'Subcategoría' },
+  { label: 'Lectura' },
+  { label: 'Fecha de Entrega' },
 ];
 
 const toTableList = (students: Student[], evaluationGroupId: number) =>
@@ -79,7 +79,7 @@ const toTableList = (students: Student[], evaluationGroupId: number) =>
       link: (
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]/[alumno]",
+            pathname: '/maestro/grupos/[grupo]/[alumno]',
             query: {
               grupo: evaluationGroupId,
               alumno: id,
@@ -89,12 +89,12 @@ const toTableList = (students: Student[], evaluationGroupId: number) =>
           Ver detalles
         </Link>
       ),
-    })
+    }),
   );
 
 const toAssignmentTableList = (
   assignments: Assignment[],
-  evaluationGroupId: number
+  evaluationGroupId: number,
 ) =>
   assignments.map(
     ({
@@ -111,7 +111,7 @@ const toAssignmentTableList = (
       link: (
         <Link
           href={{
-            pathname: "/maestro/grupos/[grupo]/tarea/[tarea]",
+            pathname: '/maestro/grupos/[grupo]/tarea/[tarea]',
             query: {
               grupo: evaluationGroupId,
               tarea: evaluationGroupReadingId,
@@ -121,7 +121,7 @@ const toAssignmentTableList = (
           Ver detalles
         </Link>
       ),
-    })
+    }),
   );
 
 export default function Page({ params }: { params: { grupo: number } }) {
@@ -133,18 +133,15 @@ export default function Page({ params }: { params: { grupo: number } }) {
     isLoading: statsLoading,
     isError: statsError,
   } = useFetchGroupStats(evaluationGroupId);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
-  const {
-    name: groupName,
-    students,
-    assignments,
-  } = data ?? {
-    name: "",
+  const { name: groupName, students } = data ?? {
+    name: '',
     students: [],
     assignments: [],
   };
+  const assignments = data?.assignments ?? [];
   const {
     assignmentsDone,
     assignmentsPending,
@@ -164,7 +161,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     setStartDate(start);
     setEndDate(end);
   };
-  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
+  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState('');
 
   useChartJSInitializer();
 
@@ -174,7 +171,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
     assignments,
     assignmentSearchQuery,
     categoryOption,
-    subcategoryOption
+    subcategoryOption,
   );
 
   const { defaultOption, readingCategoryOptions, readingSubcategoryOptions } =
@@ -187,7 +184,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
   } = useDisclosure();
 
   const months = monthlyScoreAverages?.map(
-    ({ month }) => SPANISH_MONTH_NAMES[month]
+    ({ month }) => SPANISH_MONTH_NAMES[month],
   );
 
   const dataLine = {
@@ -195,10 +192,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
     datasets: [
       {
         id: 2,
-        label: "Promedio",
+        label: 'Promedio',
         data: monthlyScoreAverages?.map(({ value }) => value),
-        backgroundColor: "#FBE38E",
-        borderColor: "#FBE38E",
+        backgroundColor: '#FBE38E',
+        borderColor: '#FBE38E',
       },
     ],
   };
@@ -207,24 +204,24 @@ export default function Page({ params }: { params: { grupo: number } }) {
     labels: months,
     datasets: [
       {
-        label: "Tareas hechas",
+        label: 'Tareas hechas',
         data: monthlyAssignmentsDone?.map(({ value }) => value),
-        backgroundColor: "#c8fac3",
-        borderColor: "#c8fac3",
+        backgroundColor: '#c8fac3',
+        borderColor: '#c8fac3',
         borderWidth: 1,
       },
       {
-        label: "Tareas pendientes",
+        label: 'Tareas pendientes',
         data: monthlyAssignmentsPending?.map(({ value }) => value),
-        backgroundColor: "#D0E8FFB2",
-        borderColor: "#D0E8FFB2",
+        backgroundColor: '#D0E8FFB2',
+        borderColor: '#D0E8FFB2',
         borderWidth: 1,
       },
       {
-        label: "Tareas atrasadas",
+        label: 'Tareas atrasadas',
         data: monthlyAssignmentsDelayed?.map(({ value }) => value),
-        backgroundColor: "#FED0EEB2",
-        borderColor: "#FED0EEB2",
+        backgroundColor: '#FED0EEB2',
+        borderColor: '#FED0EEB2',
         borderWidth: 1,
       },
     ],
@@ -245,18 +242,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
-            <BreadcrumbLink href={"/maestro/grupos/" + evaluationGroupId}>
+            <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>
               {groupName}
             </BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
         <div className={`${styles.space} row`}>
           <h1 tabIndex={0}>{groupName}</h1>
-          <div className={`${styles["mob-col"]} row`}>
+          <div className={`${styles['mob-col']} row`}>
             <Button
               onClick={() =>
                 router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)
@@ -266,14 +265,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
               variant="solid"
             >
               Asignar Tarea
-            </Button>
-            <Button
-              onClick={onOpenReadingModal}
-              leftIcon={<AddIcon />}
-              className={styles.secondary}
-              variant="outline"
-            >
-              Crear Lectura
             </Button>
           </div>
         </div>
@@ -355,14 +346,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
                 columns={assignmentColumns}
                 data={toAssignmentTableList(
                   filteredAssignments,
-                  evaluationGroupId
+                  evaluationGroupId,
                 )}
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <div className={`row ${styles.space} ${styles["tablet-col"]}`}>
-                <div className={styles["stats-box"]}>
-                  <div className={`row ${styles["mob-col"]}`}>
+              <div className={`row ${styles.space} ${styles['tablet-col']}`}>
+                <div className={styles['stats-box']}>
+                  <div className={`row ${styles['mob-col']}`}>
                     <div className="row">
                       <Image alt="lecturas enviadas" src={SentTasksIcon} />
                       <span>Enviadas: {assignmentsDone}</span>

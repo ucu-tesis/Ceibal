@@ -1,4 +1,4 @@
-import { Subcategory } from "./Subcategory";
+import { Subcategory } from './Subcategory';
 
 export interface Category {
   name: string;
