@@ -217,10 +217,11 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
-export const fetchStudentStats = (groupId: number, studentId: number) =>
+export const fetchStudentStats = (groupId: number, studentId: number, dateFrom: string, dateTo: string) =>
   axiosInstance
     .get<StudentStatsResponse>(
       `/evaluationGroups/${groupId}/students/${studentId}`,
+      { params: { dateFrom, dateTo } }
     )
     .then(({ data }) => parseStudentStatsResponse(data));
 

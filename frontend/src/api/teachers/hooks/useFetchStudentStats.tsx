@@ -9,7 +9,7 @@ const select = (data: StudentStats): StudentStats => ({
   ),
 });
 
-const useFetchStudentStats = (evaluationGroupId: number, studentId: number) =>
+const useFetchStudentStats = (evaluationGroupId: number, studentId: number, dateFrom: string, dateTo: string) =>
   useQuery({
     queryKey: [
       'teacher',
@@ -17,9 +17,12 @@ const useFetchStudentStats = (evaluationGroupId: number, studentId: number) =>
       'evaluations',
       evaluationGroupId,
       studentId,
+      dateFrom,
+      dateTo,
     ],
-    queryFn: () => fetchStudentStats(evaluationGroupId, studentId),
+    queryFn: () => fetchStudentStats(evaluationGroupId, studentId, dateFrom, dateTo),
     select,
+    keepPreviousData: true,
   });
 
 export default useFetchStudentStats;

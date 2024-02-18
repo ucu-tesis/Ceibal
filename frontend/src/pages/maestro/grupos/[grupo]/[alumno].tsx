@@ -18,6 +18,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   ChakraProvider,
+  Flex,
   Input,
   InputGroup,
   InputRightAddon,
@@ -29,11 +30,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { Line, Radar } from 'react-chartjs-2';
-import DatePicker from 'react-datepicker';
 import IncompleteTasksIcon from '../../../../assets/images/lecturas_atrasadas.svg';
 import SentTasksIcon from '../../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../../assets/images/lecturas_pendientes.svg';
 import styles from './alumno.module.css';
+import { StudentStats } from '@/models/Stats';
+import Spinner from '@/components/spinners/Spinner';
 
 type Option = {
   value?: string;
@@ -88,21 +90,10 @@ const toTableListAssignment = (
     }),
   );
 
-export default function Page() {
-  const router = useRouter();
-  useChartJSInitializer();
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(null);
+function StudentPageContent({ data }: { data: StudentStats }) {
   const [taskSearchQuery, setTaskSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
-
-  const { grupo, alumno } = router.query;
-
-  const { data, isLoading, isError, error } = useFetchStudentStats(
-    Number(grupo),
-    Number(alumno),
-  );
 
   const categoryOptions = useMemo(
     () =>
@@ -128,20 +119,6 @@ export default function Page() {
     categoryOption,
     subcategoryOption,
   );
-
-  const onChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
-  if (isError) {
-    return <ErrorPage intendedAction="cargar estadísticas de alumno" />;
-  }
 
   const {
     assignmentsDone,
@@ -197,6 +174,115 @@ export default function Page() {
       },
     ],
   };
+  return (
+    <>
+      <Flex my="4" align="center" justify="center">
+        <div className={styles['stats-box']}>
+          <div className={`row ${styles['mob-col']}`}>
+            <ProgressCircle
+              value={`${Math.round(averageScore)}`}
+              variant="small"
+            ></ProgressCircle>
+            <div className="row">
+              <Image alt="lecturas enviadas" src={SentTasksIcon} />
+              <span>Enviadas: {assignmentsDone}</span>
+            </div>
+            <div className="row">
+              <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+              <span>Pendientes: {assignmentsPending}</span>
+            </div>
+            <div className="row">
+              <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
+              <span>Atrasadas: {assignmentsUncompleted}</span>
+            </div>
+          </div>
+        </div>
+      </Flex>
+      <Flex my="4" wrap="wrap" gap="64px" width="90%" align="center" justify="center">
+        <Flex height="300px">
+          {monthlyAverages.length > 0 && (
+            <Line data={monthlyAveragesChartData} width={400}></Line>
+          )}
+        </Flex>
+        <Flex height="300px">
+          <Radar data={dataRadar}></Radar>
+        </Flex>
+      </Flex>
+      <h2 tabIndex={0}>Tareas</h2>
+      <div className={`${styles.filters} row`}>
+        <InputGroup>
+          <Input
+            width="auto"
+            onKeyDown={(e) => {
+              if (!e.key.match(inputRegex)) {
+                e.preventDefault();
+              }
+            }}
+            onChange={({ target: { value } }) => {
+              setTaskSearchQuery(value.toLowerCase());
+            }}
+            maxLength={30}
+            placeholder="Lectura"
+          />
+          <InputRightAddon>
+            <SearchIcon />
+          </InputRightAddon>
+        </InputGroup>
+        <div className="col">
+          <label>Categoría</label>
+          <Select
+            defaultValue={defaultOption}
+            options={categoryOptions}
+            onChange={(option) => {
+              setCategoryOption(option.value);
+            }}
+          ></Select>
+        </div>
+        <div className="col">
+          <label>Subcategoría</label>
+          <Select
+            defaultValue={defaultOption}
+            options={subcategoryOptions}
+            onChange={(option) => {
+              setSubcategoryOption(option.value);
+            }}
+          ></Select>
+        </div>
+      </div>
+      <ChakraTable
+        columns={taskColumns}
+        data={toTableListAssignment(
+          filteredAssignments,
+          `${data.groupId}`,
+          `${data.studentId}`,
+        )}
+      ></ChakraTable>
+    </>
+  );
+}
+
+export default function Page() {
+  const router = useRouter();
+  useChartJSInitializer();
+  const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'))
+
+  const { grupo, alumno } = router.query;
+
+  const { data, isRefetching, isError } = useFetchStudentStats(
+    Number(grupo),
+    Number(alumno),
+    startDate,
+    endDate,
+  );
+
+  if (isError) {
+    return <ErrorPage intendedAction="cargar estadísticas de alumno" />;
+  }
+
+  if (!data) {
+    return <LoadingPage />;
+  }
 
   return (
     <ChakraProvider>
@@ -224,93 +310,27 @@ export default function Page() {
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>{data.studentName}</h1>
-        <div className={`row ${styles.space} ${styles['tablet-col']}`}>
-          <div className={styles['stats-box']}>
-            <div className={`row ${styles['mob-col']}`}>
-              <ProgressCircle
-                value={`${Math.round(averageScore)}`}
-                variant="small"
-              ></ProgressCircle>
-              <div className="row">
-                <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                <span>Enviadas: {assignmentsDone}</span>
-              </div>
-              <div className="row">
-                <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                <span>Pendientes: {assignmentsPending}</span>
-              </div>
-              <div className="row">
-                <Image alt="lecturas atrasadas" src={IncompleteTasksIcon} />
-                <span>Atrasadas: {assignmentsUncompleted}</span>
-              </div>
-            </div>
-          </div>
-          <div>
-            <DatePicker
-              selected={startDate}
-              onChange={onChange}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              inline
-            />
-          </div>
-        </div>
-        <div className={`row ${styles.canvas}`}>
-          {monthlyAverages.length > 0 && (
-            <Line data={monthlyAveragesChartData} width={400}></Line>
-          )}
-          <Radar data={dataRadar}></Radar>
-        </div>
-        <h2 tabIndex={0}>Tareas</h2>
-        <div className={`${styles.filters} row`}>
-          <InputGroup>
-            <Input
-              width="auto"
-              onKeyDown={(e) => {
-                if (!e.key.match(inputRegex)) {
-                  e.preventDefault();
-                }
-              }}
-              onChange={({ target: { value } }) => {
-                setTaskSearchQuery(value.toLowerCase());
-              }}
-              maxLength={30}
-              placeholder="Lectura"
-            />
-            <InputRightAddon>
-              <SearchIcon />
-            </InputRightAddon>
-          </InputGroup>
-          <div className="col">
-            <label>Categoría</label>
-            <Select
-              defaultValue={defaultOption}
-              options={categoryOptions}
-              onChange={(option) => {
-                setCategoryOption(option.value);
-              }}
-            ></Select>
-          </div>
-          <div className="col">
-            <label>Subcategoría</label>
-            <Select
-              defaultValue={defaultOption}
-              options={subcategoryOptions}
-              onChange={(option) => {
-                setSubcategoryOption(option.value);
-              }}
-            ></Select>
-          </div>
-        </div>
-        <ChakraTable
-          columns={taskColumns}
-          data={toTableListAssignment(
-            filteredAssignments,
-            `${data.groupId}`,
-            `${data.studentId}`,
-          )}
-        ></ChakraTable>
+        <Flex my="4" align="center" gap={4} justify="center">
+          Desde:
+          <Input
+            maxWidth="44"
+            type="date"
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+            }}
+          />
+          Hasta:
+          <Input
+            maxWidth="44"
+            type="date"
+            value={endDate}
+            onChange={(e) => {
+              setEndDate(e.target.value);
+            }}
+          />
+        </Flex>
+        {isRefetching ? <Flex my={8} justify={"center"}><Spinner /></Flex> : <StudentPageContent data={data} />}    
       </div>
     </ChakraProvider>
   );
