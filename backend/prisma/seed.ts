@@ -377,21 +377,21 @@ async function load() {
     decemberDate,
   );
 
-  // await prisma.evaluationGroupReading.create({
-  //   data: {
-  //     reading_id: testReading4.id,
-  //     evaluation_group_id: testTeacher.GroupsOwned[0].id,
-  //     due_date: new Date('2024-09-10'),
-  //   },
-  // });
+  await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading4.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-09-10'),
+    },
+  });
 
-  // await prisma.evaluationGroupReading.create({
-  //   data: {
-  //     reading_id: testReading5.id,
-  //     evaluation_group_id: testTeacher.GroupsOwned[0].id,
-  //     due_date: new Date('2024-09-10'),
-  //   },
-  // });
+  await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading5.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: new Date('2024-09-10'),
+    },
+  });
 
   await addStudents(testTeacher);
   await addAchievements();
