@@ -21,6 +21,7 @@ import {
   BreadcrumbLink,
   Button,
   ChakraProvider,
+  Flex,
   Input,
   InputGroup,
   InputRightAddon,
@@ -44,6 +45,7 @@ import SentTasksIcon from '../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
 import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
 import styles from './grupos.module.css';
+import Spinner from '@/components/spinners/Spinner';
 
 const columns: ChakraTableColumn[] = [
   { label: 'Nombre' },
@@ -128,11 +130,17 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
+  
+  // TODO ensure startDate < endDate
+  // TODO ensure valid values (31 -> 30 days)
+  const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'))
   const {
     data: statsData,
-    isLoading: statsLoading,
+    isRefetching: statsIsRefetching,
     isError: statsError,
-  } = useFetchGroupStats(evaluationGroupId);
+  } = useFetchGroupStats(evaluationGroupId, startDate, endDate);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -154,13 +162,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const onChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState('');
 
   useChartJSInitializer();
@@ -232,6 +233,9 @@ export default function Page({ params }: { params: { grupo: number } }) {
   }
   if (isError) {
     return <ErrorPage intendedAction="buscar los alumnos del grupo" />;
+  }
+  if (statsError) {
+    return <ErrorPage intendedAction="recopilar estadisticas del grupo" />;
   }
 
   return (
@@ -357,41 +361,57 @@ export default function Page({ params }: { params: { grupo: number } }) {
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <div className={`row ${styles.space} ${styles['tablet-col']}`}>
-                <div className={styles['stats-box']}>
-                  <div className={`row ${styles['mob-col']}`}>
-                    <div className="row">
-                      <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                      <span>Enviadas: {assignmentsDone}</span>
-                    </div>
-                    <div className="row">
-                      <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                      <span>Pendientes: {assignmentsPending}</span>
-                    </div>
-                    <div className="row">
-                      <Image
-                        alt="lecturas atrasadas"
-                        src={IncompleteTasksIcon}
-                      />
-                      <span>Atrasadas: {assignmentsDelayed}</span>
+              <Flex my="4" align="center" gap={4} justify="center">
+                Desde:
+                <Input
+                  maxWidth="44"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                  }}
+                />
+                Hasta:
+                <Input
+                  maxWidth="44"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                  }}
+                />
+              </Flex>
+              {statsIsRefetching ? (
+                <Flex my={8} justify={"center"}><Spinner /></Flex>
+              ) : (
+                <>
+                  <div className={`row ${styles.space} ${styles['tablet-col']}`}>
+                    <div className={styles['stats-box']}>
+                      <div className={`row ${styles['mob-col']}`}>
+                        <div className="row">
+                          <Image alt="lecturas enviadas" src={SentTasksIcon} />
+                          <span>Enviadas: {assignmentsDone}</span>
+                        </div>
+                        <div className="row">
+                          <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+                          <span>Pendientes: {assignmentsPending}</span>
+                        </div>
+                        <div className="row">
+                          <Image
+                            alt="lecturas atrasadas"
+                            src={IncompleteTasksIcon}
+                          />
+                          <span>Atrasadas: {assignmentsDelayed}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={onChange}
-                    startDate={startDate}
-                    endDate={endDate}
-                    selectsRange
-                    inline
-                  />
-                </div>
-              </div>
-              <div className={`row ${styles.canvas}`}>
-                <Line data={dataLine}></Line>
-                <Bar data={dataBar}></Bar>
-              </div>
+                  <div className={`row ${styles.canvas}`}>
+                    <Line data={dataLine}></Line>
+                    <Bar data={dataBar}></Bar>
+                  </div>
+                </>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

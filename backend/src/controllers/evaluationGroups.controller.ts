@@ -182,21 +182,32 @@ export class EvaluationGroupsController {
         where: {
           evaluation_group_id: evaluationGroup.id,
           Recordings: {
-            some: {},
+            some: {
+              created_at: { gte: dayjs(dateFrom).toISOString(), lte: dayjs(dateTo).toISOString() },
+            },
           },
         },
       });
+    
+    const now = new Date();
+    const inDateRangeCondition = {
+      AND: [
+        { created_at: { lte: dayjs(dateTo).toISOString() } },
+        { due_date: { gte: dayjs(dateFrom).toISOString() } },
+      ],
+    };
 
     const assignmentsPendingCount =
       await this.prismaService.evaluationGroupReading.count({
         where: {
           evaluation_group_id: evaluationGroup.id,
           due_date: {
-            gt: new Date(),
+            gt: now,
           },
           Recordings: {
             none: {},
           },
+          ...inDateRangeCondition,
         },
       });
 
@@ -205,11 +216,12 @@ export class EvaluationGroupsController {
         where: {
           evaluation_group_id: evaluationGroup.id,
           due_date: {
-            lt: new Date(),
+            lt: now,
           },
           Recordings: {
             none: {},
           },
+          ...inDateRangeCondition,
         },
       });
 

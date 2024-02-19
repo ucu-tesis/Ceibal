@@ -79,8 +79,11 @@ td .badge {
 }
 
 .space.tablet-col {
-  margin-right: 15%;
   margin-bottom: 64px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .desc {
@@ -147,7 +150,7 @@ td .badge {
 }
 
 .stats-box {
-  padding: 24px 80px 24px 24px;
+  padding: 24px 24px 24px 24px;
   width: fit-content;
   height: fit-content;
   border: 1px solid var(--ceibal-black);

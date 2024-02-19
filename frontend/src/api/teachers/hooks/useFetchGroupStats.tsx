@@ -15,10 +15,10 @@ const select = (data: GroupStats): GroupStats => ({
   ),
 });
 
-const useFetchGroupStats = (evaluationGroupId: number) =>
+const useFetchGroupStats = (evaluationGroupId: number, dateFrom: string, dateTo: string) =>
   useQuery({
-    queryKey: ['teacher', 'groups', 'evaluations', evaluationGroupId],
-    queryFn: () => fetchGroupStats(evaluationGroupId),
+    queryKey: ['teacher', 'groups', 'evaluations', evaluationGroupId, dateFrom, dateTo],
+    queryFn: () => fetchGroupStats(evaluationGroupId, dateFrom, dateTo),
     select,
   });
 
