@@ -65,7 +65,7 @@ const Premios: React.FC = () => {
                   a.achieved ? 'completado' : 'por completar'
                 }`}
                 title={a.name}
-                overlayText={a.achieved ? 'En Proceso' : undefined}
+                overlayText={a.achieved ? 'Completado!' : undefined}
               />
             );
           })}
