@@ -18,7 +18,7 @@ const Login: React.FC = () => {
   const user = useUser();
 
   if (user?.type === 'teacher') {
-    router.replace('/maestro/grupos');
+    router.replace('/maestro');
   } else if (user?.type === 'student') {
     router.replace('/alumno');
   }
