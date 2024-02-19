@@ -10,6 +10,7 @@ import {
   toastDuration,
 } from '@/constants/constants';
 import { Reading } from '@/models/Reading';
+import { dateFormats } from '@/util/dates';
 import { getOptionsFromArray } from '@/util/select';
 import { SearchIcon } from '@chakra-ui/icons';
 import {
@@ -98,7 +99,9 @@ const Summary: React.FC<SummaryProps> = ({
     <>
       <div className={`${styles.desc} row`}>
         <span tabIndex={0}>Fecha límite:</span>
-        <span tabIndex={0}>{selectedDueDate}</span>
+        <span tabIndex={0}>{dayjs(selectedDueDate).format(
+            dateFormats.assignmentDueDate,
+          )}</span>
       </div>
       <div className={`${styles.desc} row`}>
         <span tabIndex={0}>Lecturas:</span>
