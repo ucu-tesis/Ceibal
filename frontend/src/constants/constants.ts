@@ -8,7 +8,11 @@ export const silverAchievement = 'premio de plata';
 
 export const goldAchievement = 'premio de oro';
 
-export const errorMetrics = ['Repeticiones', 'Pausas', 'Faltas'];
+export const errorMetrics = [
+  'Errores de pronunciación',
+  'Pausas',
+  'Repeticiones',
+];
 
 export const inputRegex = /\w|\d|\-|\s/;
 
