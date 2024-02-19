@@ -138,6 +138,10 @@
   .modal-content {
     min-width: 700px;
   }
+
+  .modal-body {
+    white-space: pre-line;
+  }
   
   .canvas {
     height: 300px;
