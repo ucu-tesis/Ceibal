@@ -2,20 +2,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReadingsController } from 'src/controllers/readings.controller';
 import { PrismaService } from 'src/prisma.service';
 import { TestFactory } from '../testFactory';
+import { FileUploadService } from 'src/services/file-upload.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('ReadingsController', () => {
   let controller: ReadingsController;
 
   let prismaService: PrismaService;
+  let fileUploadService: FileUploadService;
 
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [ReadingsController],
-      providers: [PrismaService],
+      providers: [PrismaService, FileUploadService, ConfigService],
     }).compile();
 
     controller = app.get<ReadingsController>(ReadingsController);
     prismaService = app.get<PrismaService>(PrismaService);
+    fileUploadService = app.get<FileUploadService>(FileUploadService);
   });
 
   describe('getAll', () => {
@@ -82,12 +86,15 @@ describe('ReadingsController', () => {
       const teacher = await TestFactory.createTeacher({});
       const readingsBefore = await prismaService.reading.findMany();
       expect(readingsBefore).toEqual([]);
+      const fileUploadSpy = jest.spyOn(fileUploadService, 'uploadFileToPublicS3').mockImplementation(async () => {
+        return { key: "s3key", url: "s3url" };
+      });
       const result = await controller.createReading(teacher.id, {
         title: 'testTitle',
         content: 'someContent',
         category: 'Beginner',
         subcategory: 'Adventure',
-      });
+      }, 'some file');
       const readingsAfter = await prismaService.reading.findMany();
       expect(readingsAfter).toEqual([
         {
@@ -97,12 +104,13 @@ describe('ReadingsController', () => {
           category: 'Beginner',
           subcategory: 'Adventure',
           position: 0,
-          image_url: null,
+          image_url: 's3url',
           is_public: false,
           created_at: expect.any(Date),
           created_by: teacher.id,
         },
       ]);
+      expect(fileUploadSpy).toHaveBeenCalledWith('some file');
     });
   });
 });

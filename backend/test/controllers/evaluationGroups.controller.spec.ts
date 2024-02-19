@@ -3,6 +3,8 @@ import { EvaluationGroupsController } from 'src/controllers/evaluationGroups.con
 import { PrismaService } from 'src/prisma.service';
 import { TestFactory } from '../testFactory';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { FileUploadService } from 'src/services/file-upload.service';
+import { ConfigService } from '@nestjs/config';
 
 const defaultPagination = { page: 0, pageSize: 20 };
 
@@ -14,7 +16,7 @@ describe('EvaluationGroupsController', () => {
   beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [EvaluationGroupsController],
-      providers: [PrismaService],
+      providers: [PrismaService, FileUploadService, ConfigService],
     }).compile();
 
     controller = app.get<EvaluationGroupsController>(
