@@ -203,19 +203,79 @@ async function load() {
   const novemberDate = new Date('2023-11-18');
   const decemberDate = new Date('2023-12-22');
 
-  await addStudentReading(1, groupReading1.id, octoberDate);
-  await addStudentReading(1, groupReading2.id, octoberDate);
-  await addStudentReading(1, groupReading3.id, novemberDate);
-  await addStudentReading(1, groupReading1.id, novemberDate);
-  await addStudentReading(1, groupReading1.id, decemberDate);
-  await addStudentReading(1, groupReading1.id, decemberDate);
+  await addStudentReading(
+    1,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading2.id,
+    groupReading2.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading3.id,
+    groupReading3.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading1.id,
+    groupReading1.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading1.id,
+    groupReading1.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading1.id,
+    groupReading1.reading_id,
+    decemberDate,
+  );
 
-  await addStudentReading(2, groupReading1.id, octoberDate);
-  await addStudentReading(2, groupReading2.id, octoberDate);
-  await addStudentReading(2, groupReading3.id, novemberDate);
-  await addStudentReading(2, groupReading1.id, novemberDate);
-  await addStudentReading(2, groupReading1.id, decemberDate);
-  await addStudentReading(2, groupReading1.id, decemberDate);
+  await addStudentReading(
+    2,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading2.id,
+    groupReading2.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading3.id,
+    groupReading3.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading1.id,
+    groupReading1.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading1.id,
+    groupReading1.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading1.id,
+    groupReading1.reading_id,
+    decemberDate,
+  );
 
   await prisma.evaluationGroupReading.create({
     data: {
@@ -322,6 +382,7 @@ async function addSSOUsers(testTeacher) {
 async function addStudentReading(
   studentId,
   groupReadingId,
+  readingId,
   createdAt = undefined,
 ) {
   const recording = await prisma.recording.create({
@@ -329,6 +390,7 @@ async function addStudentReading(
       recording_url:
         'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
       evaluation_group_reading_id: groupReadingId,
+      reading_id: readingId,
       student_id: studentId,
       created_at: createdAt,
     },

@@ -1,8 +1,11 @@
 import {
+  Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Post,
+  UnprocessableEntityException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -16,6 +19,15 @@ import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { UserData } from 'src/decorators/userData.decorator';
 import { AchievementService } from 'src/services/achievement.service';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+
+class UploadRecordingDTO {
+  @IsString()
+  @IsOptional()
+  evaluationGroupReadingId: string;
+  @IsString()
+  readingId?: string;
+}
 
 @Controller('recordings')
 export class RecordingsController {
@@ -26,22 +38,58 @@ export class RecordingsController {
   ) {}
 
   // TODO consider moving this to a "student" controller with all other student-facing logic
-  @Post('/upload/:evaluationGroupReadingId')
+  @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(StudentGuard)
   async upload(
     @UserData('id') userId: number,
-    @Param('evaluationGroupReadingId') evaluationGroupReadingId: string,
+    @Body() uploadDTO: UploadRecordingDTO,
     @UploadedFile() file: File,
   ): Promise<{ recordingId: number; analysisId: number }> {
+    const readingId = parseInt(uploadDTO.readingId);
+    const evaluationGroupReadingId = parseInt(
+      uploadDTO.evaluationGroupReadingId,
+    );
     const s3File = await this.fileUploadService.uploadFileToPrivateS3(file);
+
+    const reading = await this.prismaService.reading.findUnique({
+      where: {
+        id: readingId,
+      },
+    });
+
+    if (!reading) {
+      throw new UnprocessableEntityException('Reading not found');
+    }
+
+    if (uploadDTO.evaluationGroupReadingId) {
+      const evaluationGroupReading =
+        await this.prismaService.evaluationGroupReading.findFirst({
+          where: {
+            id: evaluationGroupReadingId,
+            reading_id: readingId,
+            EvaluationGroup: {
+              Students: {
+                some: {
+                  id: userId,
+                },
+              },
+            },
+          },
+        });
+      if (!evaluationGroupReading) {
+        throw new ForbiddenException(
+          'You are not part of this evaluation group reading',
+        );
+      }
+    }
 
     const recording = await this.prismaService.recording.create({
       data: {
         recording_url: s3File.key,
         student_id: userId,
-        // TODO check student is part of evaluation group
-        evaluation_group_reading_id: Number(evaluationGroupReadingId),
+        evaluation_group_reading_id: evaluationGroupReadingId || null,
+        reading_id: readingId,
         Analysis: {
           create: {
             status: AnalysisStatus.PENDING,
@@ -90,11 +138,8 @@ export class RecordingsController {
       },
       include: {
         Analysis: true,
-        EvaluationGroupReading: {
-          include: {
-            Reading: true,
-          },
-        },
+        Reading: true,
+        EvaluationGroupReading: true,
       },
     });
 

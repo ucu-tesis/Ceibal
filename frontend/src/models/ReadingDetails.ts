@@ -1,6 +1,6 @@
 // TODO rename this, is this for an assignment? AssignmentDetails
 export interface ReadingDetails {
-  evaluationGroupReadingId: number;
+  evaluationGroupReadingId: number | null;
   category: string;
   content: string;
   id: number;

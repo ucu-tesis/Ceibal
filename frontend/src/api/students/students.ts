@@ -80,13 +80,11 @@ interface RecordingResponse {
   recording_url: string;
   created_at: string;
   Analysis: AnalysisItem[];
-  EvaluationGroupReading: {
-    Reading: {
-      title: string;
-      image_url: string;
-      category: string;
-      subcategory: string;
-    };
+  Reading: {
+    title: string;
+    image_url: string;
+    category: string;
+    subcategory: string;
   };
 }
 
@@ -214,9 +212,7 @@ const parseRecordingResponse = ({
   Analysis,
   id,
   created_at,
-  EvaluationGroupReading: {
-    Reading: { image_url, title, category, subcategory },
-  },
+  Reading: { image_url, title, category, subcategory },
   recording_url,
 }: RecordingResponse): Recording => ({
   analysis_score: Analysis[0].score,
