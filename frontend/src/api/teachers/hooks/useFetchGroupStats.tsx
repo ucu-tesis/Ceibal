@@ -16,12 +16,25 @@ const select = (data: GroupStats): GroupStats => ({
   ),
 });
 
-const useFetchGroupStats = (evaluationGroupId: number, dateFrom: string, dateTo: string) =>
+const useFetchGroupStats = (
+  evaluationGroupId: number,
+  dateFrom: string,
+  dateTo: string,
+) =>
   useQuery({
-    queryKey: ['teacher', 'groups', 'evaluations', evaluationGroupId, dateFrom, dateTo],
+    queryKey: [
+      'teacher',
+      'groups',
+      'evaluations',
+      evaluationGroupId,
+      dateFrom,
+      dateTo,
+    ],
     queryFn: () => fetchGroupStats(evaluationGroupId, dateFrom, dateTo),
     select,
-    enabled: dayjs(dateFrom, "YYYY-MM-DD").isBefore(dayjs(dateTo, "YYYY-MM-DD")),
+    enabled: dayjs(dateFrom, 'YYYY-MM-DD').isBefore(
+      dayjs(dateTo, 'YYYY-MM-DD'),
+    ),
   });
 
 export default useFetchGroupStats;

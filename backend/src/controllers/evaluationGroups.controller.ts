@@ -186,12 +186,15 @@ export class EvaluationGroupsController {
           evaluation_group_id: evaluationGroup.id,
           Recordings: {
             some: {
-              created_at: { gte: dateFrom.toISOString(), lte: dateTo.toISOString() },
+              created_at: {
+                gte: dateFrom.toISOString(),
+                lte: dateTo.toISOString(),
+              },
             },
           },
         },
       });
-    
+
     const now = new Date();
     const inDateRangeCondition = {
       AND: [
@@ -324,7 +327,7 @@ export class EvaluationGroupsController {
           },
         },
       });
-    
+
     let doneAssignmentsCount = 0; // has recording
     let pendingAssignmentsCount = 0; // no recording, due_date > now
     let delayedAssignmentsCount = 0; // no recording, due_date <= now
@@ -335,15 +338,17 @@ export class EvaluationGroupsController {
       repetitions_count: { sum: 0, count: 0 },
       similarity_error: { sum: 0, count: 0 },
     };
-    
+
     const addAverage = (key: string, value: number) => {
       averagesDataMap[key].sum += value;
       averagesDataMap[key].count += 1;
     };
-    
+
     assignments.forEach(({ Recordings, created_at, due_date }) => {
       if (Recordings.length === 0) {
-        const outOfRange = dayjs(created_at).isAfter(dateTo) || dayjs(due_date).isBefore(dateFrom);
+        const outOfRange =
+          dayjs(created_at).isAfter(dateTo) ||
+          dayjs(due_date).isBefore(dateFrom);
         if (!outOfRange) {
           if (dayjs().isAfter(due_date)) {
             delayedAssignmentsCount += 1;
@@ -354,16 +359,18 @@ export class EvaluationGroupsController {
       } else {
         const lastRecording = Recordings[Recordings.length - 1];
         const recordingDate = dayjs(lastRecording.created_at);
-        const isInDateRange = recordingDate.isAfter(dateFrom) && recordingDate.isBefore(dateTo);
+        const isInDateRange =
+          recordingDate.isAfter(dateFrom) && recordingDate.isBefore(dateTo);
 
         if (isInDateRange) {
           doneAssignmentsCount += 1;
 
-          const lastAnalysis = lastRecording.Analysis.length ?
-            lastRecording.Analysis[lastRecording.Analysis.length - 1] :
-            null;
+          const lastAnalysis = lastRecording.Analysis.length
+            ? lastRecording.Analysis[lastRecording.Analysis.length - 1]
+            : null;
 
-          const isAnalysisCompleted = lastAnalysis && lastAnalysis.status === AnalysisStatus.COMPLETED;
+          const isAnalysisCompleted =
+            lastAnalysis && lastAnalysis.status === AnalysisStatus.COMPLETED;
           if (isAnalysisCompleted) {
             addAverage('score', lastAnalysis.score);
             addAverage('silences_count', lastAnalysis.silences_count);
@@ -376,7 +383,7 @@ export class EvaluationGroupsController {
 
     const getAverage = (key: string) => {
       return averagesDataMap[key].sum / averagesDataMap[key].count;
-    }
+    };
 
     // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
     const monthlyAverages = await this.prismaService.$queryRaw`

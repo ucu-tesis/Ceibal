@@ -10,7 +10,12 @@ const select = (data: StudentStats): StudentStats => ({
   ),
 });
 
-const useFetchStudentStats = (evaluationGroupId: number, studentId: number, dateFrom: string, dateTo: string) =>
+const useFetchStudentStats = (
+  evaluationGroupId: number,
+  studentId: number,
+  dateFrom: string,
+  dateTo: string,
+) =>
   useQuery({
     queryKey: [
       'teacher',
@@ -21,10 +26,13 @@ const useFetchStudentStats = (evaluationGroupId: number, studentId: number, date
       dateFrom,
       dateTo,
     ],
-    queryFn: () => fetchStudentStats(evaluationGroupId, studentId, dateFrom, dateTo),
+    queryFn: () =>
+      fetchStudentStats(evaluationGroupId, studentId, dateFrom, dateTo),
     select,
     keepPreviousData: true,
-    enabled: dayjs(dateFrom, "YYYY-MM-DD").isBefore(dayjs(dateTo, "YYYY-MM-DD")),
+    enabled: dayjs(dateFrom, 'YYYY-MM-DD').isBefore(
+      dayjs(dateTo, 'YYYY-MM-DD'),
+    ),
   });
 
 export default useFetchStudentStats;

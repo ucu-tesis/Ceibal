@@ -131,16 +131,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
-  
-  const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
-  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'));
+
+  const [startDate, setStartDate] = useState(
+    dayjs().startOf('year').format('YYYY-MM-DD'),
+  );
+  const [endDate, setEndDate] = useState(
+    dayjs().endOf('year').format('YYYY-MM-DD'),
+  );
   const {
     data: statsData,
     isRefetching: statsIsRefetching,
     isError: statsError,
   } = useFetchGroupStats(evaluationGroupId, startDate, endDate);
-  const invalidStartDate = !dayjs(startDate, "YYYY-MM-DD").isBefore(dayjs(endDate, "YYYY-MM-DD"));
-  
+  const invalidStartDate = !dayjs(startDate, 'YYYY-MM-DD').isBefore(
+    dayjs(endDate, 'YYYY-MM-DD'),
+  );
+
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -361,7 +367,13 @@ export default function Page({ params }: { params: { grupo: number } }) {
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <Flex my="4" align="center" gap={4} justify="center" wrap={"wrap"}>
+              <Flex
+                my="4"
+                align="center"
+                gap={4}
+                justify="center"
+                wrap={'wrap'}
+              >
                 Desde:
                 <Input
                   maxWidth="44"
@@ -387,14 +399,20 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   }}
                 />
                 {invalidStartDate && (
-                  <Text width="100%" textAlign={"center"} color="red.600"><i>Rango Invalido</i></Text>
+                  <Text width="100%" textAlign={'center'} color="red.600">
+                    <i>Rango Invalido</i>
+                  </Text>
                 )}
               </Flex>
               {statsIsRefetching ? (
-                <Flex my={8} justify={"center"}><Spinner /></Flex>
+                <Flex my={8} justify={'center'}>
+                  <Spinner />
+                </Flex>
               ) : (
                 <>
-                  <div className={`row ${styles.space} ${styles['tablet-col']}`}>
+                  <div
+                    className={`row ${styles.space} ${styles['tablet-col']}`}
+                  >
                     <div className={styles['stats-box']}>
                       <div className={`row ${styles['mob-col']}`}>
                         <div className="row">
@@ -402,7 +420,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                           <span>Enviadas: {assignmentsDone}</span>
                         </div>
                         <div className="row">
-                          <Image alt="lecturas pendientes" src={PendingTasksIcon} />
+                          <Image
+                            alt="lecturas pendientes"
+                            src={PendingTasksIcon}
+                          />
                           <span>Pendientes: {assignmentsPending}</span>
                         </div>
                         <div className="row">

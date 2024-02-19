@@ -199,7 +199,14 @@ function StudentPageContent({ data }: { data: StudentStats }) {
           </div>
         </div>
       </Flex>
-      <Flex my="4" wrap="wrap" gap="64px" width="90%" align="center" justify="center">
+      <Flex
+        my="4"
+        wrap="wrap"
+        gap="64px"
+        width="90%"
+        align="center"
+        justify="center"
+      >
         <Flex height="300px">
           {monthlyAverages.length > 0 && (
             <Line data={monthlyAveragesChartData} width={400}></Line>
@@ -265,9 +272,15 @@ function StudentPageContent({ data }: { data: StudentStats }) {
 export default function Page() {
   const router = useRouter();
   useChartJSInitializer();
-  const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
-  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'))
-  const invalidStartDate = !dayjs(startDate, "YYYY-MM-DD").isBefore(dayjs(endDate, "YYYY-MM-DD"));
+  const [startDate, setStartDate] = useState(
+    dayjs().startOf('year').format('YYYY-MM-DD'),
+  );
+  const [endDate, setEndDate] = useState(
+    dayjs().endOf('year').format('YYYY-MM-DD'),
+  );
+  const invalidStartDate = !dayjs(startDate, 'YYYY-MM-DD').isBefore(
+    dayjs(endDate, 'YYYY-MM-DD'),
+  );
 
   const { grupo, alumno } = router.query;
 
@@ -312,7 +325,7 @@ export default function Page() {
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>{data.studentName}</h1>
-        <Flex my="4" align="center" gap={4} justify="center" wrap={"wrap"}>
+        <Flex my="4" align="center" gap={4} justify="center" wrap={'wrap'}>
           Desde:
           <Input
             maxWidth="44"
@@ -338,10 +351,18 @@ export default function Page() {
             }}
           />
           {invalidStartDate && (
-            <Text width="100%" textAlign={"center"} color="red.600"><i>Rango Invalido</i></Text>
+            <Text width="100%" textAlign={'center'} color="red.600">
+              <i>Rango Invalido</i>
+            </Text>
           )}
         </Flex>
-        {isRefetching ? <Flex my={8} justify={"center"}><Spinner /></Flex> : <StudentPageContent data={data} />}    
+        {isRefetching ? (
+          <Flex my={8} justify={'center'}>
+            <Spinner />
+          </Flex>
+        ) : (
+          <StudentPageContent data={data} />
+        )}
       </div>
     </ChakraProvider>
   );
