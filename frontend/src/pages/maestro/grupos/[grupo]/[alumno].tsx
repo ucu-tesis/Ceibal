@@ -22,6 +22,7 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
+  Text,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import Head from 'next/head';
@@ -266,6 +267,7 @@ export default function Page() {
   useChartJSInitializer();
   const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'))
+  const invalidStartDate = !dayjs(startDate, "YYYY-MM-DD").isBefore(dayjs(endDate, "YYYY-MM-DD"));
 
   const { grupo, alumno } = router.query;
 
@@ -310,7 +312,7 @@ export default function Page() {
           </BreadcrumbItem>
         </Breadcrumb>
         <h1 tabIndex={0}>{data.studentName}</h1>
-        <Flex my="4" align="center" gap={4} justify="center">
+        <Flex my="4" align="center" gap={4} justify="center" wrap={"wrap"}>
           Desde:
           <Input
             maxWidth="44"
@@ -335,6 +337,9 @@ export default function Page() {
               }
             }}
           />
+          {invalidStartDate && (
+            <Text width="100%" textAlign={"center"} color="red.600"><i>Rango Invalido</i></Text>
+          )}
         </Flex>
         {isRefetching ? <Flex my={8} justify={"center"}><Spinner /></Flex> : <StudentPageContent data={data} />}    
       </div>

@@ -30,6 +30,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
@@ -131,16 +132,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
   
-  // TODO ensure startDate < endDate
-  // TODO ensure valid values (31 -> 30 days)
   const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'));
-  console.log('endDate', endDate);
   const {
     data: statsData,
     isRefetching: statsIsRefetching,
     isError: statsError,
   } = useFetchGroupStats(evaluationGroupId, startDate, endDate);
+  const invalidStartDate = !dayjs(startDate, "YYYY-MM-DD").isBefore(dayjs(endDate, "YYYY-MM-DD"));
   
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
@@ -362,7 +361,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <Flex my="4" align="center" gap={4} justify="center">
+              <Flex my="4" align="center" gap={4} justify="center" wrap={"wrap"}>
                 Desde:
                 <Input
                   maxWidth="44"
@@ -387,6 +386,9 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     }
                   }}
                 />
+                {invalidStartDate && (
+                  <Text width="100%" textAlign={"center"} color="red.600"><i>Rango Invalido</i></Text>
+                )}
               </Flex>
               {statsIsRefetching ? (
                 <Flex my={8} justify={"center"}><Spinner /></Flex>
