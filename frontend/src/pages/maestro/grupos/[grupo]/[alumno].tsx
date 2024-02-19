@@ -317,7 +317,10 @@ export default function Page() {
             type="date"
             value={startDate}
             onChange={(e) => {
-              setStartDate(e.target.value);
+              // value is empty string when date is invalid (like 31 of february)
+              if (e.target.value) {
+                setStartDate(e.target.value);
+              }
             }}
           />
           Hasta:
@@ -326,7 +329,10 @@ export default function Page() {
             type="date"
             value={endDate}
             onChange={(e) => {
-              setEndDate(e.target.value);
+              // value is empty string when date is invalid (like 31 of february)
+              if (e.target.value) {
+                setEndDate(e.target.value);
+              }
             }}
           />
         </Flex>

@@ -163,9 +163,12 @@ export class EvaluationGroupsController {
   @UseGuards(TeacherGuard)
   async getGroupStats(
     @Param('evaluationGroupId') evaluationGroupId: string,
-    @Query('dateFrom') dateFrom: string,
-    @Query('dateTo') dateTo: string,
+    @Query('dateFrom') dateFromRaw: string,
+    @Query('dateTo') dateToRaw: string,
   ) {
+    const dateFrom = dayjs(dateFromRaw, 'YYYY-MM-DD');
+    const dateTo = dayjs(dateToRaw, 'YYYY-MM-DD');
+
     const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
       {
         where: {
@@ -183,7 +186,7 @@ export class EvaluationGroupsController {
           evaluation_group_id: evaluationGroup.id,
           Recordings: {
             some: {
-              created_at: { gte: dayjs(dateFrom).toISOString(), lte: dayjs(dateTo).toISOString() },
+              created_at: { gte: dateFrom.toISOString(), lte: dateTo.toISOString() },
             },
           },
         },
@@ -192,8 +195,8 @@ export class EvaluationGroupsController {
     const now = new Date();
     const inDateRangeCondition = {
       AND: [
-        { created_at: { lte: dayjs(dateTo).toISOString() } },
-        { due_date: { gte: dayjs(dateFrom).toISOString() } },
+        { created_at: { lte: dateTo.toISOString() } },
+        { due_date: { gte: dateFrom.toISOString() } },
       ],
     };
 
@@ -275,9 +278,11 @@ export class EvaluationGroupsController {
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
     @Param('studentId') studentId: string,
-    @Query('dateFrom') dateFrom: string,
-    @Query('dateTo') dateTo: string,
+    @Query('dateFrom') dateFromRaw: string,
+    @Query('dateTo') dateToRaw: string,
   ) {
+    const dateFrom = dayjs(dateFromRaw, 'YYYY-MM-DD');
+    const dateTo = dayjs(dateToRaw, 'YYYY-MM-DD');
     const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
       where: {
         id: Number(evaluationGroupId),

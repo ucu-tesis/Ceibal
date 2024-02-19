@@ -134,7 +134,8 @@ export default function Page({ params }: { params: { grupo: number } }) {
   // TODO ensure startDate < endDate
   // TODO ensure valid values (31 -> 30 days)
   const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
-  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState(dayjs().endOf('year').format('YYYY-MM-DD'));
+  console.log('endDate', endDate);
   const {
     data: statsData,
     isRefetching: statsIsRefetching,
@@ -368,7 +369,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   type="date"
                   value={startDate}
                   onChange={(e) => {
-                    setStartDate(e.target.value);
+                    // value is empty string when date is invalid (like 31 of february)
+                    if (e.target.value) {
+                      setStartDate(e.target.value);
+                    }
                   }}
                 />
                 Hasta:
@@ -377,7 +381,10 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   type="date"
                   value={endDate}
                   onChange={(e) => {
-                    setEndDate(e.target.value);
+                    // value is empty string when date is invalid (like 31 of february)
+                    if (e.target.value) {
+                      setEndDate(e.target.value);
+                    }
                   }}
                 />
               </Flex>
