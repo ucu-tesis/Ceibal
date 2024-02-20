@@ -71,10 +71,12 @@ const Recorder: React.FC<RecorderProps> = ({
     ) as HTMLElement;
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
-      activeStreamRef.current?.getAudioTracks().forEach((track: MediaStreamTrack) => {
-        track.stop();
-        activeStreamRef.current!.removeTrack(track);
-      });
+      activeStreamRef.current
+        ?.getAudioTracks()
+        .forEach((track: MediaStreamTrack) => {
+          track.stop();
+          activeStreamRef.current!.removeTrack(track);
+        });
       if (buttonElement) {
         buttonElement.style.transform = 'scale(0.75)';
       }
@@ -111,7 +113,7 @@ const Recorder: React.FC<RecorderProps> = ({
       setRecording(true);
       setTimeout(() => {
         if (mediaRecorderRef.current === recorder) {
-          stopRecording()
+          stopRecording();
         }
       }, MAX_RECORDING_DURATION);
     } catch (error) {
