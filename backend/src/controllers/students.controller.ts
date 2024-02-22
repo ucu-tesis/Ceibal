@@ -75,11 +75,8 @@ export class StudentsController {
       },
       include: {
         Analysis: true,
-        EvaluationGroupReading: {
-          include: {
-            Reading: true,
-          },
-        },
+        EvaluationGroupReading: true,
+        Reading: true,
       },
       skip: page * pageSize,
       take: pageSize,
@@ -102,8 +99,8 @@ export class StudentsController {
         return {
           id: r.id,
           date_submitted: r.created_at,
-          reading_title: r.EvaluationGroupReading.Reading.title,
-          reading_image: r.EvaluationGroupReading.Reading.image_url,
+          reading_title: r.Reading.title,
+          reading_image: r.Reading.image_url,
           analysis_score: newestAnalysis?.score || 0,
           analysis_status: newestAnalysis?.status || 'NOT_STARTED',
         };
@@ -222,22 +219,25 @@ export class StudentsController {
             },
           },
         },
-        include: {
-          Reading: true,
-        },
       });
 
-    if (!assignment) {
-      throw new UnprocessableEntityException('Reading not found/assigned');
+    const reading = await this.prismaService.reading.findFirst({
+      where: {
+        id: Number(readingId),
+      },
+    });
+
+    if (!reading) {
+      throw new UnprocessableEntityException('Reading not found');
     }
 
     return {
-      reading_id: assignment.Reading.id,
-      reading_title: assignment.Reading.title,
-      reading_content: assignment.Reading.content,
-      reading_category: assignment.Reading.category,
-      reading_subcategory: assignment.Reading.subcategory,
-      evaluation_group_reading_id: assignment.id,
+      reading_id: reading.id,
+      reading_title: reading.title,
+      reading_content: reading.content,
+      reading_category: reading.category,
+      reading_subcategory: reading.subcategory,
+      evaluation_group_reading_id: assignment?.id ?? 0,
     };
   }
 

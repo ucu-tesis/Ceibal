@@ -47,7 +47,7 @@ const RecordScreen: React.FC<RecordScreenProps> = ({ readingDetails }) => {
   };
 
   const { mutate, isLoading, error } = useFileUpload(
-    readingDetails.evaluationGroupReadingId,
+    readingDetails.evaluationGroupReadingId, readingDetails.id
   );
 
   async function uploadFile(arrayBuffer: ArrayBuffer, mimeType: string) {

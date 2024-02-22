@@ -1,12 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const useFileUpload = (evaluationGroupReadingId: number) => {
+const useFileUpload = (evaluationGroupReadingId: number | null, readingId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (formData: FormData) => {
+      formData.append('readingId', readingId.toString());
+      if (evaluationGroupReadingId) {
+        formData.append('evaluationGroupReadingId', evaluationGroupReadingId?.toString());
+      }
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/recordings/upload/${evaluationGroupReadingId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/recordings/upload`,
         {
           method: 'POST',
           body: formData,

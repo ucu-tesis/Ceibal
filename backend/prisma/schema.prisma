@@ -58,6 +58,7 @@ model Reading {
   position                Int                      @default(0)
   is_public               Boolean                  @default(true)
   EvaluationGroupReadings EvaluationGroupReading[]
+  Recordings              Recording[]
   created_at              DateTime                 @default(now())
   created_by              Int?
   Creator                 User?                    @relation(name: "created", fields: [created_by], references: [id])
@@ -75,13 +76,15 @@ model EvaluationGroupReading {
 }
 
 model Recording {
-  id                          Int                    @id @default(autoincrement())
+  id                          Int                     @id @default(autoincrement())
   recording_url               String
-  EvaluationGroupReading      EvaluationGroupReading @relation(fields: [evaluation_group_reading_id], references: [id])
-  evaluation_group_reading_id Int
-  Student                     Student                @relation(fields: [student_id], references: [id])
+  EvaluationGroupReading      EvaluationGroupReading? @relation(fields: [evaluation_group_reading_id], references: [id])
+  evaluation_group_reading_id Int?
+  Reading                     Reading                 @relation(fields: [reading_id], references: [id])
+  reading_id                  Int
+  Student                     Student                 @relation(fields: [student_id], references: [id])
   student_id                  Int
-  created_at                  DateTime               @default(now())
+  created_at                  DateTime                @default(now())
   Analysis                    Analysis[]
 }
 
