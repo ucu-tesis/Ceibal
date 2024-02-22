@@ -26,7 +26,7 @@ class UploadRecordingDTO {
   @IsOptional()
   evaluationGroupReadingId: string;
   @IsString()
-  readingId?: string;
+  readingId: string;
 }
 
 @Controller('recordings')
