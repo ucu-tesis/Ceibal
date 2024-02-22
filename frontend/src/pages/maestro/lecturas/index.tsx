@@ -195,7 +195,7 @@ const Page: React.FC = () => {
         <ModalContent className={styles['modal-content']}>
           <ModalHeader>{activeTitle}</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>{activeContent}</ModalBody>
+          <ModalBody className={styles['modal-body']}>{activeContent}</ModalBody>
         </ModalContent>
       </Modal>
       <CreateReadingModal
