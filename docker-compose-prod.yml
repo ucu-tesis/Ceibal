@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  audiolib:
+    platform: linux/amd64
+    build:
+      context: ./
+      dockerfile: audiolib/Dockerfile
+    volumes:
+      - ./audiolib:/app/audiolib
+      - ./.torchcache:/root/.cache/torch
+    network_mode: "host"
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
