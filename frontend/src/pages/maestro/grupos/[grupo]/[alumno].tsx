@@ -37,6 +37,7 @@ import PendingTasksIcon from '../../../../assets/images/lecturas_pendientes.svg'
 import styles from './alumno.module.css';
 import { StudentStats } from '@/models/Stats';
 import Spinner from '@/components/spinners/Spinner';
+import { chartOptions } from '@/util/chart';
 
 type Option = {
   value?: string;
@@ -161,9 +162,9 @@ function StudentPageContent({ data }: { data: StudentStats }) {
       {
         label: 'Errores',
         data: [
-          averageErrors?.repetitionsCount,
-          averageErrors?.silencesCount,
           averageErrors?.generalErrors,
+          averageErrors?.silencesCount,
+          averageErrors?.repetitionsCount,
         ],
         fill: true,
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -209,11 +210,18 @@ function StudentPageContent({ data }: { data: StudentStats }) {
       >
         <Flex height="300px">
           {monthlyAverages.length > 0 && (
-            <Line data={monthlyAveragesChartData} width={400}></Line>
+            <Line
+              data={monthlyAveragesChartData}
+              width={400}
+              options={chartOptions('Promedio de score mensual')}
+            ></Line>
           )}
         </Flex>
         <Flex height="300px">
-          <Radar data={dataRadar}></Radar>
+          <Radar
+            data={dataRadar}
+            options={chartOptions('Errores cometidos')}
+          ></Radar>
         </Flex>
       </Flex>
       <h2 tabIndex={0}>Tareas</h2>
@@ -307,9 +315,11 @@ export default function Page() {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
               {data.groupName}

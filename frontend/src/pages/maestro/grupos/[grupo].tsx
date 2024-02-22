@@ -47,6 +47,7 @@ import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
 import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
 import styles from './grupos.module.css';
 import Spinner from '@/components/spinners/Spinner';
+import { chartOptions } from '@/util/chart';
 
 const columns: ChakraTableColumn[] = [
   { label: 'Nombre' },
@@ -252,9 +253,11 @@ export default function Page({ params }: { params: { grupo: number } }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>
               {groupName}
@@ -273,14 +276,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
               variant="solid"
             >
               Asignar Tarea
-            </Button>
-            <Button
-              onClick={onOpenReadingModal}
-              leftIcon={<AddIcon />}
-              className={styles.secondary}
-              variant="outline"
-            >
-              Crear Lectura
             </Button>
           </div>
         </div>
@@ -437,8 +432,14 @@ export default function Page({ params }: { params: { grupo: number } }) {
                     </div>
                   </div>
                   <div className={`row ${styles.canvas}`}>
-                    <Line data={dataLine}></Line>
-                    <Bar data={dataBar}></Bar>
+                    <Line
+                      data={dataLine}
+                      options={chartOptions('Promedio de score mensual')}
+                    ></Line>
+                    <Bar
+                      data={dataBar}
+                      options={chartOptions('Promedio de tareas hechas')}
+                    ></Bar>
                   </div>
                 </>
               )}

@@ -27,6 +27,8 @@ const mozaicFont = localFont({
   ],
 });
 
+const MAX_RECORDING_DURATION = 1000 * 60 * 5; // max recording time is 5 minutes
+
 const Recorder: React.FC<RecorderProps> = ({
   onComplete,
   newRecord,
@@ -36,9 +38,8 @@ const Recorder: React.FC<RecorderProps> = ({
   setBufferSource,
 }) => {
   const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null,
-  );
+  const activeStreamRef = useRef<MediaStream>();
+  const mediaRecorderRef = useRef<MediaRecorder>();
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [playing, setPlaying] = useState(false);
   const audioContext = useRef<AudioContext | null>(null);
@@ -64,6 +65,27 @@ const Recorder: React.FC<RecorderProps> = ({
     }
   };
 
+  const stopRecording = () => {
+    const buttonElement = document.getElementById(
+      'primary-button',
+    ) as HTMLElement;
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      activeStreamRef.current
+        ?.getAudioTracks()
+        .forEach((track: MediaStreamTrack) => {
+          track.stop();
+          activeStreamRef.current!.removeTrack(track);
+        });
+      if (buttonElement) {
+        buttonElement.style.transform = 'scale(0.75)';
+      }
+      setTimeout(() => {
+        setRecording(false);
+      }, 500);
+    }
+  };
+
   const startRecording = async () => {
     try {
       stopAudioPlayback();
@@ -71,7 +93,8 @@ const Recorder: React.FC<RecorderProps> = ({
       disableStopButtonTemporarily();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
+      activeStreamRef.current = stream;
+      mediaRecorderRef.current = recorder;
 
       const audioChunks: Blob[] = [];
       recorder.ondataavailable = (e) => {
@@ -88,21 +111,13 @@ const Recorder: React.FC<RecorderProps> = ({
 
       recorder.start();
       setRecording(true);
+      setTimeout(() => {
+        if (mediaRecorderRef.current === recorder) {
+          stopRecording();
+        }
+      }, MAX_RECORDING_DURATION);
     } catch (error) {
       console.error('Error starting recording:', error);
-    }
-  };
-
-  const stopRecording = () => {
-    const buttonElement = document.getElementById(
-      'primary-button',
-    ) as HTMLElement;
-    if (mediaRecorder) {
-      buttonElement.style.transform = 'scale(0.75)';
-      setTimeout(() => {
-        mediaRecorder.stop();
-        setRecording(false);
-      }, 500);
     }
   };
 

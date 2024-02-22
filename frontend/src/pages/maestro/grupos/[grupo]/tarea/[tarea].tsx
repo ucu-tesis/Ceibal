@@ -37,6 +37,7 @@ import IncompleteTasksIcon from '../../../../../assets/images/lecturas_atrasadas
 import SentTasksIcon from '../../../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../../../assets/images/lecturas_pendientes.svg';
 import styles from './tarea.module.css';
+import { chartOptions } from '@/util/chart';
 
 interface Params {
   alumno: string;
@@ -100,9 +101,9 @@ export default function Page({ params }: { params: Params }) {
       {
         label: 'Errores',
         data: [
-          averageErrors?.repetitionsCount,
-          averageErrors?.silencesCount,
           averageErrors?.generalErrors,
+          averageErrors?.silencesCount,
+          averageErrors?.repetitionsCount,
         ],
         fill: true,
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -209,9 +210,11 @@ export default function Page({ params }: { params: Params }) {
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
           <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
             <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
               {data.groupName}
@@ -289,8 +292,16 @@ export default function Page({ params }: { params: Params }) {
           </div>
         </div>
         <div className={`row ${styles.canvas} ${styles.space}`}>
-          <Radar width={600} data={dataRadar}></Radar>
-          <Pie width={600} data={dataPie}></Pie>
+          <Radar
+            width={600}
+            data={dataRadar}
+            options={chartOptions('Errores cometidos')}
+          ></Radar>
+          <Pie
+            width={600}
+            data={dataPie}
+            options={chartOptions('Palabras con mayor repetición')}
+          ></Pie>
         </div>
         <h2 tabIndex={0}>Entregas</h2>
         <div className={`${styles.filters} row`}>

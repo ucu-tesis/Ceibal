@@ -102,10 +102,47 @@
   transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
+.teacher.card-button {
+  position: relative;
+  flex-direction: column;
+  gap: 64px;
+  width: 100%;
+  padding: 32px 64px;
+}
+
+.teacher.card-button .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity linear 0.3s, transform linear 0.1s;
+}
+
+.teacher.card-button .card-overlay img {
+  border-radius: 10px;
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  opacity: 0.2;
+  object-fit: cover;
+}
+
 .card-button:hover {
   cursor: pointer;
   transform: scale(1.25);
   background-color: #ffcc80;
+}
+
+.teacher.card-button:hover {
+  background-color: var(--ceibal-light-grey-secondary);
+}
+
+.teacher.card-button:hover .card-overlay {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .card-button img {
@@ -113,11 +150,20 @@
   max-width: 70px;
 }
 
+.teacher.card-button img {
+  max-height: 160px;
+  max-width: 160px;
+}
+
 .card-button span {
   flex: 1;
   flex-direction: column;
   text-align: start;
   font-size: 24px;
+}
+
+.teacher.card-button span {
+  flex: none;
 }
 
 .icon-button-container {
@@ -214,6 +260,12 @@
     padding: 8px 16px;
   }
 
+  .teacher.card-button {
+    gap: 16px;
+    width: 250px;
+    height: auto;
+  }
+
   /* Disable hover for mobile.  */
   .card-button:hover {
     transform: scale(1);
@@ -223,6 +275,16 @@
   .card-button:active {
     transform: scale(1.25);
     background-color: #ffcc80;
+  }
+
+  .teacher.card-button:hover {
+    transform: scale(1);
+    background-color: var(--ceibal-light-grey-secondary);
+  }
+
+  .teacher.card-button:active {
+    transform: scale(1.25);
+    background-color: var(--ceibal-light-grey-secondary);
   }
 
   .card-button img {
