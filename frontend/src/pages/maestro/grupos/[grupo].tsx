@@ -21,6 +21,7 @@ import {
   BreadcrumbLink,
   Button,
   ChakraProvider,
+  Flex,
   Input,
   InputGroup,
   InputRightAddon,
@@ -29,6 +30,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
@@ -44,6 +46,7 @@ import SentTasksIcon from '../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
 import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
 import styles from './grupos.module.css';
+import Spinner from '@/components/spinners/Spinner';
 import { chartOptions } from '@/util/chart';
 
 const columns: ChakraTableColumn[] = [
@@ -129,11 +132,22 @@ export default function Page({ params }: { params: { grupo: number } }) {
   const { query } = useRouter();
   const evaluationGroupId = Number(query.grupo);
   const { data, isLoading, isError } = useFetchGroupDetails(evaluationGroupId);
+
+  const [startDate, setStartDate] = useState(
+    dayjs().startOf('year').format('YYYY-MM-DD'),
+  );
+  const [endDate, setEndDate] = useState(
+    dayjs().endOf('year').format('YYYY-MM-DD'),
+  );
   const {
     data: statsData,
-    isLoading: statsLoading,
+    isRefetching: statsIsRefetching,
     isError: statsError,
-  } = useFetchGroupStats(evaluationGroupId);
+  } = useFetchGroupStats(evaluationGroupId, startDate, endDate);
+  const invalidStartDate = !dayjs(startDate, 'YYYY-MM-DD').isBefore(
+    dayjs(endDate, 'YYYY-MM-DD'),
+  );
+
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOption, setCategoryOption] = useState<string>();
   const [subcategoryOption, setSubcategoryOption] = useState<string>();
@@ -155,13 +169,6 @@ export default function Page({ params }: { params: { grupo: number } }) {
 
   const { filteredStudents } = useFilteredStudents(students ?? [], searchQuery);
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const onChange = (dates: any) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
   const [assignmentSearchQuery, setAssignmentSearchQuery] = useState('');
 
   useChartJSInitializer();
@@ -233,6 +240,9 @@ export default function Page({ params }: { params: { grupo: number } }) {
   }
   if (isError) {
     return <ErrorPage intendedAction="buscar los alumnos del grupo" />;
+  }
+  if (statsError) {
+    return <ErrorPage intendedAction="recopilar estadisticas del grupo" />;
   }
 
   return (
@@ -352,47 +362,87 @@ export default function Page({ params }: { params: { grupo: number } }) {
               ></ChakraTable>
             </TabPanel>
             <TabPanel>
-              <div className={`row ${styles.space} ${styles['tablet-col']}`}>
-                <div className={styles['stats-box']}>
-                  <div className={`row ${styles['mob-col']}`}>
-                    <div className="row">
-                      <Image alt="lecturas enviadas" src={SentTasksIcon} />
-                      <span>Enviadas: {assignmentsDone}</span>
-                    </div>
-                    <div className="row">
-                      <Image alt="lecturas pendientes" src={PendingTasksIcon} />
-                      <span>Pendientes: {assignmentsPending}</span>
-                    </div>
-                    <div className="row">
-                      <Image
-                        alt="lecturas atrasadas"
-                        src={IncompleteTasksIcon}
-                      />
-                      <span>Atrasadas: {assignmentsDelayed}</span>
+              <Flex
+                my="4"
+                align="center"
+                gap={4}
+                justify="center"
+                wrap={'wrap'}
+              >
+                Desde:
+                <Input
+                  maxWidth="44"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => {
+                    // value is empty string when date is invalid (like 31 of february)
+                    if (e.target.value) {
+                      setStartDate(e.target.value);
+                    }
+                  }}
+                />
+                Hasta:
+                <Input
+                  maxWidth="44"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => {
+                    // value is empty string when date is invalid (like 31 of february)
+                    if (e.target.value) {
+                      setEndDate(e.target.value);
+                    }
+                  }}
+                />
+                {invalidStartDate && (
+                  <Text width="100%" textAlign={'center'} color="red.600">
+                    <i>Rango Invalido</i>
+                  </Text>
+                )}
+              </Flex>
+              {statsIsRefetching ? (
+                <Flex my={8} justify={'center'}>
+                  <Spinner />
+                </Flex>
+              ) : (
+                <>
+                  <div
+                    className={`row ${styles.space} ${styles['tablet-col']}`}
+                  >
+                    <div className={styles['stats-box']}>
+                      <div className={`row ${styles['mob-col']}`}>
+                        <div className="row">
+                          <Image alt="lecturas enviadas" src={SentTasksIcon} />
+                          <span>Enviadas: {assignmentsDone}</span>
+                        </div>
+                        <div className="row">
+                          <Image
+                            alt="lecturas pendientes"
+                            src={PendingTasksIcon}
+                          />
+                          <span>Pendientes: {assignmentsPending}</span>
+                        </div>
+                        <div className="row">
+                          <Image
+                            alt="lecturas atrasadas"
+                            src={IncompleteTasksIcon}
+                          />
+                          <span>Atrasadas: {assignmentsDelayed}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={onChange}
-                    startDate={startDate}
-                    endDate={endDate}
-                    selectsRange
-                    inline
-                  />
-                </div>
-              </div>
-              <div className={`row ${styles.canvas}`}>
-                <Line
-                  data={dataLine}
-                  options={chartOptions('Promedio de score mensual')}
-                ></Line>
-                <Bar
-                  data={dataBar}
-                  options={chartOptions('Promedio de tareas hechas')}
-                ></Bar>
-              </div>
+                  <div className={`row ${styles.canvas}`}>
+                    <Line
+                      data={dataLine}
+                      options={chartOptions('Promedio de score mensual')}
+                    ></Line>
+                    <Bar
+                      data={dataBar}
+                      options={chartOptions('Promedio de tareas hechas')}
+                    ></Bar>
+                  </div>
+                </>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

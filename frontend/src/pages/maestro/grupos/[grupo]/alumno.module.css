@@ -36,7 +36,7 @@
 }
 
 .stats-box {
-  padding: 24px 80px 24px 24px;
+  padding: 24px 24px 24px 24px;
   width: fit-content;
   border: 1px solid var(--ceibal-black);
   background: #f5f5f5;

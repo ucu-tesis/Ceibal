@@ -217,16 +217,28 @@ export const fetchGroups = (teacherCI: number) =>
     })
     .then(({ data }) => parseGroupsResponse(data));
 
-export const fetchStudentStats = (groupId: number, studentId: number) =>
+export const fetchStudentStats = (
+  groupId: number,
+  studentId: number,
+  dateFrom: string,
+  dateTo: string,
+) =>
   axiosInstance
     .get<StudentStatsResponse>(
       `/evaluationGroups/${groupId}/students/${studentId}`,
+      { params: { dateFrom, dateTo } },
     )
     .then(({ data }) => parseStudentStatsResponse(data));
 
-export const fetchGroupStats = (groupId: number) =>
+export const fetchGroupStats = (
+  groupId: number,
+  dateFrom: string,
+  dateTo: string,
+) =>
   axiosInstance
-    .get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`)
+    .get<GroupStatsResponse>(`/evaluationGroups/${groupId}/stats`, {
+      params: { dateFrom, dateTo },
+    })
     .then(({ data }) => parseGroupStatsResponse(data));
 
 export const fetchAssignmentStats = (

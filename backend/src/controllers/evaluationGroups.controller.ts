@@ -4,11 +4,13 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
-import { EvaluationGroup } from '@prisma/client';
+import { AnalysisStatus, EvaluationGroup } from '@prisma/client';
 import { IsDateString, IsNumber } from 'class-validator';
+import * as dayjs from 'dayjs';
 import { Pagination } from 'src/decorators/pagination.decorator';
 import { UserData } from 'src/decorators/userData.decorator';
 import { TeacherGuard } from 'src/guards/teacher.guard';
@@ -159,7 +161,14 @@ export class EvaluationGroupsController {
 
   @Get('/:evaluationGroupId/stats')
   @UseGuards(TeacherGuard)
-  async getGroupStats(@Param('evaluationGroupId') evaluationGroupId: string) {
+  async getGroupStats(
+    @Param('evaluationGroupId') evaluationGroupId: string,
+    @Query('dateFrom') dateFromRaw: string,
+    @Query('dateTo') dateToRaw: string,
+  ) {
+    const dateFrom = dayjs(dateFromRaw, 'YYYY-MM-DD');
+    const dateTo = dayjs(dateToRaw, 'YYYY-MM-DD');
+
     const evaluationGroup = await this.prismaService.evaluationGroup.findUnique(
       {
         where: {
@@ -176,21 +185,35 @@ export class EvaluationGroupsController {
         where: {
           evaluation_group_id: evaluationGroup.id,
           Recordings: {
-            some: {},
+            some: {
+              created_at: {
+                gte: dateFrom.toISOString(),
+                lte: dateTo.toISOString(),
+              },
+            },
           },
         },
       });
+
+    const now = new Date();
+    const inDateRangeCondition = {
+      AND: [
+        { created_at: { lte: dateTo.toISOString() } },
+        { due_date: { gte: dateFrom.toISOString() } },
+      ],
+    };
 
     const assignmentsPendingCount =
       await this.prismaService.evaluationGroupReading.count({
         where: {
           evaluation_group_id: evaluationGroup.id,
           due_date: {
-            gt: new Date(),
+            gt: now,
           },
           Recordings: {
             none: {},
           },
+          ...inDateRangeCondition,
         },
       });
 
@@ -199,11 +222,12 @@ export class EvaluationGroupsController {
         where: {
           evaluation_group_id: evaluationGroup.id,
           due_date: {
-            lt: new Date(),
+            lt: now,
           },
           Recordings: {
             none: {},
           },
+          ...inDateRangeCondition,
         },
       });
 
@@ -257,7 +281,11 @@ export class EvaluationGroupsController {
     @UserData('id') userId: number,
     @Param('evaluationGroupId') evaluationGroupId: string,
     @Param('studentId') studentId: string,
+    @Query('dateFrom') dateFromRaw: string,
+    @Query('dateTo') dateToRaw: string,
   ) {
+    const dateFrom = dayjs(dateFromRaw, 'YYYY-MM-DD');
+    const dateTo = dayjs(dateToRaw, 'YYYY-MM-DD');
     const evaluationGroup = await this.prismaService.evaluationGroup.findFirst({
       where: {
         id: Number(evaluationGroupId),
@@ -282,48 +310,6 @@ export class EvaluationGroupsController {
       throw new UnprocessableEntityException('Student not found');
     }
 
-    const doneAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          Recordings: {
-            some: {
-              student_id: student.id,
-            },
-          },
-        },
-      });
-
-    const pendingAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            gt: new Date(),
-          },
-          Recordings: {
-            none: {
-              student_id: student.id,
-            },
-          },
-        },
-      });
-
-    const delayedAssignmentsCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            lt: new Date(),
-          },
-          Recordings: {
-            none: {
-              student_id: student.id,
-            },
-          },
-        },
-      });
-
     const assignments =
       await this.prismaService.evaluationGroupReading.findMany({
         where: {
@@ -342,32 +328,62 @@ export class EvaluationGroupsController {
         },
       });
 
-    const averageScore = await this.prismaService.analysis.aggregate({
-      _avg: {
-        score: true,
-      },
-      where: {
-        Recording: {
-          student_id: student.id,
-        },
-      },
+    let doneAssignmentsCount = 0; // has recording
+    let pendingAssignmentsCount = 0; // no recording, due_date > now
+    let delayedAssignmentsCount = 0; // no recording, due_date <= now
+
+    const averagesDataMap = {
+      score: { sum: 0, count: 0 },
+      silences_count: { sum: 0, count: 0 },
+      repetitions_count: { sum: 0, count: 0 },
+      similarity_error: { sum: 0, count: 0 },
+    };
+
+    const addAverage = (key: string, value: number) => {
+      averagesDataMap[key].sum += value;
+      averagesDataMap[key].count += 1;
+    };
+
+    assignments.forEach(({ Recordings, created_at, due_date }) => {
+      if (Recordings.length === 0) {
+        const outOfRange =
+          dayjs(created_at).isAfter(dateTo) ||
+          dayjs(due_date).isBefore(dateFrom);
+        if (!outOfRange) {
+          if (dayjs().isAfter(due_date)) {
+            delayedAssignmentsCount += 1;
+          } else {
+            pendingAssignmentsCount += 1;
+          }
+        }
+      } else {
+        const lastRecording = Recordings[Recordings.length - 1];
+        const recordingDate = dayjs(lastRecording.created_at);
+        const isInDateRange =
+          recordingDate.isAfter(dateFrom) && recordingDate.isBefore(dateTo);
+
+        if (isInDateRange) {
+          doneAssignmentsCount += 1;
+
+          const lastAnalysis = lastRecording.Analysis.length
+            ? lastRecording.Analysis[lastRecording.Analysis.length - 1]
+            : null;
+
+          const isAnalysisCompleted =
+            lastAnalysis && lastAnalysis.status === AnalysisStatus.COMPLETED;
+          if (isAnalysisCompleted) {
+            addAverage('score', lastAnalysis.score);
+            addAverage('silences_count', lastAnalysis.silences_count);
+            addAverage('repetitions_count', lastAnalysis.repetitions_count);
+            addAverage('similarity_error', lastAnalysis.similarity_error);
+          }
+        }
+      }
     });
 
-    const averageErrors = await this.prismaService.analysis.aggregate({
-      _avg: {
-        silences_count: true,
-        repetitions_count: true,
-        similarity_error: true,
-      },
-      where: {
-        Recording: {
-          student_id: student.id,
-        },
-      },
-    });
-
-    const { similarity_error, repetitions_count, silences_count } =
-      averageErrors._avg;
+    const getAverage = (key: string) => {
+      return averagesDataMap[key].sum / averagesDataMap[key].count;
+    };
 
     // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
     const monthlyAverages = await this.prismaService.$queryRaw`
@@ -389,7 +405,7 @@ export class EvaluationGroupsController {
       assignments_done: doneAssignmentsCount,
       assignments_pending: pendingAssignmentsCount,
       assignments_delayed: delayedAssignmentsCount,
-      average_score: averageScore._avg.score || 0,
+      average_score: getAverage('score'),
       Assignments: assignments.map((a) => {
         const lastRecording = a.Recordings.length
           ? a.Recordings[a.Recordings.length - 1]
@@ -412,9 +428,9 @@ export class EvaluationGroupsController {
       }),
       monthly_averages: monthlyAverages,
       average_errors: {
-        silences_count,
-        repetitions_count,
-        general_errors: similarity_error,
+        silences_count: getAverage('silences_count'),
+        repetitions_count: getAverage('repetitions_count'),
+        general_errors: getAverage('similarity_error'),
       },
       student_name: `${student.first_name} ${student.last_name}`,
       student_id: student.id,
