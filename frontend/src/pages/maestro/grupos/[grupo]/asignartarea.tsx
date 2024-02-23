@@ -1,4 +1,5 @@
-import { createAssignment, fetchAllReadings } from '@/api/teachers/teachers';
+import useFetchAllReadings from '@/api/teachers/hooks/useFetchAllReadings';
+import { createAssignment } from '@/api/teachers/teachers';
 import InputDateTimeLocal from '@/components/inputs/InputDateTimeLocal';
 import Select, { Option } from '@/components/selects/Select';
 import ChakraTable, {
@@ -10,6 +11,7 @@ import {
   toastDuration,
 } from '@/constants/constants';
 import { Reading } from '@/models/Reading';
+import { dateFormats } from '@/util/dates';
 import { getOptionsFromArray } from '@/util/select';
 import { SearchIcon } from '@chakra-ui/icons';
 import {
@@ -41,14 +43,13 @@ import {
   useSteps,
   useToast,
 } from '@chakra-ui/react';
-import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useMutation } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ChangeEvent, useState } from 'react';
 import styles from './asignartarea.module.css';
-import useFetchAllReadings from '@/api/teachers/hooks/useFetchAllReadings';
 
 const READINGS_STEP = 'Agregar Tareas';
 const SUMMARY_STEP = 'Resumen';
@@ -98,7 +99,9 @@ const Summary: React.FC<SummaryProps> = ({
     <>
       <div className={`${styles.desc} row`}>
         <span tabIndex={0}>Fecha límite:</span>
-        <span tabIndex={0}>{selectedDueDate}</span>
+        <span tabIndex={0}>
+          {dayjs(selectedDueDate).format(dateFormats.assignmentDueDate)}
+        </span>
       </div>
       <div className={`${styles.desc} row`}>
         <span tabIndex={0}>Lecturas:</span>
