@@ -213,7 +213,7 @@ function StudentPageContent({ data }: { data: StudentStats }) {
             <Line
               data={monthlyAveragesChartData}
               width={400}
-              options={chartOptions('Promedio de score mensual')}
+              options={chartOptions('Promedio de puntaje mensual')}
             ></Line>
           )}
         </Flex>

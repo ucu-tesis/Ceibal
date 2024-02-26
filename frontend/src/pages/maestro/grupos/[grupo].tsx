@@ -433,7 +433,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <div className={`row ${styles.canvas}`}>
                     <Line
                       data={dataLine}
-                      options={chartOptions('Promedio de score mensual')}
+                      options={chartOptions('Promedio de puntaje mensual')}
                     ></Line>
                     <Bar
                       data={dataBar}
