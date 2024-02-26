@@ -1,39 +1,36 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import {
-  ChakraProvider,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  useDisclosure,
-} from '@chakra-ui/react';
+import Select from '@/components/selects/Select';
+import { inputRegex } from '@/constants/constants';
+import { AddIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
+  ChakraProvider,
   Input,
   InputGroup,
   InputRightAddon,
-} from '@chakra-ui/react';
-import { Button, Switch } from '@chakra-ui/react';
-import { SearchIcon, ChevronRightIcon, AddIcon } from '@chakra-ui/icons';
-import {
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Switch,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  useDisclosure,
 } from '@chakra-ui/react';
-import Select from '@/components/selects/Select';
+import Head from 'next/head';
+import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './listado.module.css';
-import { inputRegex } from '@/constants/constants';
 
 type Option = {
   value: string;
@@ -158,7 +155,7 @@ const ListTeachers: React.FC = () => {
             <Thead>
               <Tr>
                 <Th>Nombre</Th>
-                <Th>Mail</Th>
+                <Th>Correo</Th>
                 <Th>Documento</Th>
                 <Th width="40%"></Th>
               </Tr>
@@ -192,7 +189,7 @@ const ListTeachers: React.FC = () => {
                   <span>Primer Nombre</span>
                   <span>Segundo Nombre</span>
                   <span>Apellido(s)</span>
-                  <span>E-mail</span>
+                  <span>Correo</span>
                   <span>Documento</span>
                   <span>Habilitado</span>
                 </div>

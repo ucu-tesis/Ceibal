@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
+import RoundedButton from '@/components/buttons/RoundedButton';
+import InputPassword from '@/components/inputs/InputPassword';
+import InputText from '@/components/inputs/InputText';
 import Head from 'next/head';
-import styles from './registro.module.css';
 import Image from 'next/image';
+import React, { useEffect } from 'react';
 import LogoCeibal from '../../assets/images/logo_ceibal.png';
 import RightIcon from '../../assets/images/right_icon.svg';
-import InputText from '@/components/inputs/InputText';
-import InputPassword from '@/components/inputs/InputPassword';
-import RoundedButton from '@/components/buttons/RoundedButton';
+import styles from './registro.module.css';
 
 const Registro: React.FC = () => {
   useEffect(() => {
@@ -28,7 +28,7 @@ const Registro: React.FC = () => {
             <InputText placeholder="Segundo Nombre"></InputText>
           </div>
           <InputText placeholder="Apellido"></InputText>
-          <InputText placeholder="E-mail"></InputText>
+          <InputText placeholder="Correo"></InputText>
           <InputText placeholder="Documento"></InputText>
           <InputPassword placeholder="Contraseña"></InputPassword>
           <InputPassword placeholder="Repetir Contraseña"></InputPassword>
