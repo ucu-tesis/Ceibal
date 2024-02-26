@@ -213,7 +213,7 @@ export default function Page({ params }: { params: Params }) {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Clases</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>

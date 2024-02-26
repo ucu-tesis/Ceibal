@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import Head from 'next/head';
+import useFetchAllReadings from '@/api/teachers/hooks/useFetchAllReadings';
+import CreateReadingModal from '@/components/modals/CreateReadingModal';
+import Select, { Option } from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
 import { inputRegex } from '@/constants/constants';
-import Link from 'next/link';
+import { Reading } from '@/models/Reading';
+import { getOptionsFromArray } from '@/util/select';
+import { AddIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,24 +17,18 @@ import {
   Input,
   InputGroup,
   InputRightAddon,
-  useDisclosure,
-} from '@chakra-ui/react';
-import {
   Modal,
-  ModalOverlay,
   ModalBody,
-  ModalHeader,
   ModalCloseButton,
   ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { Reading } from '@/models/Reading';
-import { Option } from '@/components/selects/Select';
+import Head from 'next/head';
+import Link from 'next/link';
+import React, { useState } from 'react';
 import styles from './lecturas.module.css';
-import { AddIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
-import { getOptionsFromArray } from '@/util/select';
-import useFetchAllReadings from '@/api/teachers/hooks/useFetchAllReadings';
-import Select from '@/components/selects/Select';
-import CreateReadingModal from '@/components/modals/CreateReadingModal';
 
 const readingSelectionColumns: ChakraTableColumn[] = [
   { label: 'Categoría' },
@@ -97,7 +94,7 @@ const Page: React.FC = () => {
   return (
     <ChakraProvider>
       <Head>
-        <title>Grupos</title>
+        <title>Clases</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>

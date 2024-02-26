@@ -1,7 +1,7 @@
 import useFetchGroups from '@/api/teachers/hooks/useFetchGroups';
-import Select from '@/components/selects/Select';
 import ErrorPage from '@/components/errorPage/ErrorPage';
 import LoadingPage from '@/components/loadingPage/LoadingPage';
+import Select from '@/components/selects/Select';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
@@ -28,7 +28,7 @@ type Option = {
 };
 
 const columns: ChakraTableColumn[] = [
-  { label: 'Grupo' },
+  { label: 'Clase' },
   { label: 'Año', reactKey: 'anio' },
   { label: '', reactKey: 'link', width: '40%' },
 ];
@@ -63,13 +63,13 @@ const EvaluationList: React.FC = () => {
   }
 
   if (isError) {
-    return <ErrorPage intendedAction="obtener listado de grupos" />;
+    return <ErrorPage intendedAction="obtener listado de clases" />;
   }
 
   return (
     <ChakraProvider>
       <Head>
-        <title>Grupos</title>
+        <title>Clases</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
@@ -77,10 +77,10 @@ const EvaluationList: React.FC = () => {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos">Clases</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 tabIndex={0}>Grupos</h1>
+        <h1 tabIndex={0}>Clases</h1>
         <div className={`${styles.filters} row`}>
           <Select
             options={filterOptions}
