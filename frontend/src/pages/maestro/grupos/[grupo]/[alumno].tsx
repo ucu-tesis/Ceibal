@@ -3,6 +3,7 @@ import ErrorPage from '@/components/errorPage/ErrorPage';
 import LoadingPage from '@/components/loadingPage/LoadingPage';
 import ProgressCircle from '@/components/progress/ProgressCircle';
 import Select from '@/components/selects/Select';
+import Spinner from '@/components/spinners/Spinner';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
@@ -10,6 +11,8 @@ import { errorMetrics, inputRegex } from '@/constants/constants';
 import useChartJSInitializer from '@/hooks/teachers/useChartJSInitializer';
 import useFilteredAssignments from '@/hooks/teachers/useFilteredAssignments';
 import { Assignment, StudentAssignment } from '@/models/Assignment';
+import { StudentStats } from '@/models/Stats';
+import { chartOptions } from '@/util/chart';
 import { SPANISH_MONTH_NAMES, dateFormats } from '@/util/dates';
 import { getOptionsFromArray } from '@/util/select';
 import { ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
@@ -35,9 +38,6 @@ import IncompleteTasksIcon from '../../../../assets/images/lecturas_atrasadas.sv
 import SentTasksIcon from '../../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../../assets/images/lecturas_pendientes.svg';
 import styles from './alumno.module.css';
-import { StudentStats } from '@/models/Stats';
-import Spinner from '@/components/spinners/Spinner';
-import { chartOptions } from '@/util/chart';
 
 type Option = {
   value?: string;
@@ -137,7 +137,7 @@ function StudentPageContent({ data }: { data: StudentStats }) {
 
   const groupDataset = {
     id: 1,
-    label: 'Grupo',
+    label: 'Clase',
     data: monthlyAverages.map(({ groupAverageScore }) => groupAverageScore),
     backgroundColor: '#B1A5FF',
     borderColor: '#B1A5FF',
@@ -213,7 +213,7 @@ function StudentPageContent({ data }: { data: StudentStats }) {
             <Line
               data={monthlyAveragesChartData}
               width={400}
-              options={chartOptions('Promedio de score mensual')}
+              options={chartOptions('Promedio de puntaje mensual')}
             ></Line>
           )}
         </Flex>
@@ -318,7 +318,7 @@ export default function Page() {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Clases</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>

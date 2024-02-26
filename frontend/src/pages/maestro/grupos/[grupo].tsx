@@ -4,6 +4,7 @@ import ErrorPage from '@/components/errorPage/ErrorPage';
 import LoadingPage from '@/components/loadingPage/LoadingPage';
 import CreateReadingModal from '@/components/modals/CreateReadingModal';
 import Select from '@/components/selects/Select';
+import Spinner from '@/components/spinners/Spinner';
 import ChakraTable, {
   ChakraTableColumn,
 } from '@/components/tables/ChakraTable';
@@ -13,6 +14,7 @@ import useChartJSInitializer from '@/hooks/teachers/useChartJSInitializer';
 import useFilteredAssignments from '@/hooks/teachers/useFilteredAssignments';
 import { Assignment } from '@/models/Assignment';
 import { Student } from '@/models/Student';
+import { chartOptions } from '@/util/chart';
 import { SPANISH_MONTH_NAMES, dateFormats } from '@/util/dates';
 import { AddIcon, ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
@@ -40,14 +42,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
-import DatePicker from 'react-datepicker';
 import IncompleteTasksIcon from '../../../assets/images/lecturas_atrasadas.svg';
 import SentTasksIcon from '../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../assets/images/lecturas_pendientes.svg';
 import useFilteredStudents from '../../../hooks/teachers/useFilteredStudents';
 import styles from './grupos.module.css';
-import Spinner from '@/components/spinners/Spinner';
-import { chartOptions } from '@/util/chart';
 
 const columns: ChakraTableColumn[] = [
   { label: 'Nombre' },
@@ -239,16 +238,16 @@ export default function Page({ params }: { params: { grupo: number } }) {
     return <LoadingPage />;
   }
   if (isError) {
-    return <ErrorPage intendedAction="buscar los alumnos del grupo" />;
+    return <ErrorPage intendedAction="buscar los alumnos de la clase" />;
   }
   if (statsError) {
-    return <ErrorPage intendedAction="recopilar estadisticas del grupo" />;
+    return <ErrorPage intendedAction="recopilar estadisticas de la clase" />;
   }
 
   return (
     <ChakraProvider>
       <Head>
-        <title>Grupos</title>
+        <title>Clases</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>
@@ -256,7 +255,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos">Clases</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>
@@ -434,7 +433,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
                   <div className={`row ${styles.canvas}`}>
                     <Line
                       data={dataLine}
-                      options={chartOptions('Promedio de score mensual')}
+                      options={chartOptions('Promedio de puntaje mensual')}
                     ></Line>
                     <Bar
                       data={dataBar}

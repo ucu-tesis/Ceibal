@@ -1,15 +1,15 @@
-import React from 'react';
+import GroupsOverlay from '@/assets/images/groups-full.png';
+import Groups from '@/assets/images/groups.png';
+import ReadingBookOverlay from '@/assets/images/reading-book-full.png';
+import ReadingBook from '@/assets/images/reading-book.png';
+import TeacherCardButton from '@/components/buttons/TeacherCardButton';
+import { useUser } from '@/providers/UserContext';
+import { ChakraProvider } from '@chakra-ui/react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useUser } from '@/providers/UserContext';
+import React from 'react';
 import styles from './maestro.module.css';
-import { ChakraProvider } from '@chakra-ui/react';
-import TeacherCardButton from '@/components/buttons/TeacherCardButton';
-import ReadingBookOverlay from '@/assets/images/reading-book-full.png';
-import ReadingBook from '@/assets/images/reading-book.png';
-import GroupsOverlay from '@/assets/images/groups-full.png';
-import Groups from '@/assets/images/groups.png';
 
 const TeacherHomeScreen: React.FC = () => {
   const router = useRouter();
@@ -25,9 +25,9 @@ const TeacherHomeScreen: React.FC = () => {
       <div className={`${styles.container} row`}>
         <div>
           <TeacherCardButton
-            icon={<Image src={Groups} alt="ver grupos" />}
-            backgroundImage={<Image src={GroupsOverlay} alt="ver grupos" />}
-            text="Grupos"
+            icon={<Image src={Groups} alt="ver clases" />}
+            backgroundImage={<Image src={GroupsOverlay} alt="ver clases" />}
+            text="Clases"
             onClick={() => router.push(`${currentPathName}/grupos`)}
           ></TeacherCardButton>
         </div>

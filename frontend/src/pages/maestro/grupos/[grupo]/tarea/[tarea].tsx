@@ -15,6 +15,7 @@ import useChartJSInitializer from '@/hooks/teachers/useChartJSInitializer';
 import useFilteredEvaluations from '@/hooks/teachers/useFilteredEvaluations';
 import { AssignmentReading } from '@/models/AssignmentReading';
 import { AnalysisStatus } from '@/models/Recording';
+import { chartOptions } from '@/util/chart';
 import { dateFormats } from '@/util/dates';
 import { ChevronRightIcon, SearchIcon } from '@chakra-ui/icons';
 import {
@@ -37,7 +38,6 @@ import IncompleteTasksIcon from '../../../../../assets/images/lecturas_atrasadas
 import SentTasksIcon from '../../../../../assets/images/lecturas_enviadas.svg';
 import PendingTasksIcon from '../../../../../assets/images/lecturas_pendientes.svg';
 import styles from './tarea.module.css';
-import { chartOptions } from '@/util/chart';
 
 interface Params {
   alumno: string;
@@ -54,7 +54,7 @@ type Option = {
 const readingColumns: ChakraTableColumn[] = [
   { label: 'Nombre' },
   { label: 'Documento' },
-  { label: 'Mail' },
+  { label: 'Correo' },
   { label: 'Estado' },
   { label: 'Fecha de Entrega' },
 ];
@@ -213,7 +213,7 @@ export default function Page({ params }: { params: Params }) {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Clases</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>

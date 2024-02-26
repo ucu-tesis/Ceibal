@@ -1,14 +1,17 @@
-import React from 'react';
-import Head from 'next/head';
-import { ChakraProvider } from '@chakra-ui/react';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
-import { ChevronRightIcon } from '@chakra-ui/icons';
-import ProgressCircle from '@/components/progress/ProgressCircle';
-import styles from './resultado.module.css';
-import LoadingPage from '@/components/loadingPage/LoadingPage';
-import ErrorPage from '@/components/errorPage/ErrorPage';
-import { useRouter } from 'next/router';
 import useFetchStudentAssignmentDetails from '@/api/teachers/hooks/useFetchRecordingDetails';
+import ErrorPage from '@/components/errorPage/ErrorPage';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import ProgressCircle from '@/components/progress/ProgressCircle';
+import { ChevronRightIcon } from '@chakra-ui/icons';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  ChakraProvider,
+} from '@chakra-ui/react';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import styles from './resultado.module.css';
 
 export default function Page() {
   const { tarea, alumno } = useRouter().query;
@@ -40,7 +43,7 @@ export default function Page() {
             <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/maestro/grupos/">Grupos</BreadcrumbLink>
+            <BreadcrumbLink href="/maestro/grupos/">Clases</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem>
             <BreadcrumbLink href={'/maestro/grupos/' + data.groupId}>
