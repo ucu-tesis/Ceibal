@@ -186,6 +186,7 @@ export default function Page({ params }: { params: Params }) {
                   grupo: groupId,
                   tarea: evaluationGroupReadingId,
                   alumno: reading.studentId,
+                  assignmentOrigin: true,
                 },
               }}
             >
