@@ -13,9 +13,12 @@ import {
 import { Reading } from '@/models/Reading';
 import { dateFormats } from '@/util/dates';
 import { getOptionsFromArray } from '@/util/select';
-import { SearchIcon } from '@chakra-ui/icons';
+import { SearchIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
   ChakraProvider,
   Checkbox,
@@ -281,7 +284,7 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const { grupo: evaluationGroupId } = router.query;
+  const { grupo: evaluationGroupId, groupName } = router.query;
 
   const [readingSearch, setReadingSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>();
@@ -386,6 +389,19 @@ const Page: React.FC = () => {
         <title>Asignar Tarea</title>
       </Head>
       <div className={`${styles.container}`}>
+        <Breadcrumb separator={<ChevronRightIcon />}>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro">Inicio</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/maestro/grupos">Clases</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href={'/maestro/grupos/' + evaluationGroupId}>
+              {groupName}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
         <h1 tabIndex={0}>Asignar Tarea</h1>
         <Stepper index={activeStep}>
           {steps.map((step, index) => (

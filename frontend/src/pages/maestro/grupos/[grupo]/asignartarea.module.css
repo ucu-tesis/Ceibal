@@ -11,6 +11,7 @@
 }
 
 .desc {
+  margin-top: 8px;
   gap: 32px;
   margin-bottom: 16px;
 }
@@ -22,6 +23,10 @@
 
 .desc ul {
   padding: 0px 32px;
+}
+
+.desc span:has(+ input) {
+  align-self: center;
 }
 
 .filters {

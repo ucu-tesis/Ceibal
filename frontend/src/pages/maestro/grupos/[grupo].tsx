@@ -267,9 +267,12 @@ export default function Page({ params }: { params: { grupo: number } }) {
           <h1 tabIndex={0}>{groupName}</h1>
           <div className={`${styles['mob-col']} row`}>
             <Button
-              onClick={() =>
-                router.push(`/maestro/grupos/${evaluationGroupId}/asignartarea`)
-              }
+              onClick={() => {
+                router.push({
+                  pathname: `/maestro/grupos/${evaluationGroupId}/asignartarea`,
+                  query: { groupName: groupName },
+                });
+              }}
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"

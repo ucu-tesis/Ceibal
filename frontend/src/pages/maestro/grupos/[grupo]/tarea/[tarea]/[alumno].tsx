@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 import styles from './resultado.module.css';
 
 export default function Page() {
-  const { tarea, alumno } = useRouter().query;
+  const { tarea, alumno, assignmentOrigin } = useRouter().query;
   const { data, isLoading, isError } = useFetchStudentAssignmentDetails(
     Number(tarea),
     Number(alumno),
@@ -52,11 +52,19 @@ export default function Page() {
           </BreadcrumbItem>
 
           <BreadcrumbItem>
-            <BreadcrumbLink
-              href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}
-            >
-              {data.studentName}
-            </BreadcrumbLink>
+            {assignmentOrigin ? (
+              <BreadcrumbLink
+                href={'/maestro/grupos/' + data.groupId + '/tarea/' + tarea}
+              >
+                Tarea: {data.readingTitle}
+              </BreadcrumbLink>
+            ) : (
+              <BreadcrumbLink
+                href={'/maestro/grupos/' + data.groupId + '/' + data.studentId}
+              >
+                {data.studentName}
+              </BreadcrumbLink>
+            )}
           </BreadcrumbItem>
 
           <BreadcrumbItem>
