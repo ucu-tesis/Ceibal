@@ -23,13 +23,11 @@ const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
         onClick={onClick}
       >
         {/* TODO Replace SuarezReading with a default image */}
-        <Image
+        <img
           src={image ?? ''}
-          unoptimized={true}
           alt={`Imagen de la lectura '${title}'`}
           width={200}
           height={300}
-          priority
         />
         <span>{title}</span>
         <span>{dateSubmitted}</span>

@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import React from 'react';
 import styles from './Button.module.css';
 
@@ -19,7 +18,6 @@ const ImageButton: React.FC<ImageButtonProps> = ({
   title,
   variant = '',
   overlayText = undefined,
-  unoptimized = false,
 }) => {
   return (
     <div className={`${styles['btn-col']} col`}>
@@ -28,13 +26,12 @@ const ImageButton: React.FC<ImageButtonProps> = ({
         type="button"
         className={`${styles['image-btn']} ${styles[variant] ?? ''}`}
       >
-        <Image
+        <img
           className={`${styles.image}`}
           src={src}
           alt={altText}
           width={220}
           height={220}
-          unoptimized={unoptimized}
         />
         {overlayText && (
           <div className={styles.overlay}>

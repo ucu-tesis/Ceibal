@@ -99,7 +99,7 @@ export default function Page() {
       <div id="container" className={`${styles.container} col`}>
         <h1>Resultado de Evaluación</h1>
         <h2>{title}</h2>
-        <Image
+        <img
           className={styles.rounded}
           src={imageURL ?? ''}
           width={300}
