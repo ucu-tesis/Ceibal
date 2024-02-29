@@ -25,7 +25,7 @@
   padding: 0px 32px;
 }
 
-.desc span:has(+ input) {
+.self-center {
   align-self: center;
 }
 

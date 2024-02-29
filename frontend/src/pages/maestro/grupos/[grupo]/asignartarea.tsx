@@ -42,6 +42,7 @@ import {
   StepStatus,
   StepTitle,
   Stepper,
+  Text,
   useDisclosure,
   useSteps,
   useToast,
@@ -80,6 +81,10 @@ const filterReadings = (
       (!subcategory || reading.subcategory === subcategory)
     );
   });
+};
+
+const isInvalidDueDate = (date: string) => {
+  return dayjs(date).isBefore(dayjs().add(3, 'days'));
 };
 
 const defaultOption: Option = {
@@ -184,17 +189,33 @@ const ReadingsSection: React.FC<ReadingSectionProps> = ({
   if (readingsQueryData.isError) {
     return <>Error obteniendo: ${readingsQueryData.error}</>;
   }
+
+  const days = dayjs(selectedDueDate).diff(dayjs(), 'days');
+  const invalidDueDate = isInvalidDueDate(selectedDueDate);
+
   return (
     <>
       <div className={`${styles.desc} row`}>
-        <span tabIndex={0}>Fecha límite:</span>
+        <span className={styles['self-center']} tabIndex={0}>
+          Fecha límite:
+        </span>
         <InputDateTimeLocal
           value={selectedDueDate}
           onChange={(event: ChangeEvent) => {
             const { value } = event.target as HTMLInputElement;
-            setSelectedDueDate(dayjs(value).toISOString());
+            // value is empty string when date is invalid (like 31 of february)
+            if (value) {
+              setSelectedDueDate(dayjs(value).toISOString());
+            }
           }}
         ></InputDateTimeLocal>
+        <Text
+          className={styles['self-center']}
+          color={invalidDueDate ? 'red.600' : 'black'}
+          fontWeight={invalidDueDate ? 'bold' : 'normal'}
+        >
+          ({days} días)
+        </Text>
       </div>
       <span>
         <strong tabIndex={0}>Lecturas:</strong>
@@ -291,7 +312,7 @@ const Page: React.FC = () => {
   const [subcategoryFilter, setSubcategoryFilter] = useState<string>();
 
   const [selectedDueDate, setSelectedDueDate] = useState<string>(
-    dayjs().toISOString(),
+    dayjs().add(1, 'month').toISOString(),
   );
   const [selectedReadings, setSelectedReadings] = useState<Reading[]>([]);
 
@@ -358,7 +379,11 @@ const Page: React.FC = () => {
 
   const nextCondition = () => {
     if (steps[activeStep] === READINGS_STEP) {
-      return selectedReadings.length === 0 || !selectedDueDate;
+      return (
+        selectedReadings.length === 0 ||
+        !selectedDueDate ||
+        isInvalidDueDate(selectedDueDate)
+      );
     } else {
       return false;
     }
