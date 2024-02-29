@@ -17,6 +17,10 @@ import {
 import { Student } from '@/models/Student';
 import { StudentAssignmentDetails } from '@/models/StudentAssignmentDetails';
 import axiosInstance from '../axiosInstance';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 interface CreateReadingResponse {
   id: number;
@@ -403,7 +407,7 @@ const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
   return monthAverages
     .filter(({ month }) => !!month)
     .map((monthItem) => ({
-      month: new Date(monthItem.month).getMonth(),
+      month: dayjs.utc(monthItem.month).month(),
       value: Number(monthItem[valueKey]),
     }));
 };
