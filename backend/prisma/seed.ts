@@ -569,28 +569,28 @@ async function addAchievements() {
       trigger_id: 'completed:1',
       name: 'Lector Principiante',
       description: 'Has completado tu primer lectura',
-      image_url: 'https://picsum.photos/400/400?random=1',
+      image_url: '/achievements/1.jpg',
     },
     {
       id: 2,
       trigger_id: 'completed:5',
       name: 'Lector Intermedio',
       description: 'Has completado 5 lecturas',
-      image_url: 'https://picsum.photos/400/400?random=2',
+      image_url: '/achievements/2.jpg',
     },
     {
       id: 3,
       trigger_id: 'completed:10',
       name: 'Lector Avanzado',
       description: 'Has completado 10 lecturas',
-      image_url: 'https://picsum.photos/400/400?random=3',
+      image_url: '/achievements/3.jpg',
     },
     {
       id: 4,
       trigger_id: 'completed:20',
       name: 'Lector Experto',
       description: 'Has completado 20 lecturas',
-      image_url: 'https://picsum.photos/400/400?random=4',
+      image_url: '/achievements/4.jpg',
     },
   ];
   await prisma.achievement.createMany({
