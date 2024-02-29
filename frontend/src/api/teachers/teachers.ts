@@ -394,6 +394,9 @@ const parseStudentStatsResponse = (
 });
 
 const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
+  if (monthAverages.length === 0) {
+    return []
+  }
   const valueKey = Object.keys(monthAverages[0]).find(
     (key) => key !== 'month',
   ) as keyof MonthItem;
