@@ -13,11 +13,9 @@ const getDueDateString = (date: Date) => {
   const day = dayjs(date).get('date');
   const monthIndex = dayjs(date).get('month');
   const month = SPANISH_MONTH_NAMES[monthIndex];
-  const hour = dayjs(date).get('hour');
+  const hourAndMinute = dayjs(date).format('hh:mm');
   const minute = dayjs(date).get('minute');
-  return `\n(Tenés tiempo hasta el ${day} de ${month} a las ${hour}${
-    hour < 10 ? '0' : ''
-  }:${minute}${minute < 10 ? '0' : ''})`;
+  return `\n(Tenés tiempo hasta el ${day} de ${month} a las ${hourAndMinute})`;
 };
 
 const ReadingTable: React.FC<ReadingTableProps> = ({ readings }) => {
