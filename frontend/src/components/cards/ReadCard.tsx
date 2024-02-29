@@ -25,6 +25,7 @@ const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
         {/* TODO Replace SuarezReading with a default image */}
         <Image
           src={image ?? ''}
+          unoptimized={true}
           alt={`Imagen de la lectura '${title}'`}
           width={200}
           height={300}

@@ -79,6 +79,7 @@ const Premios: React.FC = () => {
           <div className={`${styles['achievement-modal']} col`}>
             <ImageButton
               src={selectedAchievement?.imageUrl}
+              unoptimized={true}
               altText={`Un logro ${
                 selectedAchievement?.achieved ? 'completado' : 'por completar'
               }`}

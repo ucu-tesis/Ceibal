@@ -9,6 +9,7 @@ interface ImageButtonProps {
   title: string;
   variant?: string;
   overlayText?: string;
+  unoptimized?: boolean;
 }
 
 const ImageButton: React.FC<ImageButtonProps> = ({
@@ -18,6 +19,7 @@ const ImageButton: React.FC<ImageButtonProps> = ({
   title,
   variant = '',
   overlayText = undefined,
+  unoptimized = false,
 }) => {
   return (
     <div className={`${styles['btn-col']} col`}>
@@ -32,6 +34,7 @@ const ImageButton: React.FC<ImageButtonProps> = ({
           alt={altText}
           width={220}
           height={220}
+          unoptimized={unoptimized}
         />
         {overlayText && (
           <div className={styles.overlay}>
