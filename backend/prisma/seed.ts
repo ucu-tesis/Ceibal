@@ -90,7 +90,7 @@ async function load() {
   const testReading1 = await prisma.reading.create({
     data: {
       title: 'Quiero ser Suárez',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/suarez.jpeg',
       content: `Había una vez un niño llamado Martín que soñaba con convertirse en un gran goleador como su héroe, Luis Suárez.
 
         Martín vivía en un pequeño pueblo donde cada tarde, después de la escuela, corría al campo de fútbol con su viejo balón desgastado. Martín admiraba a Suárez no solo por sus increíbles goles, sino también por su valentía y espíritu de equipo.
@@ -104,7 +104,7 @@ async function load() {
   const testReading2 = await prisma.reading.create({
     data: {
       title: 'Diógenes no quiere ser ratón',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/diogenes.jpeg',
       content: `¡Pobre Diógenes! Fue un error mirarse en el espejo luego de haber comido cinco páginas de un antiguo libro de animales...
 
       Cuando vio su imagen reflejada, descubrió que ya no quería ser ratón. «No me gusta ser como soy, quiero ser otro. ¡Es tan difícil ser uno mismo!», pensó mientras desaprobaba sus orejas gigantescas, sus ojos saltones y sus dientes desparejos.
@@ -120,7 +120,7 @@ async function load() {
   const testReading3 = await prisma.reading.create({
     data: {
       title: 'La Aventura de Pico Amarillo',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/pico-amarillo.jpeg',
       content: `En el vasto cielo azul, donde el sol brilla con fuerza y las nubes se deslizan perezosamente, vive un pequeño pájaro llamado Pico Amarillo.Con sus alas fuertes y su plumaje brillante, Pico Amarillo es conocido por ser el más aventurero de todos los pájaros del bosque.
 
       Un día, decide emprender el viaje más emocionante de su vida: encontrar el legendario Árbol de las Cerezas Doradas.Según los cuentos de los mayores, este árbol mágico solo da frutos una vez cada cien años, y sus cerezas doradas pueden conceder deseos.
@@ -134,7 +134,7 @@ async function load() {
   const testReading4 = await prisma.reading.create({
     data: {
       title: 'La Carrera del Río',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/carrera-rio.jpeg',
       content: `Entre los competidores estaban Lina la Liebre, con sus patas largas y rápidas; Tortu, la tortuga sabia y serena; y un nuevo desafiante este año, Felipe el Pez, quien aseguraba que podía ganar la carrera desde el agua.
 
       A medida que la carrera comenzaba, los animales del bosque se alineaban a lo largo de las orillas para animar a sus favoritos.Lina saltaba con agilidad, mientras que Tortu avanzaba lento pero seguro, y Felipe nadaba ágilmente siguiendo el curso del río.A lo largo del camino, cada uno enfrentó desafíos que pusieron a prueba su determinación.`,
@@ -146,7 +146,7 @@ async function load() {
   const testReading5 = await prisma.reading.create({
     data: {
       title: 'Princesofía',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/princesofia.jpeg',
       content: `En un reino lleno de magia y color, vivía una princesa muy especial llamada Sofía.Sofía amaba aprender y soñaba con aventuras que le enseñaran sobre el mundo más allá de los muros del castillo.
 
         Cada día, se levantaba con el sol y en lugar de asistir a clases de etiqueta, prefería estudiar mapas, leer sobre plantas y animales exóticos, y practicar arquería. "Una princesa debe ser valiente, curiosa y bondadosa", decía siempre.`,
@@ -158,7 +158,7 @@ async function load() {
   const testReading6 = await prisma.reading.create({
     data: {
       title: 'El Jardín Encantado',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/jardin-encantado.jpeg',
       content: `En el corazón de un reino lejano, más allá de los montes y los ríos, hay un jardín secreto, oculto por un hechizo anitguo.Solo aquellos de corazón puro podían ver el resplandor de sus flores mágicas, que brillaban bajo la luz de las estrellas.
 
       Era un lugar de encuentro para las criaturas más maravillosas y bondadosas del reino, desde hadas diminutas hasta unicornios de mirada sabia.
@@ -172,7 +172,7 @@ async function load() {
   const testReading7 = await prisma.reading.create({
     data: {
       title: 'El Misterio de la Isla Escondida',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/isla-escondida.jpeg',
       content: `El sol se ponía en el horizonte cuando Lucas y Emma, con el mapa desplegado entre ellos, decidieron que era el momento de emprender su aventura.La Isla Escondida, según las leyendas, albergaba un tesoro sin igual, pero lo que realmente buscaban era la emoción de descubrir lo desconocido.
 
       "¿Crees que encontraremos el tesoro?" preguntó Emma, mirando el mapa con esperanza.
@@ -188,7 +188,7 @@ async function load() {
   const testReading8 = await prisma.reading.create({
     data: {
       title: 'El Bosque de los Secretos Susurrantes',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/bosque-secretos.jpeg',
       content: `Sofía y Alex siempre habían sentido curiosidad por el viejo bosque que se extendía más allá de su pueblo.Se decía que era un lugar donde la naturaleza hablaba, donde cada planta y cada criatura tenía su historia.Armados con una libreta y una cámara, decidieron adentrarse en este misterioso mundo para documentar sus maravillas.
 
       A medida que avanzaban, el bosque parecía cobrar vida.Los árboles susurraban con el viento, llevando mensajes antiguos que solo el corazón podía entender.Se encontraron con rastros de animales que nunca habían visto, huellas que los llevaban por senderos ocultos hacia claros iluminados por rayos de sol donde florecían flores de colores imposibles.
@@ -202,7 +202,7 @@ async function load() {
   const testReading9 = await prisma.reading.create({
     data: {
       title: 'El Canto de la Selva',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/canto-selva.jpeg',
       content: `La luz del sol se filtraba a través de las densas copas de los árboles, creando un mosaico de luces y sombras en el suelo del bosque.A su alrededor, el zumbido de los insectos se mezclaba con el canto de las aves, creando una sinfonía natural que Elena nunca había experimentado.Se detuvo a observar cómo una mariposa posaba delicadamente sobre una flor, maravillándose de la precisión con la que la naturaleza tejía sus conexiones.
 
       Mientras avanzaba, Elena tomó notas sobre las diferentes especies de plantas que encontraba, fascinada por la diversidad de la vida en la selva.Se sorprendió al descubrir cómo algunas plantas habían desarrollado relaciones simbióticas con los animales, proporcionándoles alimento a cambio de la dispersión de sus semillas.`,
@@ -214,7 +214,7 @@ async function load() {
   const testReading10 = await prisma.reading.create({
     data: {
       title: 'Desiertos de Arena y Estrellas',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/desiertos-arena.jpeg',
       content: `Armada con una botella de agua, un sombrero de ala ancha y su fiel cuaderno, comenzó su caminata.No pasó mucho tiempo antes de que observara los primeros signos de vida.Un lagarto escarabajo se deslizaba rápidamente entre las sombras, buscando refugio del calor abrasador.Lara tomó nota de cómo sus patas estaban adaptadas para correr sobre la arena sin hundirse.
 
       Más adelante, se maravilló ante la resistencia de las plantas del desierto, como el cactus, que almacenaba agua en sus gruesos tallos para sobrevivir meses sin lluvia.La adaptación, pensó Lara, era la clave de la supervivencia aquí, donde cada gota de agua y cada sombra era un tesoro.
@@ -228,7 +228,7 @@ async function load() {
   const testReading11 = await prisma.reading.create({
     data: {
       title: 'Descifrando los Secretos del Universo Oscuro',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/universo-oscuro.jpeg',
       content: `En el corazón de la cosmología moderna yace un enigma que desafía nuestras comprensiones más fundamentales del universo: la naturaleza del universo oscuro.Compuesto por materia oscura y energía oscura, constituye aproximadamente el 95 % del total del cosmos, dejando a la materia ordinaria, aquella con la que estamos familiarizados, en una minoría sorprendentemente pequeña.
 
       La materia oscura, invisible y detectable únicamente a través de sus efectos gravitacionales sobre la materia visible, teje la infraestructura cósmica, dictando la formación y estructura de galaxias.Por otro lado, la energía oscura, aún más misteriosa, impulsa la expansión acelerada del universo, un descubrimiento que ha sacudido los cimientos de la física teórica.
@@ -242,7 +242,7 @@ async function load() {
   const testReading12 = await prisma.reading.create({
     data: {
       title: 'La Revolución de la Genética',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/genetica.jpeg',
       content: `La biotecnología ha entrado en una nueva era dorada con el desarrollo de CRISPR, una herramienta de edición genética que ha transformado radicalmente las posibilidades de la ingeniería genética.
 
       Este sistema, derivado de mecanismos de defensa bacterianos, permite a los científicos realizar cortes precisos en el ADN, eliminando, añadiendo o alterando secuencias genéticas con una precisión sin precedentes.Este avance representa no solo un salto monumental en la investigación genética, sino también una promesa para el tratamiento de enfermedades hasta ahora incurables, desde trastornos hereditarios como la distrofia muscular y la fibrosis quística hasta el cáncer y enfermedades cardiovasculares. `,
@@ -254,7 +254,7 @@ async function load() {
   const testReading13 = await prisma.reading.create({
     data: {
       title: 'El Surgimiento del Imperio Otomano',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/otomano.jpeg',
       content: `A finales del siglo XIII, en las estepas de Anatolia, emergía un poder destinado a transformar radicalmente el equilibrio político y cultural del mundo medieval: el Imperio Otomano.Fundado por Osman I, este imperio no solo unificó bajo su estandarte a tribus turcas nómadas, sino que también inició una era de expansión militar y florecimiento cultural que desafiaría a las más grandes potencias de su tiempo.
 
       El siglo XV marcó el cenit de su expansión con la conquista de Constantinopla en 1453 bajo el mando de Mehmed II, conocido como "el Conquistador".Esta victoria no solo significó el fin del milenario Imperio Romano de Oriente, sino que también estableció a los otomanos como una fuerza dominante en el Mediterráneo, abriendo nuevas rutas comerciales y culturales entre Oriente y Occidente.`,
@@ -266,7 +266,7 @@ async function load() {
   const testReading14 = await prisma.reading.create({
     data: {
       title: 'La Revolución Industrial',
-      image_url: 'https://picsum.photos/300/400',
+      image_url: '/libros/industrial.jpeg',
       content: `La invención de la máquina de vapor por James Watt y la introducción del telar mecánico revolucionaron la industria textil, la esfera productiva dominante de la época.Estas innovaciones propiciaron un incremento exponencial en la producción y eficiencia, pero también trajeron consigo desafíos significativos.La concentración de fábricas en ciudades provocó una migración masiva del campo a la urbe, generando crecimiento urbano desmedido y condiciones de vida precarias para la clase trabajadora.
 
       El impacto de la Revolución Industrial se extendió más allá de la economía y la demografía; provocó un replanteamiento de las leyes laborales, la educación y el papel del Estado en la protección del bienestar de sus ciudadanos.Las respuestas a estos desafíos sentaron las bases para las políticas sociales modernas y el desarrollo de sindicatos que buscarían mejorar las condiciones laborales.`,
