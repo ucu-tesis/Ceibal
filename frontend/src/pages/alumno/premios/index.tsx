@@ -48,7 +48,7 @@ const Premios: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Colección de premios</title>
+        <title>Colección de logros</title>
       </Head>
       <div className={`${styles.container} col`}>
         <h1 tabIndex={0}>Logros</h1>
