@@ -19,7 +19,7 @@ import { Pagination } from 'src/decorators/pagination.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { UserData } from 'src/decorators/userData.decorator';
 import { AchievementService } from 'src/services/achievement.service';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 class UploadRecordingDTO {
   @IsString()
