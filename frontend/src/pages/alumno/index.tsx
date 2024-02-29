@@ -63,7 +63,7 @@ const StudentHomeScreen: React.FC = () => {
           <CardButton
             leftIcon={<Image src={Trofeo} alt="" />}
             onClick={() => router.push(`${currentPathName}/premios`)}
-            text="Ver mi colección de premios"
+            text="Ver mi colección de logros"
           />
         </div>
       </div>
