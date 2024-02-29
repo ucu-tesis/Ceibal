@@ -10,10 +10,14 @@ import { UserData } from 'src/decorators/userData.decorator';
 import { StudentGuard } from 'src/guards/student.guard';
 import { ReadingsResponse } from 'src/models/reading-response.model';
 import { PrismaService } from 'src/prisma.service';
+import { FileUploadService } from 'src/services/file-upload.service';
 
 @Controller('students')
 export class StudentsController {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private fileUploadService: FileUploadService,
+  ) {}
 
   @Get('/readings/all')
   @UseGuards(StudentGuard)
@@ -100,7 +104,9 @@ export class StudentsController {
           id: r.id,
           date_submitted: r.created_at,
           reading_title: r.Reading.title,
-          reading_image: r.Reading.image_url,
+          reading_image: this.fileUploadService.getPublicUrl(
+            r.Reading.image_url,
+          ),
           analysis_score: newestAnalysis?.score || 0,
           analysis_status: newestAnalysis?.status || 'NOT_STARTED',
         };
@@ -260,6 +266,7 @@ export class StudentsController {
       return {
         ...achievement,
         achieved,
+        image_url: this.fileUploadService.getPublicUrl(achievement.image_url),
       };
     });
 

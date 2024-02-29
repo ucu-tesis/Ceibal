@@ -113,4 +113,21 @@ export class FileUploadService implements MulterOptionsFactory {
       throw new BadRequestException('Error generating signed URL');
     }
   }
+
+  getPublicUrl(s3ObjectKey: string): string {
+    // If the key is an URL, that means it's already a public URL
+    // or it's not an S3 upload, skip and return the URL.
+    if (
+      s3ObjectKey.startsWith('http://') ||
+      s3ObjectKey.startsWith('https://')
+    ) {
+      return s3ObjectKey;
+    }
+
+    const bucket = this.configService.get('AWS_PUBLIC_BUCKET');
+    return `https://${bucket}.s3.amazonaws.com/${s3ObjectKey}`.replace(
+      /([^:])(\/\/+)/g,
+      '$1/',
+    );
+  }
 }

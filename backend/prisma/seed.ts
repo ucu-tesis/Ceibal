@@ -569,28 +569,28 @@ async function addAchievements() {
       trigger_id: 'completed:1',
       name: 'Lector Principiante',
       description: 'Has completado tu primer lectura',
-      image_url: '/achievements/1.jpg',
+      image_url: '/logros/1.jpg',
     },
     {
       id: 2,
       trigger_id: 'completed:5',
       name: 'Lector Intermedio',
       description: 'Has completado 5 lecturas',
-      image_url: '/achievements/2.jpg',
+      image_url: '/logros/2.jpg',
     },
     {
       id: 3,
       trigger_id: 'completed:10',
       name: 'Lector Avanzado',
       description: 'Has completado 10 lecturas',
-      image_url: '/achievements/3.jpg',
+      image_url: '/logros/3.jpg',
     },
     {
       id: 4,
       trigger_id: 'completed:20',
       name: 'Lector Experto',
       description: 'Has completado 20 lecturas',
-      image_url: '/achievements/4.jpg',
+      image_url: '/logros/4.jpg',
     },
   ];
   await prisma.achievement.createMany({
