@@ -276,6 +276,7 @@ export default function Page({ params }: { params: { grupo: number } }) {
               leftIcon={<AddIcon />}
               className={styles.primary}
               variant="solid"
+              isDisabled={students.length === 0}
             >
               Asignar Tarea
             </Button>
