@@ -233,7 +233,7 @@ export class EvaluationGroupsController {
 
     const monthlyAverages = (await this.prismaService.$queryRaw`
       SELECT
-        DATE_TRUNC('month', a.created_at) as month,
+        DATE_TRUNC('month', egr.created_at) as month,
         AVG(a.score) as average_score,
         CAST(COUNT(DISTINCT CASE WHEN r.id IS NOT NULL THEN egr.id END) AS INTEGER) as assignments_done,
         CAST(COUNT(DISTINCT CASE WHEN r.id IS NULL AND egr.due_date > NOW() THEN egr.id END) AS INTEGER) as assignments_pending,
@@ -242,7 +242,7 @@ export class EvaluationGroupsController {
       LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
       LEFT JOIN "Analysis" a ON r.id = a.recording_id
       WHERE egr.evaluation_group_id = ${evaluationGroup.id}
-      GROUP BY DATE_TRUNC('month', a.created_at)
+      GROUP BY DATE_TRUNC('month', egr.created_at)
       ORDER BY month;
     `) as {
       month: Date;
