@@ -28,6 +28,7 @@ const ReadCard = forwardRef<HTMLDivElement, ReadCardProps>(
           alt={`Imagen de la lectura '${title}'`}
           width={200}
           height={300}
+          crossOrigin="anonymous"
         />
         <span>{title}</span>
         <span>{dateSubmitted}</span>
