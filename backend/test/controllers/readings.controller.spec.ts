@@ -86,15 +86,21 @@ describe('ReadingsController', () => {
       const teacher = await TestFactory.createTeacher({});
       const readingsBefore = await prismaService.reading.findMany();
       expect(readingsBefore).toEqual([]);
-      const fileUploadSpy = jest.spyOn(fileUploadService, 'uploadFileToPublicS3').mockImplementation(async () => {
-        return { key: "s3key", url: "s3url" };
-      });
-      const result = await controller.createReading(teacher.id, {
-        title: 'testTitle',
-        content: 'someContent',
-        category: 'Beginner',
-        subcategory: 'Adventure',
-      }, 'some file');
+      const fileUploadSpy = jest
+        .spyOn(fileUploadService, 'uploadFileToPublicS3')
+        .mockImplementation(async () => {
+          return { key: 's3key', url: 's3url' };
+        });
+      const result = await controller.createReading(
+        teacher.id,
+        {
+          title: 'testTitle',
+          content: 'someContent',
+          category: 'Beginner',
+          subcategory: 'Adventure',
+        },
+        'some file',
+      );
       const readingsAfter = await prismaService.reading.findMany();
       expect(readingsAfter).toEqual([
         {
