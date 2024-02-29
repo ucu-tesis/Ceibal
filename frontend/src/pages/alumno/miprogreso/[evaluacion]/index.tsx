@@ -106,6 +106,7 @@ export default function Page() {
           height={400}
           alt={`imagen de lectura: ${title}`}
           style={{ border: `2px solid ${imageAverageColor}` ?? 'unset' }}
+          crossOrigin="anonymous"
         />
         <div className={`${styles.info} row`}>
           <div className="row">

@@ -143,6 +143,10 @@ export class RecordingsController {
       },
     });
 
+    recording.Reading.image_url = this.fileUploadService.getPublicUrl(
+      recording.Reading.image_url,
+    );
+
     return {
       ...recording,
       recording_url: await this.fileUploadService.getSignedUrl(
