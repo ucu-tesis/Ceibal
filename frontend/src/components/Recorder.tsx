@@ -146,7 +146,11 @@ const Recorder: React.FC<RecorderProps> = ({
   };
 
   return (
-    <div ref={componentRef} id="recorder" className="row">
+    <div
+      ref={componentRef}
+      id="recorder"
+      className={`row ${arrayBuffer && !recording ? '' : 'mobile-sticky'}`}
+    >
       {arrayBuffer && !recording ? (
         <>
           <SecondaryButton
