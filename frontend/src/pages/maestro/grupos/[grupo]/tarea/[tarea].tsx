@@ -203,6 +203,9 @@ export default function Page({ params }: { params: Params }) {
     return <ErrorPage intendedAction="obtener estadísticas de la tarea" />;
   }
 
+  // only show stats when at least one analysis has been completed
+  const shouldShowStats = recordings.some(r => r.status === "COMPLETED");
+
   return (
     <ChakraProvider>
       <Head>
@@ -269,10 +272,12 @@ export default function Page({ params }: { params: Params }) {
           </div>
           <div className={styles['stats-box']}>
             <div className={`row ${styles['mob-col']}`}>
-              <ProgressCircle
-                value={Math.round(averageScore).toString()}
-                variant="small"
-              ></ProgressCircle>
+              {shouldShowStats && (
+                <ProgressCircle
+                  value={Math.round(averageScore).toString()}
+                  variant="small"
+                ></ProgressCircle>
+              )}
               <div className="row">
                 <Image alt="lecturas completadas" src={SentTasksIcon} />
                 <span>Completadas: {assignmentsDone}</span>
@@ -292,18 +297,20 @@ export default function Page({ params }: { params: Params }) {
             </div>
           </div>
         </div>
-        <div className={`row ${styles.canvas} ${styles.space}`}>
-          <Radar
-            width={600}
-            data={dataRadar}
-            options={chartOptions('Errores cometidos')}
-          ></Radar>
-          <Pie
-            width={600}
-            data={dataPie}
-            options={chartOptions('Palabras con mayor repetición')}
-          ></Pie>
-        </div>
+        {shouldShowStats && (
+          <div className={`row ${styles.canvas} ${styles.space}`}>
+            <Radar
+              width={600}
+              data={dataRadar}
+              options={chartOptions('Errores cometidos')}
+            ></Radar>
+            <Pie
+              width={600}
+              data={dataPie}
+              options={chartOptions('Palabras con mayor repetición')}
+            ></Pie>
+          </div>
+        )}
         <h2 tabIndex={0}>Entregas</h2>
         <div className={`${styles.filters} row`}>
           <InputGroup>
