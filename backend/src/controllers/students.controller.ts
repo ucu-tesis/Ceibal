@@ -224,6 +224,9 @@ export class StudentsController {
               },
             },
           },
+          Recordings: {
+            none: {},
+          },
         },
       });
 
