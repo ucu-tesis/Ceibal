@@ -295,4 +295,13 @@
   .card-button span {
     font-size: 18px;
   }
+
+  .button.large {
+    padding: 8px;
+    padding-inline: 8px;
+  }
+
+  .button.big.large {
+    padding-inline: 96px;
+  }
 }
