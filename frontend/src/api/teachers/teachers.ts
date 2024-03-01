@@ -207,6 +207,7 @@ interface StudentAssignmentDetailsResponse {
   recording_id: number | null;
   recording_url: string | null;
   status: string;
+  analysis_status: string;
 }
 
 export const fetchGroupDetails = (groupId: number) =>
@@ -486,4 +487,5 @@ const parseStudentAssignmentDetailsResponse = (
   recordingId: recording.recording_id,
   recordingUrl: recording.recording_url,
   status: recording.status,
+  analysisStatus: recording.analysis_status,
 });

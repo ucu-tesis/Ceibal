@@ -1,3 +1,5 @@
+import { AnalysisStatus } from "@prisma/client";
+
 export class StudentAssignmentDetailsResponse {
   analysis_id: number | null;
   student_id: number;
@@ -16,4 +18,5 @@ export class StudentAssignmentDetailsResponse {
   recording_id: number | null;
   recording_url: string | null;
   status: string;
+  analysis_status: AnalysisStatus;
 }
