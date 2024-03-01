@@ -94,7 +94,7 @@ const Page: React.FC = () => {
   return (
     <ChakraProvider>
       <Head>
-        <title>Clases</title>
+        <title>Lecturas</title>
       </Head>
       <div className={`${styles.container}`}>
         <Breadcrumb separator={<ChevronRightIcon />}>

@@ -22,6 +22,8 @@ import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import InputFile from '../inputs/InputFile';
 import SearchBox from '../selects/SearchBox';
 import { Option } from '../selects/Select';
+import DefaultReadingImage from '@/assets/images/default_reading.jpg';
+import Image from 'next/image';
 
 interface CreateReadingModalProps {
   isOpen: boolean;
@@ -51,6 +53,26 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
   const [category, setCategory] = useState<Option>();
   const [subcategory, setSubCategory] = useState<Option>();
   const { categories, subcategories } = data ?? emptyCategoriesAndSubcategories;
+
+  const [defaultFile, setDefaultFile] = useState<File>(new File([], ''));
+
+  const createDefaultFile = () => {
+    const defaultImage = document.getElementById(
+      'default-image',
+    ) as HTMLImageElement;
+    fetch(defaultImage.src)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const newFile = new File([blob], 'default_image.png', {
+          type: 'image/jpg',
+        });
+        setDefaultFile(newFile);
+        defaultImage.remove();
+      })
+      .catch((error) => {
+        console.error('Error fetching default image:', error);
+      });
+  };
 
   const categoryOptions = useMemo<Option[]>(
     () => categories.map((c) => ({ label: c, value: c })),
@@ -94,17 +116,18 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
   };
 
   const isAnyRequiredFieldEmpty =
-    !category?.value || !content || !file || !title || !subcategory?.value;
+    !category?.value || !content || !title || !subcategory?.value;
 
   const createReading = () => {
     if (!isAnyRequiredFieldEmpty) {
+      const uploadedFile = file ?? defaultFile;
       mutate(
         {
           category: category.value!,
           subcategory: subcategory.value!,
           content,
           title,
-          file,
+          file: uploadedFile,
         },
         {
           onSuccess,
@@ -192,6 +215,13 @@ const CreateReadingModal: React.FC<CreateReadingModalProps> = ({
               disabled={isLoadingCreateReading}
             ></InputFile>
           </div>
+          <Image
+            src={DefaultReadingImage}
+            id="default-image"
+            alt=""
+            hidden
+            onLoad={createDefaultFile}
+          ></Image>
         </ModalBody>
         <ModalFooter>
           {isLoadingCreateReading ? (
