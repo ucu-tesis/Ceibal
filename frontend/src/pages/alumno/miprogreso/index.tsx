@@ -66,6 +66,9 @@ const MiProgreso: React.FC = () => {
       <Head>
         <title>Mi Progreso</title>
       </Head>
+      <h1 tabIndex={0} className={styles.h1}>
+        Mi Progreso
+      </h1>
       <div className={`${styles.container} row`}>
         {recordings
           .sort(({ dateSubmitted: lds }, { dateSubmitted: rds }) =>

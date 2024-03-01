@@ -25,6 +25,7 @@
 .read-card img {
   max-height: 300px;
   max-width: 200px;
+  object-fit: cover;
 }
 
 .stars {
