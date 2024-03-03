@@ -1,4 +1,4 @@
-import { AnalysisStatus } from "@prisma/client";
+import { AnalysisStatus } from '@prisma/client';
 
 export class StudentAssignmentDetailsResponse {
   analysis_id: number | null;

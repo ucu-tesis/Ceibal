@@ -204,7 +204,7 @@ export default function Page({ params }: { params: Params }) {
   }
 
   // only show stats when at least one analysis has been completed
-  const shouldShowStats = recordings.some(r => r.status === "COMPLETED");
+  const shouldShowStats = recordings.some((r) => r.status === 'COMPLETED');
 
   return (
     <ChakraProvider>

@@ -72,7 +72,7 @@ export default function Page() {
             <BreadcrumbLink>Resultado</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
-        
+
         <h1 tabIndex={0}>Resultado de Evaluación</h1>
         <div className={`row ${styles.space}`}>
           <div className={`col ${styles.stats}`}>
@@ -87,15 +87,29 @@ export default function Page() {
             ></ProgressCircle>
           )}
         </div>
-        {data.analysisStatus === 'PENDING' && <h5>Análisis de grabacion <b>pendiente</b></h5>}
-        {data.analysisStatus === 'WORKING' && <h5>Análisis de grabacion <b>en proceso</b></h5>}
-        {data.analysisStatus === 'FAILED' && <h5><b>Error</b> en el análisis de grabacion</h5>}
+        {data.analysisStatus === 'PENDING' && (
+          <h5>
+            Análisis de grabacion <b>pendiente</b>
+          </h5>
+        )}
+        {data.analysisStatus === 'WORKING' && (
+          <h5>
+            Análisis de grabacion <b>en proceso</b>
+          </h5>
+        )}
+        {data.analysisStatus === 'FAILED' && (
+          <h5>
+            <b>Error</b> en el análisis de grabacion
+          </h5>
+        )}
         {data.analysisStatus === 'COMPLETED' && <h2 tabIndex={0}>Métricas</h2>}
         <Flex gap={8} mt={8} padding={6} align="center" border="1px">
           {data.analysisStatus === 'COMPLETED' && (
             <div className={`col`}>
               <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
-              <h5 tabIndex={0}>Cantidad Repeticiones: {data.repetitionsCount}</h5>
+              <h5 tabIndex={0}>
+                Cantidad Repeticiones: {data.repetitionsCount}
+              </h5>
               <h5 tabIndex={0}>
                 Velocidad de lectura: {data.wordsVelocity} palabras/minuto
               </h5>

@@ -500,7 +500,9 @@ const Page: React.FC = () => {
               )}
               <Button
                 onClick={changeStep}
-                isDisabled={nextCondition() || createAssignmentMutation.isSuccess}
+                isDisabled={
+                  nextCondition() || createAssignmentMutation.isSuccess
+                }
                 className={styles.primary}
                 variant="solid"
               >
