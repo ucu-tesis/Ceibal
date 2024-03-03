@@ -8,6 +8,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   ChakraProvider,
+  Flex,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -71,6 +72,7 @@ export default function Page() {
             <BreadcrumbLink>Resultado</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
+
         <h1 tabIndex={0}>Resultado de Evaluación</h1>
         <div className={`row ${styles.space}`}>
           <div className={`col ${styles.stats}`}>
@@ -79,26 +81,47 @@ export default function Page() {
             <h5 tabIndex={0}>Categoría: {data.category}</h5>
             <h5 tabIndex={0}>Subcategoría: {data.subcategory}</h5>
           </div>
-          <ProgressCircle
-            value={data.score?.toString() ?? '0'}
-          ></ProgressCircle>
+          {data.analysisStatus === 'COMPLETED' && (
+            <ProgressCircle
+              value={data.score?.toString() ?? '0'}
+            ></ProgressCircle>
+          )}
         </div>
-        <h2 tabIndex={0}>Métricas</h2>
-        <div className={`row ${styles.stats} ${styles.border}`}>
-          <div className={`col`}>
-            <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
-            <h5 tabIndex={0}>Cantidad Repeticiones: {data.repetitionsCount}</h5>
-            <h5 tabIndex={0}>
-              Velocidad de lectura: {data.wordsVelocity} palabras/minuto
-            </h5>
-          </div>
+        {data.analysisStatus === 'PENDING' && (
+          <h5>
+            Análisis de grabacion <b>pendiente</b>
+          </h5>
+        )}
+        {data.analysisStatus === 'WORKING' && (
+          <h5>
+            Análisis de grabacion <b>en proceso</b>
+          </h5>
+        )}
+        {data.analysisStatus === 'FAILED' && (
+          <h5>
+            <b>Error</b> en el análisis de grabacion
+          </h5>
+        )}
+        {data.analysisStatus === 'COMPLETED' && <h2 tabIndex={0}>Métricas</h2>}
+        <Flex gap={8} mt={8} padding={6} align="center" border="1px">
+          {data.analysisStatus === 'COMPLETED' && (
+            <div className={`col`}>
+              <h5 tabIndex={0}>Cantidad Pausas: {data.silencesCount}</h5>
+              <h5 tabIndex={0}>
+                Cantidad Repeticiones: {data.repetitionsCount}
+              </h5>
+              <h5 tabIndex={0}>
+                Velocidad de lectura: {data.wordsVelocity} palabras/minuto
+              </h5>
+            </div>
+          )}
           {data.recordingUrl ? (
             <audio controls className={`${styles.audio}`}>
               <source src={data.recordingUrl} />\ Your browser does not support
               the audio element.
             </audio>
           ) : null}
-        </div>
+        </Flex>
       </div>
     </ChakraProvider>
   );

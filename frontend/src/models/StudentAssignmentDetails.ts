@@ -16,4 +16,5 @@ export interface StudentAssignmentDetails {
   recordingId: number | null;
   recordingUrl: string | null;
   status: string;
+  analysisStatus: string;
 }

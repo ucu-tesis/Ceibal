@@ -493,13 +493,16 @@ const Page: React.FC = () => {
                   onClick={undoStep}
                   className={styles.secondary}
                   variant="outline"
+                  isDisabled={createAssignmentMutation.isSuccess}
                 >
                   Volver
                 </Button>
               )}
               <Button
                 onClick={changeStep}
-                isDisabled={nextCondition()}
+                isDisabled={
+                  nextCondition() || createAssignmentMutation.isSuccess
+                }
                 className={styles.primary}
                 variant="solid"
               >

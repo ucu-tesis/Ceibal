@@ -673,6 +673,7 @@ export class EvaluationGroupsController {
         : evaluationGroupReading.due_date < new Date()
         ? 'delayed'
         : 'pending',
+      analysis_status: recording?.Analysis[0]?.status ?? 'PENDING',
     };
   }
 }
