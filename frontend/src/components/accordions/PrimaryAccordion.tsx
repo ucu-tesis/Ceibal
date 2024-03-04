@@ -9,7 +9,7 @@ interface AccordionProps {
 }
 
 const PrimaryAccordion: React.FC<AccordionProps> = ({ title, children }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const onClickAccordion = () => {
     setOpen(!open);
   };
