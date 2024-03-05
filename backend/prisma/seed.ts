@@ -275,11 +275,21 @@ async function load() {
     },
   });
 
+  const octoberDate = new Date('2023-10-5');
+  const novemberDate = new Date('2023-11-18');
+  const decemberDate = new Date('2023-12-22');
+  const januaryDate = new Date('2024-01-10');
+  const februaryDate = new Date('2024-02-10');
+  const marchDate = new Date('2024-03-10');
+  const aprilDate = new Date('2024-04-10');
+  const mayDate = new Date('2024-05-10');
+
   const groupReading1 = await prisma.evaluationGroupReading.create({
     data: {
       reading_id: testReading1.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
-      due_date: new Date('2024-08-10'),
+      due_date: decemberDate,
+      created_at: octoberDate,
     },
   });
 
@@ -287,7 +297,8 @@ async function load() {
     data: {
       reading_id: testReading2.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
-      due_date: new Date('2024-10-10'),
+      due_date: mayDate,
+      created_at: novemberDate,
     },
   });
 
@@ -295,105 +306,182 @@ async function load() {
     data: {
       reading_id: testReading3.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
-      due_date: new Date('2024-09-10'),
+      due_date: januaryDate,
+      created_at: decemberDate,
     },
   });
 
-  const octoberDate = new Date('2023-10-5');
-  const novemberDate = new Date('2023-11-18');
-  const decemberDate = new Date('2023-12-22');
-
-  await addStudentReading(
-    1,
-    groupReading1.id,
-    groupReading1.reading_id,
-    octoberDate,
-  );
-  await addStudentReading(
-    1,
-    groupReading2.id,
-    groupReading2.reading_id,
-    octoberDate,
-  );
-  await addStudentReading(
-    1,
-    groupReading3.id,
-    groupReading3.reading_id,
-    novemberDate,
-  );
-  await addStudentReading(
-    1,
-    groupReading1.id,
-    groupReading1.reading_id,
-    novemberDate,
-  );
-  await addStudentReading(
-    1,
-    groupReading1.id,
-    groupReading1.reading_id,
-    decemberDate,
-  );
-  await addStudentReading(
-    1,
-    groupReading1.id,
-    groupReading1.reading_id,
-    decemberDate,
-  );
-
-  await addStudentReading(
-    2,
-    groupReading1.id,
-    groupReading1.reading_id,
-    octoberDate,
-  );
-  await addStudentReading(
-    2,
-    groupReading2.id,
-    groupReading2.reading_id,
-    octoberDate,
-  );
-  await addStudentReading(
-    2,
-    groupReading3.id,
-    groupReading3.reading_id,
-    novemberDate,
-  );
-  await addStudentReading(
-    2,
-    groupReading1.id,
-    groupReading1.reading_id,
-    novemberDate,
-  );
-  await addStudentReading(
-    2,
-    groupReading1.id,
-    groupReading1.reading_id,
-    decemberDate,
-  );
-  await addStudentReading(
-    2,
-    groupReading1.id,
-    groupReading1.reading_id,
-    decemberDate,
-  );
-
-  await prisma.evaluationGroupReading.create({
+  const groupReading4 = await prisma.evaluationGroupReading.create({
     data: {
       reading_id: testReading4.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
-      due_date: new Date('2024-09-10'),
+      due_date: februaryDate,
+      created_at: januaryDate,
     },
   });
 
-  await prisma.evaluationGroupReading.create({
+  const groupReading5 = await prisma.evaluationGroupReading.create({
     data: {
       reading_id: testReading5.id,
       evaluation_group_id: testTeacher.GroupsOwned[0].id,
-      due_date: new Date('2024-09-10'),
+      due_date: mayDate,
+      created_at: februaryDate,
     },
   });
 
+  const groupReading6 = await prisma.evaluationGroupReading.create({
+    data: {
+      reading_id: testReading6.id,
+      evaluation_group_id: testTeacher.GroupsOwned[0].id,
+      due_date: mayDate,
+      created_at: marchDate,
+    },
+  });
+
+  await addStudentReading(
+    1,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading3.id,
+    groupReading3.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading4.id,
+    groupReading4.reading_id,
+    januaryDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading5.id,
+    groupReading5.reading_id,
+    februaryDate,
+  );
+  await addStudentReading(
+    1,
+    groupReading6.id,
+    groupReading6.reading_id,
+    marchDate,
+  );
+
+  await addStudentReading(
+    2,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading2.id,
+    groupReading2.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading3.id,
+    groupReading3.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading4.id,
+    groupReading4.reading_id,
+    januaryDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading5.id,
+    groupReading5.reading_id,
+    februaryDate,
+  );
+  await addStudentReading(
+    2,
+    groupReading6.id,
+    groupReading6.reading_id,
+    marchDate,
+  );
+
   await addStudents(testTeacher);
+
+  await addStudentReading(
+    3,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    3,
+    groupReading2.id,
+    groupReading2.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    3,
+    groupReading3.id,
+    groupReading3.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    3,
+    groupReading4.id,
+    groupReading4.reading_id,
+    januaryDate,
+  );
+  await addStudentReading(
+    3,
+    groupReading5.id,
+    groupReading5.reading_id,
+    februaryDate,
+  );
+  await addStudentReading(
+    3,
+    groupReading6.id,
+    groupReading6.reading_id,
+    marchDate,
+  );
+
+  await addStudentReading(
+    4,
+    groupReading1.id,
+    groupReading1.reading_id,
+    octoberDate,
+  );
+  await addStudentReading(
+    4,
+    groupReading2.id,
+    groupReading2.reading_id,
+    novemberDate,
+  );
+  await addStudentReading(
+    4,
+    groupReading3.id,
+    groupReading3.reading_id,
+    decemberDate,
+  );
+  await addStudentReading(
+    4,
+    groupReading4.id,
+    groupReading4.reading_id,
+    januaryDate,
+  );
+  await addStudentReading(
+    4,
+    groupReading5.id,
+    groupReading5.reading_id,
+    februaryDate,
+  );
+  await addStudentReading(
+    4,
+    groupReading6.id,
+    groupReading6.reading_id,
+    marchDate,
+  );
+
   await addAchievements();
 }
 

@@ -49,7 +49,7 @@ export interface CategoriesAndSubcategoriesResponse {
 }
 
 interface StudentMonthlyAverage {
-  month: string;
+  month: number;
   student_avg_score: number;
   group_avg_score: number;
 }
@@ -152,34 +152,14 @@ interface AssignmentStatsResponse {
   group_name: string;
 }
 
-type MonthItem = {
-  month: string;
-};
-
-interface MonthlyScoreAverage extends MonthItem {
-  average_score: number;
-}
-
-interface MonthlyAssignmentsDone extends MonthItem {
-  assignments_done: number;
-}
-
-interface MonthlyAssignmentsPending extends MonthItem {
-  assignments_pending: number;
-}
-
-interface MonthlyAssignmentsDelayed extends MonthItem {
-  assignments_delayed: number;
-}
-
 interface GroupStatsResponse {
   assignments_done: number;
   assignments_pending: number;
   assignments_delayed: number;
-  monthly_score_averages: MonthlyScoreAverage[];
-  monthly_assignments_done: MonthlyAssignmentsDone[];
-  monthly_assignments_pending: MonthlyAssignmentsPending[];
-  monthly_assignments_delayed: MonthlyAssignmentsDelayed[];
+  monthly_score_averages: StatsMonthItem[];
+  monthly_assignments_done: StatsMonthItem[];
+  monthly_assignments_pending: StatsMonthItem[];
+  monthly_assignments_delayed: StatsMonthItem[];
 }
 
 interface ReadingsResponse {
@@ -373,7 +353,7 @@ const parseMonthlyAverage = (
   monthlyAverage: StudentMonthlyAverage,
 ): MonthlyAverage => ({
   groupAverageScore: monthlyAverage.group_avg_score,
-  month: new Date(monthlyAverage.month).getMonth(),
+  month: monthlyAverage.month,
   studentAverageScore: monthlyAverage.student_avg_score,
 });
 
@@ -397,29 +377,34 @@ const parseStudentStatsResponse = (
   groupId: stats.group_id,
 });
 
-const parseMonthData = (monthAverages: MonthItem[]): StatsMonthItem[] => {
+const parseMonthData = (monthAverages: StatsMonthItem[]): StatsMonthItem[] => {
   if (monthAverages.length === 0) {
     return [];
   }
-  const valueKey = Object.keys(monthAverages[0]).find(
-    (key) => key !== 'month',
-  ) as keyof MonthItem;
-  return monthAverages
-    .filter(({ month }) => !!month)
-    .map((monthItem) => ({
+
+  return monthAverages.map((monthItem) => {
+    var item = monthItem as any;
+    var value =
+      item.assignments_done ||
+      item.assignments_pending ||
+      item.assignments_delayed ||
+      item.score_average ||
+      0;
+    return {
       month: dayjs.utc(monthItem.month).month(),
-      value: Number(monthItem[valueKey]),
-    }));
+      value: Number(value),
+    };
+  });
 };
 
 const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({
   assignmentsDone: stats.assignments_done,
   assignmentsDelayed: stats.assignments_delayed,
   assignmentsPending: stats.assignments_pending,
-  monthlyScoreAverages: parseMonthData(stats.monthly_score_averages),
-  monthlyAssignmentsDone: parseMonthData(stats.monthly_assignments_done),
-  monthlyAssignmentsDelayed: parseMonthData(stats.monthly_assignments_delayed),
-  monthlyAssignmentsPending: parseMonthData(stats.monthly_assignments_pending),
+  monthlyScoreAverages: stats.monthly_score_averages,
+  monthlyAssignmentsDone: stats.monthly_assignments_done,
+  monthlyAssignmentsDelayed: stats.monthly_assignments_delayed,
+  monthlyAssignmentsPending: stats.monthly_assignments_pending,
 });
 
 const parseAssignmentStatsResponse = (
