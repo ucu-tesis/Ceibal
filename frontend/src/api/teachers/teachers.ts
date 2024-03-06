@@ -377,26 +377,6 @@ const parseStudentStatsResponse = (
   groupId: stats.group_id,
 });
 
-const parseMonthData = (monthAverages: StatsMonthItem[]): StatsMonthItem[] => {
-  if (monthAverages.length === 0) {
-    return [];
-  }
-
-  return monthAverages.map((monthItem) => {
-    var item = monthItem as any;
-    var value =
-      item.assignments_done ||
-      item.assignments_pending ||
-      item.assignments_delayed ||
-      item.score_average ||
-      0;
-    return {
-      month: dayjs.utc(monthItem.month).month(),
-      value: Number(value),
-    };
-  });
-};
-
 const parseGroupStatsResponse = (stats: GroupStatsResponse): GroupStats => ({
   assignmentsDone: stats.assignments_done,
   assignmentsDelayed: stats.assignments_delayed,
