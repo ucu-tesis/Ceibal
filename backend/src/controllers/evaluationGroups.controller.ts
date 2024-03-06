@@ -224,42 +224,42 @@ export class EvaluationGroupsController {
       count: number;
     };
 
+    const totalStudents = await this.prismaService.student.count({
+      where: {
+        EvaluationGroups: {
+          some: {
+            id: evaluationGroup.id,
+          },
+        },
+      },
+    });
+
     const monthlyAverages = (await this.prismaService.$queryRaw`
-      WITH evaluation_group_students AS (
+      WITH readings_with_recordings AS (
         SELECT
-          eg.id AS evaluation_group_id,
-          COUNT(s."B") AS total_students
-        FROM "EvaluationGroup" eg
-        JOIN "_EvaluationGroupToStudent" s ON s."A" = eg.id
-        WHERE eg.id = ${evaluationGroup.id}
-        GROUP BY eg.id
-      ),
-      readings_with_recordings AS (
-        SELECT
-          egr.evaluation_group_id,
-          egr.id AS egr_id,
+          egr.id,
           egr.due_date,
+          egr.created_at,
           COUNT(DISTINCT r.id) AS completed_assignments,
-          egs.total_students
+          AVG(a.score) AS reading_average
         FROM "EvaluationGroupReading" egr
-        JOIN evaluation_group_students egs ON egs.evaluation_group_id = egr.evaluation_group_id
         LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
-        GROUP BY egr.evaluation_group_id, egr.id, egs.total_students
+        LEFT JOIN "Analysis" a ON r.id = a.recording_id
+        WHERE egr.evaluation_group_id = ${evaluationGroup.id}
+        AND egr.created_at BETWEEN ${dateFrom.toISOString()}::timestamp AND ${dateTo.toISOString()}::timestamp
+        GROUP BY egr.id
       )
       SELECT
-        EXTRACT('month' FROM egr.created_at) AS month,
-        EXTRACT('year' FROM egr.created_at) AS year,
-        AVG(a.score) AS average_score,
+        EXTRACT('month' FROM rwr.created_at) AS month,
+        EXTRACT('year' FROM rwr.created_at) AS year,
+        AVG(rwr.reading_average) AS average_score,
+        COUNT(DISTINCT rwr.id) AS assignments_count,
         SUM(rwr.completed_assignments) AS assignments_done,
-        SUM(rwr.total_students - rwr.completed_assignments) FILTER (WHERE egr.due_date > NOW()) AS assignments_pending,
-        SUM(rwr.total_students - rwr.completed_assignments) FILTER (WHERE egr.due_date <= NOW()) AS assignments_delayed
+        (${totalStudents} * COUNT(DISTINCT rwr.id)) - SUM(rwr.completed_assignments) FILTER (WHERE rwr.due_date > NOW()) AS assignments_pending,
+        (${totalStudents} * COUNT(DISTINCT rwr.id)) - SUM(rwr.completed_assignments) FILTER (WHERE rwr.due_date <= NOW()) AS assignments_delayed
       FROM readings_with_recordings rwr
-      JOIN "EvaluationGroupReading" egr ON rwr.egr_id = egr.id
-      LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
-      LEFT JOIN "Analysis" a ON r.id = a.recording_id
-      WHERE egr.created_at BETWEEN ${dateFrom.toISOString()}::timestamp AND ${dateTo.toISOString()}::timestamp
-      GROUP BY EXTRACT('year' FROM egr.created_at), EXTRACT('month' FROM egr.created_at)
-      ORDER BY EXTRACT('year' FROM egr.created_at), EXTRACT('month' FROM egr.created_at);
+      GROUP BY EXTRACT('year' FROM rwr.created_at), EXTRACT('month' FROM rwr.created_at)
+      ORDER BY EXTRACT('year' FROM rwr.created_at), EXTRACT('month' FROM rwr.created_at);
     `) as {
       month: Date;
       average_score: number;
