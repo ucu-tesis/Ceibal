@@ -120,7 +120,7 @@ export default function Page({ params }: { params: Params }) {
     labels: mostRepeatedWords.map(({ word }) => word),
     datasets: [
       {
-        label: 'My First Dataset',
+        label: 'Repeticiones',
         data: mostRepeatedWords.map(({ repetitionCount }) => repetitionCount),
         backgroundColor: [
           'rgb(255, 99, 132)',
