@@ -129,7 +129,9 @@ export class StudentsController {
         },
       },
       Recordings: {
-        none: {},
+        none: {
+          student_id: userId,
+        },
       },
     };
 
@@ -198,7 +200,9 @@ export class StudentsController {
           },
         },
         Recordings: {
-          none: {},
+          none: {
+            student_id: userId,
+          },
         },
       },
     });
@@ -225,7 +229,9 @@ export class StudentsController {
             },
           },
           Recordings: {
-            none: {},
+            none: {
+              student_id: userId,
+            },
           },
         },
       });
