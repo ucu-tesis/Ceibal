@@ -180,70 +180,86 @@ export class EvaluationGroupsController {
       throw new UnprocessableEntityException('Evaluation group not found');
     }
 
-    const assignmentsDoneCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
+    const assignmentsDoneCount = await this.prismaService.recording.count({
+      where: {
+        EvaluationGroupReading: {
           evaluation_group_id: evaluationGroup.id,
-          Recordings: {
-            some: {
-              created_at: {
-                gte: dateFrom.toISOString(),
-                lte: dateTo.toISOString(),
-              },
-            },
+          created_at: {
+            gte: dateFrom.toISOString(),
+            lte: dateTo.toISOString(),
           },
         },
-      });
+      },
+    });
 
-    const now = new Date();
-    const inDateRangeCondition = {
-      AND: [
-        { created_at: { lte: dateTo.toISOString() } },
-        { due_date: { gte: dateFrom.toISOString() } },
-      ],
+    const assignmentsPending = (await this.prismaService.$queryRaw`
+      SELECT CAST(COUNT(1) AS INTEGER)
+      FROM "EvaluationGroupReading" egr
+      INNER JOIN "_EvaluationGroupToStudent" s ON s."A" = egr.evaluation_group_id
+      WHERE egr.evaluation_group_id = ${evaluationGroup.id}
+      AND egr.created_at BETWEEN ${dateFrom.toISOString()}::timestamp AND ${dateTo.toISOString()}::timestamp
+      AND egr.due_date > NOW()
+      AND NOT EXISTS (
+        SELECT 1 FROM "Recording" r
+        WHERE r.evaluation_group_reading_id = egr.id
+        AND r.student_id = s."B"
+      )
+    `) as {
+      count: number;
+    }[];
+
+    const assignmentsDelayed = (await this.prismaService.$queryRaw`
+      SELECT CAST(COUNT(1) AS INTEGER)
+      FROM "EvaluationGroupReading" egr
+      INNER JOIN "_EvaluationGroupToStudent" s ON s."A" = egr.evaluation_group_id
+      WHERE egr.evaluation_group_id = ${evaluationGroup.id}
+      AND egr.created_at BETWEEN ${dateFrom.toISOString()}::timestamp AND ${dateTo.toISOString()}::timestamp
+      AND egr.due_date <= NOW()
+      AND NOT EXISTS (
+        SELECT 1 FROM "Recording" r
+        WHERE r.evaluation_group_reading_id = egr.id
+        AND r.student_id = s."B"
+      )
+    `) as {
+      count: number;
     };
 
-    const assignmentsPendingCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            gt: now,
+    const totalStudents = await this.prismaService.student.count({
+      where: {
+        EvaluationGroups: {
+          some: {
+            id: evaluationGroup.id,
           },
-          Recordings: {
-            none: {},
-          },
-          ...inDateRangeCondition,
         },
-      });
-
-    const assignmentsDelayedCount =
-      await this.prismaService.evaluationGroupReading.count({
-        where: {
-          evaluation_group_id: evaluationGroup.id,
-          due_date: {
-            lt: now,
-          },
-          Recordings: {
-            none: {},
-          },
-          ...inDateRangeCondition,
-        },
-      });
+      },
+    });
 
     const monthlyAverages = (await this.prismaService.$queryRaw`
+      WITH readings_with_recordings AS (
+        SELECT
+          egr.id,
+          egr.due_date,
+          egr.created_at,
+          COUNT(DISTINCT r.id) AS completed_assignments,
+          AVG(a.score) AS reading_average
+        FROM "EvaluationGroupReading" egr
+        LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
+        LEFT JOIN "Analysis" a ON r.id = a.recording_id
+        WHERE egr.evaluation_group_id = ${evaluationGroup.id}
+        AND egr.created_at BETWEEN ${dateFrom.toISOString()}::timestamp AND ${dateTo.toISOString()}::timestamp
+        GROUP BY egr.id
+      )
       SELECT
-        DATE_TRUNC('month', egr.created_at) as month,
-        AVG(a.score) as average_score,
-        CAST(COUNT(DISTINCT CASE WHEN r.id IS NOT NULL THEN egr.id END) AS INTEGER) as assignments_done,
-        CAST(COUNT(DISTINCT CASE WHEN r.id IS NULL AND egr.due_date > NOW() THEN egr.id END) AS INTEGER) as assignments_pending,
-        CAST(COUNT(DISTINCT CASE WHEN r.id IS NULL AND egr.due_date <= NOW() THEN egr.id END) AS INTEGER) as assignments_delayed
-      FROM "EvaluationGroupReading" egr
-      LEFT JOIN "Recording" r ON egr.id = r.evaluation_group_reading_id
-      LEFT JOIN "Analysis" a ON r.id = a.recording_id
-      WHERE egr.evaluation_group_id = ${evaluationGroup.id}
-      GROUP BY DATE_TRUNC('month', egr.created_at)
-      ORDER BY month;
+        EXTRACT('month' FROM rwr.created_at) AS month,
+        EXTRACT('year' FROM rwr.created_at) AS year,
+        AVG(rwr.reading_average) AS average_score,
+        COUNT(DISTINCT rwr.id) AS assignments_count,
+        SUM(rwr.completed_assignments) AS assignments_done,
+        (${totalStudents} * COUNT(DISTINCT rwr.id)) - SUM(rwr.completed_assignments) FILTER (WHERE rwr.due_date > NOW()) AS assignments_pending,
+        (${totalStudents} * COUNT(DISTINCT rwr.id)) - SUM(rwr.completed_assignments) FILTER (WHERE rwr.due_date <= NOW()) AS assignments_delayed
+      FROM readings_with_recordings rwr
+      GROUP BY EXTRACT('year' FROM rwr.created_at), EXTRACT('month' FROM rwr.created_at)
+      ORDER BY EXTRACT('year' FROM rwr.created_at), EXTRACT('month' FROM rwr.created_at);
     `) as {
       month: Date;
       average_score: number;
@@ -254,23 +270,23 @@ export class EvaluationGroupsController {
 
     return {
       assignments_done: assignmentsDoneCount,
-      assignments_pending: assignmentsPendingCount,
-      assignments_delayed: assignmentsDelayedCount,
+      assignments_pending: assignmentsPending[0].count,
+      assignments_delayed: assignmentsDelayed[0].count,
       monthly_score_averages: monthlyAverages.map((m) => ({
-        month: m.month,
-        average_score: m.average_score || 0,
+        month: Number(m.month) - 1,
+        value: m.average_score || 0,
       })),
       monthly_assignments_done: monthlyAverages.map((m) => ({
-        month: m.month,
-        assignments_done: m.assignments_done || 0,
+        month: Number(m.month) - 1,
+        value: m.assignments_done || 0,
       })),
       monthly_assignments_pending: monthlyAverages.map((m) => ({
-        month: m.month,
-        assignments_pending: m.assignments_pending || 0,
+        month: Number(m.month) - 1,
+        value: m.assignments_pending || 0,
       })),
       monthly_assignments_delayed: monthlyAverages.map((m) => ({
-        month: m.month,
-        assignments_delayed: m.assignments_delayed || 0,
+        month: Number(m.month) - 1,
+        value: m.assignments_delayed || 0,
       })),
     };
   }
@@ -358,25 +374,20 @@ export class EvaluationGroupsController {
         }
       } else {
         const lastRecording = Recordings[Recordings.length - 1];
-        const recordingDate = dayjs(lastRecording.created_at);
-        const isInDateRange =
-          recordingDate.isAfter(dateFrom) && recordingDate.isBefore(dateTo);
 
-        if (isInDateRange) {
-          doneAssignmentsCount += 1;
+        doneAssignmentsCount += 1;
 
-          const lastAnalysis = lastRecording.Analysis.length
-            ? lastRecording.Analysis[lastRecording.Analysis.length - 1]
-            : null;
+        const lastAnalysis = lastRecording.Analysis.length
+          ? lastRecording.Analysis[lastRecording.Analysis.length - 1]
+          : null;
 
-          const isAnalysisCompleted =
-            lastAnalysis && lastAnalysis.status === AnalysisStatus.COMPLETED;
-          if (isAnalysisCompleted) {
-            addAverage('score', lastAnalysis.score);
-            addAverage('silences_count', lastAnalysis.silences_count);
-            addAverage('repetitions_count', lastAnalysis.repetitions_count);
-            addAverage('similarity_error', lastAnalysis.similarity_error);
-          }
+        const isAnalysisCompleted =
+          lastAnalysis && lastAnalysis.status === AnalysisStatus.COMPLETED;
+        if (isAnalysisCompleted) {
+          addAverage('score', lastAnalysis.score);
+          addAverage('silences_count', lastAnalysis.silences_count);
+          addAverage('repetitions_count', lastAnalysis.repetitions_count);
+          addAverage('similarity_error', lastAnalysis.similarity_error);
         }
       }
     });
@@ -388,8 +399,11 @@ export class EvaluationGroupsController {
     // Prisma does not support GROUP BY month for dates, so we have to use raw SQL
     const monthlyAverages = await this.prismaService.$queryRaw`
       SELECT
-        DATE_TRUNC('month', a.created_at) as month,
-        AVG(a.score) FILTER (WHERE r.student_id = ${student.id}) as student_avg_score,
+        (EXTRACT('month' FROM egr.created_at)::INTEGER - 1) as month,
+        EXTRACT('year' FROM egr.created_at)::INTEGER as year,
+        AVG(a.score) FILTER (WHERE r.student_id = ${
+          student.id
+        }) as student_avg_score,
         AVG(a.score) as group_avg_score
       FROM "Analysis" a
       JOIN "Recording" r ON a.recording_id = r.id
@@ -397,8 +411,9 @@ export class EvaluationGroupsController {
       JOIN "EvaluationGroupReading" egr ON r.evaluation_group_reading_id = egr.id
       JOIN "EvaluationGroup" eg ON egr.evaluation_group_id = eg.id
       WHERE eg.id = ${evaluationGroup.id}
-      GROUP BY DATE_TRUNC('month', a.created_at)
-      ORDER BY month;
+      AND egr.created_at between ${dateFrom.toISOString()}::timestamp and ${dateTo.toISOString()}::timestamp
+      GROUP BY EXTRACT('year' FROM egr.created_at), EXTRACT('month' FROM egr.created_at)
+      ORDER BY year ASC, month ASC;
     `;
 
     return {

@@ -5,9 +5,6 @@ import dayjs from 'dayjs';
 
 const select = (data: StudentStats): StudentStats => ({
   ...data,
-  monthlyAverages: [...data.monthlyAverages].sort(
-    ({ month: lhm }, { month: rhm }) => lhm - rhm,
-  ),
 });
 
 const useFetchStudentStats = (

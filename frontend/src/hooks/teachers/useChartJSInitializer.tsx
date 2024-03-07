@@ -11,6 +11,7 @@ import {
   Legend,
   BarElement,
   ArcElement,
+  Tooltip,
 } from 'chart.js';
 
 const useChartJSInitializer = () => {
@@ -26,6 +27,7 @@ const useChartJSInitializer = () => {
     RadialLinearScale,
     PieController,
     ArcElement,
+    Tooltip,
   );
 };
 

@@ -9,6 +9,9 @@ export const chartOptions = (title: string) => {
           weight: '500',
         },
       },
+      tooltip: {
+        enabled: true,
+      },
     },
   };
 };
