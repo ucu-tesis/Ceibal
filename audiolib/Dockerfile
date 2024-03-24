@@ -6,9 +6,11 @@ RUN conda create -n audiodsp python=3.8 kaldi pynini
 
 SHELL ["conda", "run", "-n", "audiodsp", "/bin/bash", "-c"]
 
-RUN conda install montreal-forced-aligner pgvector hdbscan
+RUN conda install montreal-forced-aligner=2.0.6 pgvector hdbscan
 
 RUN conda install onnxruntime webrtcvad
+
+RUN conda install gcc
 
 RUN pip install allosaurus
 
